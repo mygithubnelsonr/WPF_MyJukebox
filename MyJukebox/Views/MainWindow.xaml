@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:MyJukebox"
         mc:Ignorable="d"
         Title="MyJukebox" Height="900" Width="1200" WindowStartupLocation="CenterScreen" Background="#FF0991C3"
-            Icon="/Images/Jukebox.ico" WindowStyle="None" MouseLeftButtonDown="Move_Window" Loaded="Window_Loaded" >
+            Icon="/Images/Jukebox.ico" WindowStyle="None"
+            MouseLeftButtonDown="Move_Window" Loaded="Window_Loaded" >
+
     <Window.Resources>
         <Style TargetType="TabItem">
             <Setter Property="Background" Value="Aqua"/>
@@ -22,8 +24,8 @@
                     </LinearGradientBrush>
                 </Setter.Value>
             </Setter>
-            <Setter Property="Foreground" Value="#FFCCD1E4"/>
-            <!--<Setter Property="TextElement.Foreground" Value="White"/>-->
+            <Setter Property="Foreground" Value="Blue"/>
+            <Setter Property="FontSize" Value="14"/>
         </Style>
     </Window.Resources>
     <Window.CommandBindings>
@@ -34,52 +36,50 @@
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Text="v1.0.1" Margin="0,0,4,0"/>
+                <TextBlock Text="v1.0.1" Margin="0,0,4,0" Foreground="White"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Text="c NRSoft"/>
+                <TextBlock Text="c NRSoft" Foreground="White"/>
             </StatusBarItem>
+
+            <StatusBarItem DockPanel.Dock="Right">
+                <TextBlock x:Name="statusDuration" Text="00:00" Margin="0 0 10 0" Foreground="White"/>
+            </StatusBarItem>
+             <StatusBarItem DockPanel.Dock="Right">
+                <TextBlock Text="/" Foreground="AliceBlue"/>
+            </StatusBarItem>
+            <StatusBarItem DockPanel.Dock="Right">
+                <TextBlock x:Name="statusProgress" Text="00:00" Foreground="White"/>
+            </StatusBarItem >
             <StatusBarItem DockPanel.Dock="Left">
                 <TextBlock Text="Genre:"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusGenre" Text=""/>
+                <TextBlock x:Name="statusGenre" Text="" Foreground="White"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem DockPanel.Dock="Left">
                 <TextBlock Text="Catalog:"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusCatalog" Text=""/>
+                <TextBlock x:Name="statusCatalog" Text="" Foreground="White"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem DockPanel.Dock="Left">
                 <TextBlock Text="Artist:"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusArtist" Text=""/>
+                <TextBlock x:Name="statusArtist" Text="" Foreground="White"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem DockPanel.Dock="Left">
                 <TextBlock Text="Album:"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusAlbum" Text=""/>
+                <TextBlock x:Name="statusAlbum" Text="" Foreground="White"/>
             </StatusBarItem>
             <Separator/>
-            <Separator/>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusProgress" Text="00:00"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock Text="/" Foreground="AliceBlue"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusDuration" Text="00:00"/>
-            </StatusBarItem>
-
-            
-            
+            <StatusBarItem DockPanel.Dock="Left" Content="" Width="Auto"/>
         </StatusBar>
         <Grid DockPanel.Dock="Top" Height="50" Background="{StaticResource headerBackground}">
             <Grid.ColumnDefinitions>
@@ -237,80 +237,99 @@
             </Border>
         </Grid>
         </Expander>
-        <ToolBarTray DockPanel.Dock="Top" Background="LightBlue">
-            <ToolBar Band="0" Height="34">
-                <Button Content="Play" Width="60" Margin="10 0 10 0" FontWeight="Bold" Command="MediaCommands.Play"
-                        Background="#FF75B9CF"/>
-                <Button Content="Pause" Width="60" Margin="10 0 10 0" FontWeight="Bold" Command="MediaCommands.Pause"
-                        Background="#FF75B9CF"/>
-                <Button Content="Stop" Width="60" Margin="10 0 10 0" FontWeight="Bold" Command="MediaCommands.Stop"
-                        Background="#FF75B9CF"/>
 
-                <ToggleButton Margin="20 0 0 0">
-                    <Image Source="/Images/SpeakerOn.ico" />
-                </ToggleButton>
-                <Slider x:Name="sliderVolume" Width="120" Height="24" Margin="5 0 10 0" Background="#FF75B9CF" Minimum="0" Maximum="1" 
-                        IsSnapToTickEnabled="False"
-                        TickPlacement="TopLeft"
-                        TickFrequency="0.1"
-                        MouseWheel="sliderVolume_MouseWheel"
-                        ValueChanged="sliderVolume_ValueChanged"
-                        Value="{Binding ElementName=mediaPlayer, Path=Volume}">
-                </Slider>
-                
-                <Slider x:Name="sliderPosition" Minimum="0" Maximum="1" Width="120" Height="24" Margin="10 0 10 0" Background="#FF75B9CF"
-                        TickPlacement="TopLeft"
-                        Thumb.DragStarted="sliderPosition_DragStarted"
-                        Thumb.DragCompleted="sliderPosition_DragCompleted"
-                        ValueChanged="sliderPosition_ValueChanged">
-                </Slider>
-            </ToolBar>
-            <ToolBar Band="1" Height="34" FontSize="14" Foreground="Blue">
-                <Label Content="Enter Query: " Foreground="DarkBlue"/>
-                <TextBox x:Name="textboxQuery" Text="" Height="24" Width="200" Background="Beige" IsReadOnly="False" KeyDown="textboxQuery_KeyDown">
+        <Grid Margin="10 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <ToolBarTray Grid.Row="0" Background="LightBlue">
+                <ToolBar Band="0" Height="Auto">
+                    <Button Command="MediaCommands.Play" Style="{StaticResource RundButton}">
+                        <Image Source="/Images/PlaybackPlay.png" />
+                    </Button>
+                    <Button Command="MediaCommands.Pause" Style="{StaticResource RundButton}">
+                        <Image Source="/Images/PlaybackPause.png"/>
+                    </Button>
+                    <Button Command="MediaCommands.Stop"  Style="{StaticResource RundButton}">
+                        <Image Source="/Images/PlaybackStop.png" />
+                    </Button>
+                    <Button x:Name="Playback_Loop" Style="{StaticResource RundButton}" Click="Playback_Loop_Click">
+                        <Image Source="/Images/PlaybackLoop.png"/>
+                    </Button>
+                    <Button x:Name="Playback_Shuffle"  Style="{StaticResource RundButton}" Click="Playback_Shuffle_Click">
+                        <Image Source="/Images/PlaybackShuffel.png"/>
+                    </Button>
+                    <ToggleButton Margin="20 0 0 0">
+                        <Image Source="/Images/SpeakerOn.ico" />
+                    </ToggleButton>
+                    <Slider x:Name="sliderVolume" Width="120" Height="24" Margin="5 0 10 0" Background="#FF75B9CF" Minimum="0" Maximum="1" 
+                            IsSnapToTickEnabled="False"
+                            TickPlacement="TopLeft"
+                            TickFrequency="0.1"
+                            MouseWheel="sliderVolume_MouseWheel"
+                            ValueChanged="sliderVolume_ValueChanged"
+                            Value="{Binding ElementName=mediaPlayer, Path=Volume}">
+                    </Slider>
+                    <Slider x:Name="sliderPosition" Minimum="0" Maximum="1" Width="120" Height="24" Margin="10 0 10 0" Background="#FF75B9CF"
+                            TickPlacement="TopLeft"
+                            Thumb.DragStarted="sliderPosition_DragStarted"
+                            Thumb.DragCompleted="sliderPosition_DragCompleted"
+                            ValueChanged="sliderPosition_ValueChanged">
+                    </Slider>
+                </ToolBar>
+                <ToolBar Band="1" Height="34" FontSize="14" Foreground="Blue">
+                    <Label Content="Enter Query: " Foreground="DarkBlue"/>
+                    <TextBox x:Name="textboxQuery" Text="" Height="24" Width="200" Background="Beige" FontWeight="Medium"
+                             IsReadOnly="False" KeyDown="textboxQuery_KeyDown">
 
-                </TextBox>
-                <Button x:Name="buttonQueryClear" Margin="4 0" Click="buttonQueryClear_Click">
-                    <Image Source="/Images/QueryClear.png" />
-                </Button>
-                <Button x:Name="buttonQuerySearch" Margin="4 0" Click="buttonQuerySearch_Click">
-                    <Image Source="/Images/QuerySearch.ico" />
-                </Button>
-                <Button x:Name="buttonQuerySave" Margin="4 0"  Click="buttonQuerySave_Click">
-                    <Image Source="/Images/QuerySave.ico" />
-                </Button>
-                <Label Content="Stored Queries:" Margin="20 0 0 0" Foreground="DarkBlue" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
-                <ComboBox x:Name="comboboxStoredQueries" Width="200" Margin="10 0" IsEditable="True"
-                         SelectionChanged="comboboxStoredQueries_SelectionChanged" KeyDown="comboboxStoredQueries_KeyDown"/>
-                <Button x:Name="buttonQueryDelete" Click="buttonQueryDelete_Click">
-                    <Image Source="/Images/QueryDelete.ico" />
-                </Button>
-                <Button x:Name="buttonTest" Content="Test" Padding="10 2 10 2" Margin="10 0 10 0" Background="#FF75B9CF" Foreground="DarkBlue" Click="buttonTest_Click"/>
-            </ToolBar>
-        </ToolBarTray>
-
-        <MediaElement Name="mediaPlayer" LoadedBehavior="Manual" Stretch="None" Volume="0" Height="20" Width="20"
-                      MediaEnded="mediaplayer_MediaEnded"/>
+                    </TextBox>
+                    <Button x:Name="buttonQueryClear" Margin="4 0" Click="buttonQueryClear_Click">
+                        <Image Source="/Images/QueryClear.png" />
+                    </Button>
+                    <Button x:Name="buttonQuerySearch" Margin="4 0" Click="buttonQuerySearch_Click">
+                        <Image Source="/Images/QuerySearch.ico" />
+                    </Button>
+                    <Button x:Name="buttonQuerySave" Margin="4 0"  Click="buttonQuerySave_Click">
+                        <Image Source="/Images/QuerySave.ico" />
+                    </Button>
+                    <Label Content="Stored Queries:" Margin="20 0 0 0" Foreground="DarkBlue" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+                    <ComboBox x:Name="comboboxStoredQueries" Width="200" Margin="10 0" IsEditable="True" FontWeight="Medium"
+                             SelectionChanged="comboboxStoredQueries_SelectionChanged" KeyDown="comboboxStoredQueries_KeyDown"/>
+                    <Button x:Name="buttonQueryDelete" Click="buttonQueryDelete_Click">
+                        <Image Source="/Images/QueryDelete.ico" />
+                    </Button>
+                    <Button x:Name="buttonTest" Content="Test" Padding="10 2 10 2" Margin="10 0 10 0" Background="#FF75B9CF" Foreground="DarkBlue" Click="buttonTest_Click"/>
+                </ToolBar>
+            </ToolBarTray>
         
-        <DataGrid x:Name="datagrid"
-                  DockPanel.Dock="Right" VerticalAlignment="Stretch" Background="LightGray"
-                  CanUserSortColumns="True" ScrollViewer.VerticalScrollBarVisibility="Visible" AllowDrop="True"
-                  AlternationCount="1" AlternatingRowBackground="#FFB9DFF7" RowBackground="#FFD2EAF7"
-                  IsReadOnly="True" SelectionMode="Single" ColumnHeaderStyle="{StaticResource datagridHeaderStyle}"
-                  SelectionChanged="datagrid_SelectionChanged">
-            <DataGrid.RowStyle>
-                <Style TargetType="DataGridRow">
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="FontWeight" Value="Bold"/>
-                            <Setter Property="Foreground" Value="DarkBlue"/>
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="FontWeight" Value="Bold"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.RowStyle>
-        </DataGrid>
+            <DataGrid Grid.Row="1"  x:Name="datagrid"
+                      DockPanel.Dock="Right" VerticalAlignment="Stretch" Background="LightGray"
+                      CanUserSortColumns="True" ScrollViewer.VerticalScrollBarVisibility="Visible" AllowDrop="True"
+                      AlternationCount="1" AlternatingRowBackground="#FFB9DFF7" RowBackground="#FFD2EAF7"
+                      IsReadOnly="True" SelectionMode="Single" ColumnHeaderStyle="{StaticResource datagridHeaderStyle}"
+                      SelectionChanged="datagrid_SelectionChanged">
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF0078D7"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"/>
+                </DataGrid.Resources>
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Foreground" Value="DarkBlue"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+            </DataGrid>
+
+            <MediaElement Grid.Row="1" Name="mediaPlayer" LoadedBehavior="Manual" Stretch="None" Volume="0" Height="20" Width="20"
+                          MediaEnded="mediaplayer_MediaEnded"/>            
+        </Grid>
     </DockPanel>
 </Window>

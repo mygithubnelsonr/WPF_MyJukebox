@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace MyJukebox
@@ -90,7 +91,7 @@ namespace MyJukebox
             FillCatalogsAsync();
             FillArtistsAsync();
             FillAlbumsAsync();
-            SetInfo(listboxGenres);
+            statusGenre.Text = genre;
             FillDatagridByTabLogical();
         }
 
@@ -106,8 +107,7 @@ namespace MyJukebox
             FillAlbumsAsync();
             string album = listboxAlbums.SelectedItem.ToString();
             AudioStates.Album = album == "Alle" ? "" : album;
-
-            SetInfo(listboxCatalogs);
+            statusAlbum.Text = album;
             FillDatagridByTabLogical();
         }
 
@@ -116,7 +116,7 @@ namespace MyJukebox
             string artist = listboxArtists.SelectedItem.ToString();
             AudioStates.Artist = artist == "Alle" ? "" : artist;
             FillAlbumsAsync();
-            SetInfo(listboxArtists);
+            statusArtist.Text = artist;
             FillDatagridByTabLogical();
         }
 
@@ -124,7 +124,7 @@ namespace MyJukebox
         {
             string album = listboxAlbums.SelectedItem.ToString();
             AudioStates.Album = album == "Alle" ? "" : album;
-            SetInfo(listboxAlbums);
+            statusAlbum.Text = album;
             FillDatagridByTabLogical();
         }
 
@@ -151,16 +151,6 @@ namespace MyJukebox
         #endregion
 
         #region Methods
-        private void SetInfo(object sender)
-        {
-            //ListBox listBox = sender as ListBox;
-            //string name = (string)listBox.Tag;
-            //int id = listBox.SelectedIndex;
-            //labelInfo.Content = $"List: {name}, ID: {id}";
-
-
-
-        }
 
         #endregion
 
@@ -245,6 +235,9 @@ namespace MyJukebox
             var rowlist = (vSong)datagrid.SelectedItem;
             string fullpath = $"{rowlist.Pfad}\\{rowlist.FileName}";
             mediaPlayer.Source = new Uri(fullpath);
+
+            this.Title = $"{rowlist.Artist} - {rowlist.Titel}";
+
         }
 
         private void FillDatagridByTabLogical()
@@ -252,13 +245,6 @@ namespace MyJukebox
             _dataLoaded = false;
             List<vSong> results = DataGetSet.GetTablogicalResults();
             datagrid.ItemsSource = results;
-            //if (results != null)
-            //{
-            //    datagrid.SelectedIndex = 0;
-            //    datagrid.ScrollIntoView(datagrid.SelectedItem);
-            //    datagrid.Focus();
-            //    _dataLoaded = true;
-            //}
             _dataLoaded = true;
 
         }
@@ -271,24 +257,6 @@ namespace MyJukebox
             statusArtist.Text = AudioStates.Artist;
             statusAlbum.Text = AudioStates.Album;
         }
-
-        //private void buttonPlay_Click(object sender, RoutedEventArgs e)
-        //{
-        //    var rowlist = (vSong)datagrid.SelectedItem;
-        //    string fullpath = $"{rowlist.Pfad}\\{rowlist.FileName}";
-        //    mediaPlayer.Source = new Uri(fullpath);
-        //    mediaPlayer.Play();
-        //}
-
-        //private void buttonPause_Click(object sender, RoutedEventArgs e)
-        //{
-        //    mediaPlayer.Pause();
-        //}
-
-        //private void buttonStop_Click(object sender, RoutedEventArgs e)
-        //{
-        //    mediaPlayer.Stop();
-        //}
 
         #region Slider Events
         private void sliderVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -324,6 +292,7 @@ namespace MyJukebox
         private void buttonQueryClear_Click(object sender, RoutedEventArgs e)
         {
             textboxQuery.Text = "";
+            FillDatagridByTabLogical();
         }
 
         private void buttonQuerySearch_Click(object sender, RoutedEventArgs e)
@@ -378,8 +347,12 @@ namespace MyJukebox
 
         private void comboboxStoredQueries_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            timer.Stop();
+            mediaPlayer.Stop();
             textboxQuery.Text = (string)comboboxStoredQueries.SelectedItem;
+            _dataLoaded = false;
             FillDatagridByQuery();
+            _dataLoaded = true;
         }
 
         private void comboboxStoredQueries_KeyDown(object sender, KeyEventArgs e)
@@ -443,6 +416,16 @@ namespace MyJukebox
             var currentItem = datagrid.SelectedIndex;
             if (currentItem + 1 < datagrid.Items.Count)
                 datagrid.SelectedIndex = currentItem + 1;
+        }
+
+        private void Playback_Loop_Click(object sender, RoutedEventArgs e)
+        {
+            Playback_Loop.Background = Brushes.Blue;
+        }
+
+        private void Playback_Shuffle_Click(object sender, RoutedEventArgs e)
+        {
+            Playback_Shuffle.Background = Brushes.Blue;
         }
 
         #endregion
