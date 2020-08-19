@@ -18,7 +18,8 @@
         <Style x:Key="exitButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="WhiteSmoke"/>
-            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontSize" Value="26"/>
+            <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="ToolTip" Value="Close"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -28,6 +29,23 @@
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="maxButton" TargetType="ToggleButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="WhiteSmoke"/>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="26"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="ToolTip" Value="Close"/>
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="Content" Value="Black"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -94,34 +112,33 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Height" Value="40"/>
         </Style>
-        <Style TargetType="Button" x:Key="RundButton">
-            <Setter Property="Background" Value="Blue"/>
-            <Setter Property="Foreground" Value="WhiteSmoke"/>
-            <Setter Property="Margin" Value="5 2"/>
-            <Setter Property="Height" Value="38"/>
-            <Setter Property="Width" Value="38"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Border Background="{TemplateBinding Background}" CornerRadius="45"/>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF2AB4F5"/>
+
+        <ControlTemplate x:Key="rundButton" TargetType="Button">
+            <Grid>
+                <Ellipse x:Name="backgroundElement" Fill="WhiteSmoke" StrokeThickness="4" Stroke="Blue"/>
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Stroke" TargetName="backgroundElement" Value="#FF39A8F5"/>
                 </Trigger>
-            </Style.Triggers>
-        </Style>
-        <Style TargetType="Button" x:Key="RundbuttonToggle" BasedOn="{StaticResource RundButton}">
-            <Style.Triggers>
-                <Trigger Property="IsFocused" Value="True">
-                    <Setter Property="Background" Value="#FF2AB4F5"/>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="toggleButton" TargetType="ToggleButton">
+            <Grid>
+                <Ellipse x:Name="ellipse" Fill="WhiteSmoke" StrokeThickness="4" Stroke="Blue"/>
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Stroke" TargetName="ellipse" Value="#FF39A8F5"/>
                 </Trigger>
-            </Style.Triggers>
-        </Style>
+                <Trigger Property="IsChecked" Value="true">
+                    <Setter Property="Fill" TargetName="ellipse" Value="LightBlue"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
     </Application.Resources>
 </Application>

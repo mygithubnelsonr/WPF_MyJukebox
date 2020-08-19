@@ -209,11 +209,11 @@
       <DependentUpon>MyJukeboxModel.edmx</DependentUpon>
       <LastGenOutput>MyJukeboxModel.cs</LastGenOutput>
     </Content>
-    <Resource Include="Images\PlaybackShuffel.png" />
-    <Resource Include="Images\PlaybackPause.png" />
-    <Resource Include="Images\PlaybackLoop.png" />
     <Resource Include="Images\PlaybackStop.png" />
     <Resource Include="Images\PlaybackPlay.png" />
+    <Resource Include="Images\PlaybackPause.png" />
+    <Resource Include="Images\PlaybackLoop.png" />
+    <Resource Include="Images\PlaybackShuffel.png" />
     <Resource Include="Images\SpeakerOn.ico" />
     <Resource Include="Images\QueryDelete.ico" />
     <Resource Include="Images\QuerySave.ico" />

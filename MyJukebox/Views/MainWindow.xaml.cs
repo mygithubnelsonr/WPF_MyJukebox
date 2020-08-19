@@ -4,6 +4,7 @@ using MyJukebox.DAL;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -146,6 +147,15 @@ namespace MyJukebox
         private void buttonMinimize_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
+        }
+        private void buttonMaximize_Checked(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Maximized;
+        }
+
+        private void buttonMaximize_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Normal;
         }
 
         #endregion
@@ -440,6 +450,26 @@ namespace MyJukebox
                 sliderPosition.TickFrequency = sliderPosition.Maximum / 10;
                 statusDuration.Text = TimeSpan.FromSeconds(sliderPosition.Maximum).ToString(@"mm\:ss");
             }
+        }
+
+        private void Playback_Loop_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Playback_Loop_Unchecked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Playback_Shuffle_Checked(object sender, RoutedEventArgs e)
+        {
+            Debug.Print("Playback_Shuffle_Checked");
+        }
+
+        private void Playback_Shuffle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Debug.Print("Playback_Shuffle_Unchecked");
         }
     }
 }

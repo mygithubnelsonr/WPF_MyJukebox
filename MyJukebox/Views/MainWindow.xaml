@@ -85,11 +85,10 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="1" Margin="10 0" HorizontalAlignment="Left">
-                <TextBlock x:Name="textblockHeader" Foreground="White" FontSize="26" Width="192">
+            <StackPanel Grid.Column="1" Margin="10 0" HorizontalAlignment="Left" Width="300">
+                <TextBlock x:Name="textblockHeader" Foreground="White" FontSize="26">
                     <Bold FontWeight="ExtraBold" Foreground="LightGray">
                         My</Bold><Run FontWeight="ExtraBold" FontSize="28" Foreground="Red">J</Run>
                         <Italic>ukebox</Italic>
@@ -112,15 +111,18 @@
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </StackPanel>
-            <Button Grid.Column="2" x:Name="buttonMinimize" Margin="0 4 0 0" Style="{StaticResource exitButton}"
-                VerticalAlignment="Top" Click="buttonMinimize_Click">
-                <Button.Content>
-                    <Rectangle Width="20" Height="6" Fill="White"/>
-                </Button.Content>
-            </Button>
-            <Button Grid.Column="3" x:Name="buttonClose" Content="X" Margin="0 4 0 0" Style="{StaticResource exitButton}"
-                VerticalAlignment="Top" Click="buttonClose_Click">
-            </Button>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 18 0">
+                <ToggleButton x:Name="buttonMaximize" Style="{StaticResource maxButton}"
+                              Checked="buttonMaximize_Checked" Unchecked="buttonMaximize_Unchecked">
+                    <Rectangle Width="20" Height="20" Stroke="WhiteSmoke" StrokeThickness="4"/>
+                </ToggleButton>
+                <Button x:Name="buttonMinimize" Style="{StaticResource exitButton}" Click="buttonMinimize_Click">
+                    <Button.Content>
+                        <Rectangle Width="20" Height="6" Fill="White"/>
+                    </Button.Content>
+                </Button>
+                <Button x:Name="buttonClose" Content="X" Style="{StaticResource exitButton}" Click="buttonClose_Click"/>
+            </StackPanel>
         </Grid>
         <Menu DockPanel.Dock="Top" Width="Auto" Margin="0 0 0 10">
             <MenuItem Header="_Datei">
@@ -245,22 +247,22 @@
             </Grid.RowDefinitions>
             <ToolBarTray Grid.Row="0" Background="LightBlue">
                 <ToolBar Band="0" Height="Auto">
-                    <Button Command="MediaCommands.Play" Style="{StaticResource RundButton}">
-                        <Image Source="/Images/PlaybackPlay.png" />
+                    <Button Command="MediaCommands.Play" Height="38" Width="38" Template="{StaticResource rundButton}">
+                        <Image Source="/Images/PlaybackPlay.png" Width="32" Height="32"/>
                     </Button>
-                    <Button Command="MediaCommands.Pause" Style="{StaticResource RundButton}">
-                        <Image Source="/Images/PlaybackPause.png"/>
+                    <Button Command="MediaCommands.Pause" Height="38" Width="38" Margin="10 0" Template="{StaticResource rundButton}">
+                        <Image Source="/Images/PlaybackPause.png"  Width="32" Height="32"/>
                     </Button>
-                    <Button Command="MediaCommands.Stop"  Style="{StaticResource RundButton}">
-                        <Image Source="/Images/PlaybackStop.png" />
+                    <Button Command="MediaCommands.Stop" Height="38" Width="38" Template="{StaticResource rundButton}">
+                        <Image Source="/Images/PlaybackStop.png" Width="32" Height="32" />
                     </Button>
-                    <Button x:Name="Playback_Loop" Style="{StaticResource RundButton}" Click="Playback_Loop_Click">
-                        <Image Source="/Images/PlaybackLoop.png"/>
-                    </Button>
-                    <Button x:Name="Playback_Shuffle"  Style="{StaticResource RundButton}" Click="Playback_Shuffle_Click">
-                        <Image Source="/Images/PlaybackShuffel.png"/>
-                    </Button>
-                    <ToggleButton Margin="20 0 0 0">
+                    <ToggleButton x:Name="Playback_Loop" Height="38" Width="38" Margin="20 0 0 0" Template="{StaticResource toggleButton}">
+                        <Image Source="/Images/PlaybackLoop.png" Width="24" Height="24"  Margin="3 0 0 0"/>
+                    </ToggleButton>
+                    <ToggleButton x:Name="Playback_Shuffle"  Height="38" Width="38" Margin="10 0 0 0" Template="{StaticResource toggleButton}">
+                        <Image Source="/Images/PlaybackShuffel.png" Width="26" Height="26" />
+                    </ToggleButton>
+                    <ToggleButton Margin="40 0 0 0">
                         <Image Source="/Images/SpeakerOn.ico" />
                     </ToggleButton>
                     <Slider x:Name="sliderVolume" Width="120" Height="24" Margin="5 0 10 0" Background="#FF75B9CF" Minimum="0" Maximum="1" 
