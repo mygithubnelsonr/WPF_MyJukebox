@@ -6,6 +6,5 @@
         {
             return $"select * from vsongs where charindex('{queryText}', lower( concat([pfad],[filename]))) > 0";
         }
-
     }
 }

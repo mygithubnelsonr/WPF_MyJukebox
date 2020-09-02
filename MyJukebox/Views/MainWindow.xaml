@@ -5,10 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyJukebox"
         mc:Ignorable="d"
-        Title="MyJukebox" Height="900" Width="1200" WindowStartupLocation="CenterScreen" Background="#FF0991C3"
+        Title="MyJukebox" Height="900" Width="1200" WindowStartupLocation="CenterScreen" Background="{StaticResource WindowBackgroundBrush}"
             Icon="/Images/Jukebox.ico" WindowStyle="None"
-            MouseLeftButtonDown="Move_Window" Loaded="Window_Loaded" >
-
+            MouseLeftButtonDown="Move_Window" Loaded="Window_Loaded">
     <Window.Resources>
         <Style TargetType="TabItem">
             <Setter Property="Background" Value="Aqua"/>
@@ -27,11 +26,20 @@
             <Setter Property="Foreground" Value="Blue"/>
             <Setter Property="FontSize" Value="14"/>
         </Style>
+        
+        <ContextMenu x:Key="contextmenuDatagrid">
+            <MenuItem x:Name="datagridMenuitemSendTo" Header="Send to" Click="datagridMenuitemSendTo_Click"/>
+            <MenuItem x:Name="datagridMenuitemCopyCell" Header="Copy Cell to Clipboard" Click="datagridMenuitemCopyCell_Click"/>
+            <MenuItem x:Name="datagridMenuitemCopyLine" Header="Copy Line to Clipboard" Click="datagridMenuitemCopyLine_Click"/>
+            <Separator />
+            <MenuItem Header="Open Folder" Command="ApplicationCommands.Open"/>
+        </ContextMenu>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="MediaCommands.Play" CanExecute="Play_CanExecute" Executed="Play_Executed"  />
         <CommandBinding Command="MediaCommands.Pause" CanExecute="Pause_CanExecute" Executed="Pause_Executed" />
         <CommandBinding Command="MediaCommands.Stop" CanExecute="Stop_CanExecute" Executed="Stop_Executed" />
+        <CommandBinding Command="ApplicationCommands.Open" CanExecute="Open_CanExecute" Executed="Open_Executed"/>
     </Window.CommandBindings>
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
@@ -41,18 +49,19 @@
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock Text="c NRSoft" Foreground="White"/>
             </StatusBarItem>
-
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock x:Name="statusDuration" Text="00:00" Margin="0 0 10 0" Foreground="White"/>
             </StatusBarItem>
-             <StatusBarItem DockPanel.Dock="Right">
+            <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock Text="/" Foreground="AliceBlue"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock x:Name="statusProgress" Text="00:00" Foreground="White"/>
-            </StatusBarItem >
+            </StatusBarItem>
+
+            <Separator/>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock Text="Genre:"/>
+                <TextBlock Text="Genre:" Foreground="DarkBlue"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
                 <TextBlock x:Name="statusGenre" Text="" Foreground="White"/>
@@ -79,6 +88,20 @@
                 <TextBlock x:Name="statusAlbum" Text="" Foreground="White"/>
             </StatusBarItem>
             <Separator/>
+            <StatusBarItem DockPanel.Dock="Left" Margin="20 0 0 0">
+                <TextBlock Text="Row " Foreground="AliceBlue"/>
+            </StatusBarItem>
+            <StatusBarItem DockPanel.Dock="Left">
+                <TextBlock x:Name="statusSelected" Text="{Binding SelectedIndex ,ElementName=datagrid}" Foreground="White"/>
+            </StatusBarItem>
+             <StatusBarItem DockPanel.Dock="Left">
+                <TextBlock Text=" of " Foreground="AliceBlue"/>
+            </StatusBarItem>           
+            <StatusBarItem DockPanel.Dock="Left">
+                <TextBlock x:Name="statusCount" Text="{Binding Items.Count, ElementName=datagrid}" Foreground="White"/>
+            </StatusBarItem>
+            <Separator/>
+
             <StatusBarItem DockPanel.Dock="Left" Content="" Width="Auto"/>
         </StatusBar>
         <Grid DockPanel.Dock="Top" Height="50" Background="{StaticResource headerBackground}">
@@ -158,17 +181,17 @@
         </Menu>
         <Expander x:Name="expanderHide" ExpandDirection="Right" IsExpanded="True">
             <Grid DockPanel.Dock="Left" Width="220">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="120"/>
-                <RowDefinition Height="120"/>
-            </Grid.RowDefinitions>
-                <TabControl Grid.Row="0" Height="Auto" Foreground="AliceBlue">
-                    <TabItem Header="Audio">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="120"/>
+                    <RowDefinition Height="120"/>
+                </Grid.RowDefinitions>
+                <TabControl Grid.Row="0" x:Name="tabcontrol" Height="Auto" Foreground="AliceBlue" SelectionChanged="tabcontrol_SelectionChanged">
+                    <TabItem x:Name="tabitemAudio" Header="Audio">
                         <StackPanel>
                             <Expander Header="Genre" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="True">
                                 <ListBox x:Name="listboxGenres" Height="Auto" MaxHeight="100" Tag="Genre" ItemContainerStyle="{DynamicResource listboxItemStyle}"
-                                     Background="#FFC4F7F7" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxGenres_MouseLeftButtonUp">
+                                     Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxGenres_MouseLeftButtonUp">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -181,7 +204,7 @@
                             </Expander>
                             <Expander Header="Catalog" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="True">
                                 <ListBox x:Name="listboxCatalogs" Height="Auto" MaxHeight="100" Tag="Catalog" ItemContainerStyle="{DynamicResource listboxItemStyle}"
-                                     Background="#FFC4F7F7" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxCatalogs_MouseLeftButtonUp">
+                                     Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxCatalogs_MouseLeftButtonUp">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -194,7 +217,7 @@
                             </Expander>
                             <Expander Header="Artist" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="False">
                                 <ListBox x:Name="listboxArtists" Height="Auto" MaxHeight="100" Tag="Artist" ItemContainerStyle="{DynamicResource listboxItemStyle}"
-                                     Background="#FFC4F7F7" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxArtists_MouseLeftButtonUp">
+                                     Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxArtists_MouseLeftButtonUp">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -207,7 +230,7 @@
                             </Expander>
                             <Expander Header="Album" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="False">
                                 <ListBox x:Name="listboxAlbums" Height="Auto" MaxHeight="100" Tag="Album" ItemContainerStyle="{DynamicResource listboxItemStyle}"
-                                     Background="#FFC4F7F7" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxAlbums_MouseLeftButtonUp">
+                                     Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxAlbums_MouseLeftButtonUp">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -220,24 +243,30 @@
                             </Expander>
                         </StackPanel>
                     </TabItem>
-                    <TabItem Header="Playlist">
-                        <Grid>
-                            <TreeView Background="#61210B">
-                                <TreeViewItem Header="Playlist 1"/>
-                                <TreeViewItem Header="Playlist 2"/>
-                                <TreeViewItem Header="Playlist 3"/>
-                            </TreeView>
-                        </Grid>
+                    <TabItem x:Name="tabitemPlaylist" Header="Playlist">
+                        <StackPanel>
+                                <ListBox x:Name="listboxPlaylists" Height="Auto" Tag="Playlists" ItemContainerStyle="{DynamicResource listboxItemStyle}"
+                                     Background="#FFC4F7F7" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxPlaylists_MouseLeftButtonUp">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="/Images/Catalog.png" Width="20" Height="20" Margin="0,0,20,0" />
+                                                <TextBlock Text="{Binding Path=Name}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                        </StackPanel>
                     </TabItem>
                 </TabControl>
-            
-            <Border Grid.Row="1" Background="#FF1D1B1B" Height="120">
-                <Image Source="/Images/NiceImage01.PNG" Stretch="Fill" />
-            </Border>
-            <Border Grid.Row="2" Height="120" Background="Blue">
-                <Image Source="/Images/MyBitmap.gif"/>
-            </Border>
-        </Grid>
+
+                <Border Grid.Row="1" Background="#FF1D1B1B" Height="120">
+                    <Image Source="/Images/NiceImage01.PNG" Stretch="Fill" />
+                </Border>
+                <Border Grid.Row="2" Height="120" Background="Blue">
+                    <Image Source="/Images/MyBitmap.gif"/>
+                </Border>
+            </Grid>
         </Expander>
 
         <Grid Margin="10 0">
@@ -245,9 +274,9 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <ToolBarTray Grid.Row="0" Background="LightBlue">
+            <ToolBarTray Grid.Row="0" Background="{StaticResource ToolBarTrayBackgroundBrush}">
                 <ToolBar Band="0" Height="Auto">
-                    <Button Command="MediaCommands.Play" Height="38" Width="38" Template="{StaticResource rundButton}">
+                    <Button x:Name="buttonPlay" Command="MediaCommands.Play" Height="38" Width="38" Template="{StaticResource rundButton}">
                         <Image Source="/Images/PlaybackPlay.png" Width="32" Height="32"/>
                     </Button>
                     <Button Command="MediaCommands.Pause" Height="38" Width="38" Margin="10 0" Template="{StaticResource rundButton}">
@@ -256,16 +285,19 @@
                     <Button Command="MediaCommands.Stop" Height="38" Width="38" Template="{StaticResource rundButton}">
                         <Image Source="/Images/PlaybackStop.png" Width="32" Height="32" />
                     </Button>
-                    <ToggleButton x:Name="Playback_Loop" Height="38" Width="38" Margin="20 0 0 0" Template="{StaticResource toggleButton}">
+                    <ToggleButton x:Name="Playback_Loop" Height="38" Width="38" Margin="20 0 0 0" Template="{StaticResource toggleButton}"
+                                  Click="Playback_Loop_Click">
                         <Image Source="/Images/PlaybackLoop.png" Width="24" Height="24"  Margin="3 0 0 0"/>
                     </ToggleButton>
-                    <ToggleButton x:Name="Playback_Shuffle"  Height="38" Width="38" Margin="10 0 0 0" Template="{StaticResource toggleButton}">
+                    <ToggleButton x:Name="Playback_Shuffle"  Height="38" Width="38" Margin="10 0 0 0" Template="{StaticResource toggleButton}"
+                                  Click="Playback_Shuffle_Click">
                         <Image Source="/Images/PlaybackShuffel.png" Width="26" Height="26" />
                     </ToggleButton>
                     <ToggleButton Margin="40 0 0 0">
                         <Image Source="/Images/SpeakerOn.ico" />
                     </ToggleButton>
-                    <Slider x:Name="sliderVolume" Width="120" Height="24" Margin="5 0 10 0" Background="#FF75B9CF" Minimum="0" Maximum="1" 
+                    <Slider x:Name="sliderVolume" Minimum="0" Maximum="1"  Width="120" Height="24" Margin="5 0 10 0"
+                            Background="{StaticResource SliderBackgroundBrush}"
                             IsSnapToTickEnabled="False"
                             TickPlacement="TopLeft"
                             TickFrequency="0.1"
@@ -273,7 +305,8 @@
                             ValueChanged="sliderVolume_ValueChanged"
                             Value="{Binding ElementName=mediaPlayer, Path=Volume}">
                     </Slider>
-                    <Slider x:Name="sliderPosition" Minimum="0" Maximum="1" Width="120" Height="24" Margin="10 0 10 0" Background="#FF75B9CF"
+                    <Slider x:Name="sliderPosition" Minimum="0" Maximum="1" Width="120" Height="24" Margin="10 0 10 0"
+                            Background="{StaticResource SliderBackgroundBrush}"
                             TickPlacement="TopLeft"
                             Thumb.DragStarted="sliderPosition_DragStarted"
                             Thumb.DragCompleted="sliderPosition_DragCompleted"
@@ -304,16 +337,17 @@
                     <Button x:Name="buttonTest" Content="Test" Padding="10 2 10 2" Margin="10 0 10 0" Background="#FF75B9CF" Foreground="DarkBlue" Click="buttonTest_Click"/>
                 </ToolBar>
             </ToolBarTray>
-        
-            <DataGrid Grid.Row="1"  x:Name="datagrid"
+
+            <DataGrid Grid.Row="1" x:Name="datagrid" ContextMenu="{StaticResource contextmenuDatagrid}"
                       DockPanel.Dock="Right" VerticalAlignment="Stretch" Background="LightGray"
                       CanUserSortColumns="True" ScrollViewer.VerticalScrollBarVisibility="Visible" AllowDrop="True"
-                      AlternationCount="1" AlternatingRowBackground="#FFB9DFF7" RowBackground="#FFD2EAF7"
+                      AlternationCount="1" RowBackground="{StaticResource RowBackgroundBrush}"
+                      AlternatingRowBackground="{StaticResource AlternatingRowBackgroundBrush}"
                       IsReadOnly="True" SelectionMode="Single" ColumnHeaderStyle="{StaticResource datagridHeaderStyle}"
                       SelectionChanged="datagrid_SelectionChanged">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF0078D7"/>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="WhiteSmoke"/>
                 </DataGrid.Resources>
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">
@@ -331,7 +365,7 @@
             </DataGrid>
 
             <MediaElement Grid.Row="1" Name="mediaPlayer" LoadedBehavior="Manual" Stretch="None" Volume="0" Height="20" Width="20"
-                          MediaEnded="mediaplayer_MediaEnded"/>            
+                          MediaEnded="mediaplayer_MediaEnded"/>
         </Grid>
     </DockPanel>
 </Window>

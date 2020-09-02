@@ -101,6 +101,42 @@ namespace MyJukebox.BLL
             }
         }
 
+        public static List<Playlist> GetPlaylists()
+        {
+            List<Playlist> playLists = new List<Playlist>();
+
+            using (var context = new MyJukeboxEntities())
+            {
+                var playlists = context.tPlaylists
+                                .OrderBy(p => p.Name)
+                                .Select(p => p);
+
+                foreach (var p in playlists)
+                {
+                    playLists.Add(new Playlist { ID = p.ID, Name = p.Name, Last = (bool)p.Last, Row = p.Row });
+                }
+
+                return playLists;
+            }
+        }
+
+        public static List<vPlaylistSong> GetPlaylistEntries(int playlistID)
+        {
+            List<vPlaylistSong> songs = null;
+            try
+            {
+                var context = new MyJukeboxEntities();
+                songs = context.vPlaylistSongs
+                    .Where(i => i.PLID == playlistID).ToList();
+
+                return songs;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"GetPlaylistEntries_Error: {ex.Message}");
+                return null;
+            }
+        }
 
         #endregion
 
@@ -174,8 +210,51 @@ namespace MyJukebox.BLL
                 return albums;
             }
         }
+
+        public static async Task<List<Playlist>> GetPlaylistsAsync()
+        {
+            List<Playlist> playlists = new List<Playlist>();
+
+            using (var context = new MyJukeboxEntities())
+            {
+                await Task.Run(() =>
+                {
+                    var result = context.tPlaylists
+                                    .OrderBy(p => p.Name)
+                                    .Select(p => p)
+                                    .ToList();
+
+                    foreach (var p in result)
+                    {
+                        playlists.Add(new Playlist { ID = p.ID, Name = p.Name, Last = (bool)p.Last, Row = p.Row });
+                    }
+
+                });
+
+                return playlists;
+            }
+        }
+
         #endregion
 
+        public static void SetSetting(string keyName, string keyValue)
+        {
+            var context = new MyJukeboxEntities();
+
+            var settingExits = context.tSettings
+                                        .Where(s => s.Name == keyName)
+                                        .FirstOrDefault();
+
+            if (settingExits == null)
+            {
+                context.tSettings
+                    .Add(new tSetting { Name = keyName, Value = keyValue });
+
+                context.SaveChanges();
+            }
+        }
+
+        #region CreateCatalog(string catalog)
         //public static int CreateCatalog(string catalog)
         //{
         //    int idDbo = -1;
@@ -218,7 +297,9 @@ namespace MyJukebox.BLL
         //    else
         //        return -1;
         //}
+        #endregion
 
+        #region CreateGenre(string genre)
         //public static int CreateGenre(string genre)
         //{
         //    int id = -1;
@@ -240,8 +321,10 @@ namespace MyJukebox.BLL
 
         //    return id;
         //}
+        #endregion
 
-        //public static int SaveRecord(List<MP3Record> mP3Records)
+        #region SaveRecord(List<MP3Record> mP3Records)
+        //public static int
         //{
         //    int recordsImporteds = 0;
 
@@ -252,8 +335,10 @@ namespace MyJukebox.BLL
 
         //    return recordsImporteds;
         //}
+        #endregion
 
-        //public static bool TruncateTestTables()
+        #region TruncateTestTables()
+        //public static bool 
         //{
         //    try
         //    {
@@ -272,8 +357,10 @@ namespace MyJukebox.BLL
         //        return false;
         //    }
         //}
+        #endregion
 
-        //private static bool MD5Exist(string MD5, bool testmode = false)
+        #region MD5Exist(string MD5, bool testmode = false)
+        //private static bool
         //{
         //    object result = null;
 
@@ -296,8 +383,9 @@ namespace MyJukebox.BLL
         //        return false;
         //    }
         //}
+        #endregion
 
-        //private static int SetRecord(MP3Record mp3Record)
+        #region private static int SetRecord(MP3Record mp3Record)
         //{
         //    int lastSongID = -1;
 
@@ -357,6 +445,32 @@ namespace MyJukebox.BLL
         //        return 0;
         //    }
         //}
+        #endregion
+
+        public static string GetSongFieldValuesByID(int id)
+        {
+            using (var context = new MyJukeboxEntities())
+            {
+                var entity = context.Set<tSong>().Find(id);
+                var entry = context.Entry(entity);
+                var currentPropertyValues = entry.CurrentValues;
+
+                List<Tuple<string, object>> list = currentPropertyValues.PropertyNames
+                    .Select(name => Tuple.Create(name, currentPropertyValues[name]))
+                    .ToList();
+
+                string result = "";
+                int count = 0;
+                foreach (var song in list)
+                {
+                    if (count > 5)
+                        break;
+                    result += song.Item2.ToString() + ",";
+                    count++;
+                }
+                return result.Substring(0, result.Length - 1);
+            }
+        }
 
         public static int GetLastID(string tableName)
         {
@@ -454,6 +568,29 @@ namespace MyJukebox.BLL
             }
         }
 
+        public static bool PlaylistEntryMove(int songId, int plold, int plnew)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var plentry = context.tPLentries
+                                    .Where(p => p.PLID == plold && p.SongID == songId)
+                                    .FirstOrDefault();
 
+                if (plentry == null)
+                    throw new IndexOutOfRangeException();
+
+                plentry.PLID = plnew;
+                plentry.Pos = 1;
+
+                context.SaveChanges();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

@@ -33,4 +33,8 @@ A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\obj\Debug\MyJukebox_Content.g
 A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\obj\Debug\MyJukebox.csproj.CopyComplete
 A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\obj\Debug\Views\MainWindow.g.cs
 A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\obj\Debug\Views\MainWindow.baml
+A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\bin\Debug\MyJukebox.exe.manifest
+A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\bin\Debug\MyJukebox.application
+A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\obj\Debug\MyJukebox.exe.manifest
+A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\obj\Debug\MyJukebox.application
 A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\obj\Debug\MyJukebox.csprojAssemblyReference.cache
