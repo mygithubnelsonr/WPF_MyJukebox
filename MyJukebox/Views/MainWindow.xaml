@@ -28,7 +28,8 @@
         </Style>
         
         <ContextMenu x:Key="contextmenuDatagrid">
-            <MenuItem x:Name="datagridMenuitemSendTo" Header="Send to" Click="datagridMenuitemSendTo_Click"/>
+            <MenuItem x:Name="datagridMenuitemSendTo" Header="Send to"/>
+            <MenuItem x:Name="datagridMenuitemRemove" Header="Remove"/>
             <MenuItem x:Name="datagridMenuitemCopyCell" Header="Copy Cell to Clipboard" Click="datagridMenuitemCopyCell_Click"/>
             <MenuItem x:Name="datagridMenuitemCopyLine" Header="Copy Line to Clipboard" Click="datagridMenuitemCopyLine_Click"/>
             <Separator />

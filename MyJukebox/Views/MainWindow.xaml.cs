@@ -42,7 +42,6 @@ namespace MyJukebox
         {
             InitializeComponent();
 
-            FillPlaylists();
             SettingsDb.Load();
 
             mediaPlayer.Volume = 0;
@@ -57,6 +56,7 @@ namespace MyJukebox
 
             _lastTab = Convert.ToInt32(SettingsDb.GetSetting("LastTab", "0"));
             _lastPlaylist = Convert.ToInt32(SettingsDb.GetSetting("LastPlaylist", "0"));
+            FillPlaylists();
         }
 
         #region FormEvents
@@ -66,10 +66,9 @@ namespace MyJukebox
             FillQueryCombo();
 
             tabcontrol.SelectedIndex = _lastTab;
-            listboxPlaylists.SelectedIndex = _lastPlaylist;
 
             if (tabcontrol.SelectedIndex == 0)
-                FillDatagridByTabLogical();
+                FillDatagridByTabAudio();
             else
                 FillDatagridByTabPlaylist(_lastPlaylist);
 
@@ -111,7 +110,7 @@ namespace MyJukebox
             FillArtistsAsync();
             FillAlbumsAsync();
             statusGenre.Text = genre;
-            FillDatagridByTabLogical();
+            FillDatagridByTabAudio();
         }
 
         private void listboxCatalogs_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -127,7 +126,7 @@ namespace MyJukebox
             string album = listboxAlbums.SelectedItem.ToString();
             AudioStates.Album = album == "Alle" ? "" : album;
             statusAlbum.Text = album;
-            FillDatagridByTabLogical();
+            FillDatagridByTabAudio();
         }
 
         private void listboxArtists_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -136,7 +135,7 @@ namespace MyJukebox
             AudioStates.Artist = artist == "Alle" ? "" : artist;
             FillAlbumsAsync();
             statusArtist.Text = artist;
-            FillDatagridByTabLogical();
+            FillDatagridByTabAudio();
         }
 
         private void listboxAlbums_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -144,7 +143,7 @@ namespace MyJukebox
             string album = listboxAlbums.SelectedItem.ToString();
             AudioStates.Album = album == "Alle" ? "" : album;
             statusAlbum.Text = album;
-            FillDatagridByTabLogical();
+            FillDatagridByTabAudio();
         }
 
         private void menuExit_Click(object sender, RoutedEventArgs e)
@@ -190,7 +189,6 @@ namespace MyJukebox
             await FillCatalogsAsync();
             await FillArtistsAsync();
             await FillAlbumsAsync();
-            //FillPlaylists();
         }
 
         private async Task FillPlaylistsAsync()
@@ -267,8 +265,22 @@ namespace MyJukebox
 
             ListBox lb = listboxPlaylists;
             lb.ItemsSource = _playlists;
-            lb.SelectedIndex = _lastPlaylist;
+            lb.SelectedIndex = GetSelectedIndex(_lastPlaylist);
             lb.ScrollIntoView(lb.SelectedItem);
+        }
+
+        private int GetSelectedIndex(int plid)
+        {
+            int listindex = -1;
+
+            foreach (Playlist pl in listboxPlaylists.Items)
+            {
+                listindex += 1;
+                if (pl.ID == plid)
+                    break;
+            }
+
+            return listindex;
         }
 
         #endregion
@@ -276,7 +288,6 @@ namespace MyJukebox
         #region Datagrid
         private void datagrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //_mediaPlayerIsPlaying = false;
             string fullpath = "";
 
             statusProgress.Text = @"00:00";
@@ -314,7 +325,7 @@ namespace MyJukebox
             mediaPlayer.Source = new Uri(fullpath);
         }
 
-        private void FillDatagridByTabLogical()
+        private void FillDatagridByTabAudio()
         {
             _dataLoaded = false;
             List<vSong> results = DataGetSet.GetTablogicalResults();
@@ -326,9 +337,7 @@ namespace MyJukebox
 
         private void buttonTest_Click(object sender, RoutedEventArgs e)
         {
-            bool result = DataGetSet.PlaylistEntryMove(2260, 2, 12);
-            if (result == false)
-                MessageBox.Show("Move failed!", "Move Playlist Entry");
+            listboxPlaylists.SelectedIndex = GetSelectedIndex(_lastPlaylist);
         }
 
         #region Slider Events
@@ -367,7 +376,7 @@ namespace MyJukebox
             textboxQuery.Text = "";
             TabItem tab = tabcontrol.SelectedItem as TabItem;
             if (tab.Header.ToString() == "Audio")
-                FillDatagridByTabLogical();
+                FillDatagridByTabAudio();
             else
                 FillDatagridByTabPlaylist(_lastPlaylist);
         }
@@ -555,6 +564,7 @@ namespace MyJukebox
         {
             Playlist playlist = listboxPlaylists.SelectedItem as Playlist;
             SettingsDb.LastPlaylist = playlist.ID;
+            _lastPlaylist = playlist.ID;
             FillDatagridByTabPlaylist(playlist.ID);
         }
 
@@ -575,38 +585,84 @@ namespace MyJukebox
             mediaPlayer.Stop();
             _mediaPlayerIsPlaying = false;
 
+            DatagridContextmenuCreate();
+        }
+
+        private void DatagridContextmenuCreate()
+        {
+            TabItem tab = tabcontrol.SelectedItem as TabItem;
+
+            if (tab.Header.ToString() == "Audio")
+            {
+                DatagridContextmenuCreateAudio();
+                FillDatagridByTabAudio();
+                //datagrid.SelectedIndex = 1;
+            }
+
+            if (tab.Header.ToString() == "Playlist")
+            {
+                DatagridContextmenuCreatePlaylist();
+                FillDatagridByTabPlaylist(_lastPlaylist);
+                //datagrid.SelectedIndex = 1;
+            }
+
+            datagrid.SelectedIndex = 1;
+        }
+
+        private void DatagridContextmenuCreateAudio()
+        {
             // add menu items to existing menu
             ContextMenu contextmenu = (ContextMenu)this.FindResource("contextmenuDatagrid");
             MenuItem miSendto = (MenuItem)contextmenu.Items[0];
             miSendto.Items.Clear();
 
-            TabItem tab = tabcontrol.SelectedItem as TabItem;
-
-            if (tab.Header.ToString() == "Audio")
+            miSendto.Header = "Send to";
+            foreach (var playlist in _playlists)
             {
-                miSendto.Header = "Send to";
-                foreach (var playlist in _playlists)
-                {
-                    MenuItem menuItem = new MenuItem();
-                    menuItem.Header = playlist.Name;
-                    menuItem.Tag = playlist.ID;
-                    menuItem.Click += new RoutedEventHandler(this.contextmenuDatagridSendtoPlaylist_Click);
-                    miSendto.Items.Add(menuItem);
-                }
+                MenuItem menuItem = new MenuItem();
+                menuItem.Header = playlist.Name;
+                menuItem.Tag = playlist.ID;
+                menuItem.Click += new RoutedEventHandler(this.contextmenuDatagridSendtoPlaylist_Click);
+                miSendto.Items.Add(menuItem);
             }
 
-            if (tab.Header.ToString() == "Playlist")
+            // remove menuitem 'remove'
+            MenuItem mi = (MenuItem)contextmenu.Items[1];
+            Debug.Print(mi.Header.ToString());
+            contextmenu.Items.Remove(mi);
+
+            MenuItem miRemove = new MenuItem();
+            miRemove.Header = "Remove";
+            miRemove.Click += new RoutedEventHandler(this.contextmenuDatagridRemoveFromAudio_Click);
+            contextmenu.Items.Insert(1, miRemove);
+        }
+
+        private void DatagridContextmenuCreatePlaylist()
+        {
+            // add menu items to existing menu
+            ContextMenu contextmenu = (ContextMenu)this.FindResource("contextmenuDatagrid");
+            MenuItem miSendto = (MenuItem)contextmenu.Items[0];
+            miSendto.Items.Clear();
+
+            miSendto.Header = "Move to";
+            foreach (var playlist in _playlists)
             {
-                miSendto.Header = "Move to";
-                foreach (var playlist in _playlists)
-                {
-                    MenuItem menuItem = new MenuItem();
-                    menuItem.Header = playlist.Name;
-                    menuItem.Tag = playlist.ID;
-                    menuItem.Click += new RoutedEventHandler(this.contextmenuDatagridMovetoPlaylist_Click);
-                    miSendto.Items.Add(menuItem);
-                }
+                MenuItem menuItem = new MenuItem();
+                menuItem.Header = playlist.Name;
+                menuItem.Tag = playlist.ID;
+                menuItem.Click += new RoutedEventHandler(this.contextmenuDatagridMovetoPlaylist_Click);
+                miSendto.Items.Add(menuItem);
             }
+
+            // remove menuitem 'remove'
+            MenuItem mi = (MenuItem)contextmenu.Items[1];
+            Debug.Print(mi.Header.ToString());
+            contextmenu.Items.Remove(mi);
+
+            MenuItem miRemove = new MenuItem();
+            miRemove.Header = "Remove";
+            miRemove.Click += new RoutedEventHandler(this.contextmenuDatagridRemoveFromPlaylist_Click);
+            contextmenu.Items.Insert(1, miRemove);
         }
 
         private void contextmenuDatagridMovetoPlaylist_Click(object sender, RoutedEventArgs e)
@@ -616,21 +672,24 @@ namespace MyJukebox
 
             var menuitem = sender as MenuItem;
             int plidnew = (int)menuitem.Tag;
-
-            Debug.Print($"contextmenuDatagridMovetoPlaylist_Click: ID={menuitem.Tag}, Heder={menuitem.Header}");
+            //Debug.Print($"contextmenuDatagridMovetoPlaylist_Click: ID={menuitem.Tag}, Heder={menuitem.Header}");
 
             bool result = DataGetSet.PlaylistEntryMove(songId, _lastPlaylist, plidnew);
             if (result == false)
                 MessageBox.Show("Move failed!", "Move Playlist Entry");
 
             FillDatagridByTabPlaylist(_lastPlaylist);
-
         }
 
         private void contextmenuDatagridSendtoPlaylist_Click(object sender, RoutedEventArgs e)
         {
+            var rowlist = (vSong)datagrid.SelectedItem;
+            int songId = rowlist.ID;
+
             var menuitem = sender as MenuItem;
-            Debug.Print($"contextmenuDatagridSendtoPlaylist_Click: ID={menuitem.Tag}, Heder={menuitem.Header}");
+            var playlistID = (int)menuitem.Tag;
+            //Debug.Print($"contextmenuDatagridSendtoPlaylist_Click: SongID={songId}, PlaylistID={menuitem.Tag}, Heder={menuitem.Header},");
+            DataGetSet.AddSongToPlaylist(songId, playlistID);
         }
 
         #region ContextmenuDatagrid
@@ -657,10 +716,6 @@ namespace MyJukebox
         #endregion
 
         #region datagrid contentmenu
-        private void datagridMenuitemSendTo_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void datagridMenuitemCopyCell_Click(object sender, RoutedEventArgs e)
         {
@@ -687,6 +742,38 @@ namespace MyJukebox
             Clipboard.Clear();
             Clipboard.SetText(songFields);
         }
+
+        private void contextmenuDatagridRemoveFromAudio_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.Print("contextmenuDatagridRemoveFromAudio_Click");
+
+            var rowlist = (vSong)datagrid.SelectedItem;
+            int songId = rowlist.ID;
+
+            var result = DataGetSet.DeleteSong(songId);
+
+            if (result != null)
+                MessageBox.Show(result.Message, "Delete Song");
+
+            FillDatagridByTabAudio();
+        }
+
+        private void contextmenuDatagridRemoveFromPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.Print("contextmenuDatagridRemoveFromPlaylist_Click");
+
+            var rowlist = (vPlaylistSong)datagrid.SelectedItem;
+            int songId = rowlist.ID;
+
+            var result = DataGetSet.RemoveSongFromPlaylist(songId, _lastPlaylist);
+
+            if (result != null)
+                MessageBox.Show(result.Message, "RemoveSongFromPlaylist");
+
+            FillDatagridByTabPlaylist(_lastPlaylist);
+        }
+
         #endregion
+
     }
 }

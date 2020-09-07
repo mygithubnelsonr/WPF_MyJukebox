@@ -578,7 +578,7 @@ namespace MyJukebox.BLL
                                     .FirstOrDefault();
 
                 if (plentry == null)
-                    throw new IndexOutOfRangeException();
+                    throw new IndexOutOfRangeException("Record not found!");
 
                 plentry.PLID = plnew;
                 plentry.Pos = 1;
@@ -592,5 +592,91 @@ namespace MyJukebox.BLL
                 return false;
             }
         }
+
+        public static bool AddSongToPlaylist(int idSong, int idPlaylist)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var playlist = context.tPlaylists
+                                    .Where(p => p.ID == idPlaylist)
+                                    .Select(p => p.ID).ToList();
+
+                if (playlist == null)
+                    throw new Exception("Wrong playlist!");
+
+                var entry = context.tPLentries
+                    .Where(p => p.ID == idPlaylist && p.SongID == idSong)
+                    .FirstOrDefault();
+
+                if (entry != null)
+                    throw new Exception("Song is allready in this Playlist! playlist!");
+
+                var playlistentry = new tPLentry()
+                {
+                    PLID = idPlaylist,
+                    SongID = idSong,
+                    Pos = 1
+                };
+
+                context.tPLentries.Add(playlistentry);
+                context.SaveChanges();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static Exception RemoveSongFromPlaylist(int idSong, int idPlaylist)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var playlist = context.tPlaylists
+                                    .Where(p => p.ID == idPlaylist)
+                                    .FirstOrDefault();
+
+                if (playlist == null)
+                {
+                    throw new Exception($"Playlist {idPlaylist} not found!");
+                }
+
+                var entry = context.tPLentries
+                    .Where(p => p.PLID == idPlaylist && p.SongID == idSong)
+                    .FirstOrDefault();
+
+                if (entry == null)
+                    throw new Exception($"Song not exist in the Playlist '{playlist.Name}'");
+
+                context.tPLentries.Remove(entry);
+                context.SaveChanges();
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+        }
+
+        public static Exception DeleteSong(int id)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var songs = context.tSongs.First(s => s.ID == id);
+                context.tSongs.Remove(songs);
+                context.SaveChanges();
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+        }
     }
 }
+

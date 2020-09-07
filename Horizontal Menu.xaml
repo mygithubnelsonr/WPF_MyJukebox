@@ -1,0 +1,44 @@
+https://www.c-sharpcorner.com/uploadfile/mahesh/menus-in-wpf/
+
+<Grid x:Name="LayoutRoot">  
+    <Grid.RowDefinitions>  
+        <RowDefinition Height="Auto" />  
+        <RowDefinition Height="*" />  
+    </Grid.RowDefinitions>  
+    <Menu Height="38" Name="menu1" Margin="10,10,344,0" VerticalAlignment="Top" BorderThickness="2" Foreground="White" FontSize="16" FontWeight="Bold">  
+        <Menu.Background>  
+            <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">  
+                <GradientStop Color="#FF3A60AD" Offset="0.528" />  
+                <GradientStop Color="#FF6A85D8" Offset="0.01" />  
+                <GradientStop Color="#FF3464C4" Offset="1" />  
+                <GradientStop Color="#FF202E7E" Offset="1" />  
+            </LinearGradientBrush>  
+        </Menu.Background>  
+        <Menu.BitmapEffect>  
+            <DropShadowBitmapEffect />  
+        </Menu.BitmapEffect>  
+        <MenuItem Header="Tools" IsCheckable="true">  
+        <MenuItem.Icon>  
+            <Image Source="Tools.png" Width="20" Height="20" />  
+        </MenuItem.Icon>  
+        </MenuItem>  
+        <MenuItem Header="Settings" IsCheckable="true" Foreground="Orange" FontSize="16">  
+        <MenuItem.Icon>  
+            <Image Source="Settings.png" Width="20" Height="20" />  
+        </MenuItem.Icon>  
+        </MenuItem>  
+        <MenuItem Header="Security" IsCheckable="true" Foreground="White" FontSize="16">  
+        <MenuItem.Icon>  
+            <Image Source="Security.png" Width="20" Height="20" />  
+        </MenuItem.Icon>  
+        </MenuItem>  
+        <MenuItem Header="Database" IsCheckable="true" Foreground="LightGreen" FontSize="16">  
+        <MenuItem.Icon>  
+            <Image Source="Database.png" Width="20" Height="20" />  
+        </MenuItem.Icon>  
+        <MenuItem.Background>  
+            <ImageBrush ImageSource="Database.png" Stretch="Fill" />  
+        </MenuItem.Background>  
+        </MenuItem>  
+    </Menu>  
+</Grid>
