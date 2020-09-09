@@ -26,7 +26,7 @@
             <Setter Property="Foreground" Value="Blue"/>
             <Setter Property="FontSize" Value="14"/>
         </Style>
-        
+        <!--Datagrid Context Menu-->
         <ContextMenu x:Key="contextmenuDatagrid">
             <MenuItem x:Name="datagridMenuitemSendTo" Header="Send to"/>
             <MenuItem x:Name="datagridMenuitemRemove" Header="Remove"/>
@@ -148,36 +148,60 @@
                 <Button x:Name="buttonClose" Content="X" Style="{StaticResource exitButton}" Click="buttonClose_Click"/>
             </StackPanel>
         </Grid>
-        <Menu DockPanel.Dock="Top" Width="Auto" Margin="0 0 0 10">
-            <MenuItem Header="_Datei">
-                <MenuItem Header="_Neu" InputGestureText="Strg + N">
+        <Menu DockPanel.Dock="Top" Margin="0 0 0 10" Foreground="White" FontSize="16" FontWeight="Bold" Opacity="0.82" BorderThickness="1">
+            <Menu.BitmapEffect>
+                <DropShadowBitmapEffect />
+            </Menu.BitmapEffect>
+            <MenuItem Header="_File" Margin="2 2" Background="Transparent" Foreground="White">
+                <MenuItem.Icon>
+                    <Image Source="/Images/File.png" Margin="0 0 2 0"/>
+                </MenuItem.Icon>
+                <MenuItem Header="_New" InputGestureText="Strg + N">
                     <MenuItem.Icon>
                         <Image Width="16" Height="16" Source="/Images/neu.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Öffnen" InputGestureText="Strg + O">
+                <MenuItem Header="_Open" InputGestureText="Strg + O">
                     <MenuItem.Icon>
                         <Image Width="16" Height="16" Source="/Images/oeffnen.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="_Speichern" InputGestureText="Strg + S">
+                <MenuItem Header="_Save" InputGestureText="Strg + S">
                     <MenuItem.Icon>
                         <Image Width="16" Height="16" Source="/Images/speichern.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="_Letzte Dokumente">
+                <MenuItem Header="_Last Documents">
                     <MenuItem Header="Kapitel05__Controls.doc"/>
                     <MenuItem Header="Kapitel04__LogicalVisualTrees.doc"/>
                 </MenuItem>
                 <Separator/>
-                <MenuItem x:Name="menuExit" Header="B_eenden" Click="menuExit_Click"/>
+                <MenuItem x:Name="menuExit" Header="E_xit" Click="menuExit_Click"/>
             </MenuItem>
-            <MenuItem Header="_Bearbeiten">
+            <MenuItem Header="_Edit" Margin="2 2" Background="Transparent" Foreground="White">
+                <MenuItem.Icon>
+                    <Image Source="/Images/edit.png" Margin="0 0 2 0"/>
+                </MenuItem.Icon>
                 <MenuItem Header="_Ausschneiden"/>
                 <MenuItem Header="_Kopieren"/>
                 <MenuItem Header="_Einfügen"/>
                 <MenuItem Header="_Löschen"/>
+            </MenuItem>
+            <MenuItem Header="_Tools" Margin="2 2" Background="Transparent" Foreground="White">
+                <MenuItem.Icon>
+                    <Image Source="/Images/tools.png" Margin="0 0 2 0" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="Settin_gs" Margin="2 2" Background="Transparent" Foreground="Orange" FontSize="16">
+                <MenuItem.Icon>
+                    <Image Source="/images/settings.png" Margin="0 0 2 0" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="D_atabase" Margin="4 0" Background="Transparent" Foreground="LightGreen" FontSize="16">
+                <MenuItem.Icon>
+                    <Image Source="/images/database.png" Margin="0 0 2 0" />
+                </MenuItem.Icon>
             </MenuItem>
         </Menu>
         <Expander x:Name="expanderHide" ExpandDirection="Right" IsExpanded="True">
@@ -269,7 +293,6 @@
                 </Border>
             </Grid>
         </Expander>
-
         <Grid Margin="10 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>

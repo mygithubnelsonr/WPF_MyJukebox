@@ -30,7 +30,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationRevision>6</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -253,6 +253,11 @@
       <DependentUpon>MyJukeboxModel.edmx</DependentUpon>
       <LastGenOutput>MyJukeboxModel.cs</LastGenOutput>
     </Content>
+    <Resource Include="Images\Database.png" />
+    <Resource Include="Images\Settings.png" />
+    <Resource Include="Images\Tools.png" />
+    <Resource Include="Images\Edit.png" />
+    <Resource Include="Images\File.png" />
     <Resource Include="Images\PlaybackStop.png" />
     <Resource Include="Images\PlaybackPlay.png" />
     <Resource Include="Images\PlaybackPause.png" />
