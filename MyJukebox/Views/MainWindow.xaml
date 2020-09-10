@@ -320,7 +320,7 @@
                     <ToggleButton Margin="40 0 0 0">
                         <Image Source="/Images/SpeakerOn.ico" />
                     </ToggleButton>
-                    <Slider x:Name="sliderVolume" Minimum="0" Maximum="1"  Width="120" Height="24" Margin="5 0 10 0"
+                    <Slider x:Name="sliderVolume" Minimum="0.1" Maximum="1"  Width="120" Height="24" Margin="5 0 10 0"
                             Background="{StaticResource SliderBackgroundBrush}"
                             IsSnapToTickEnabled="False"
                             TickPlacement="TopLeft"

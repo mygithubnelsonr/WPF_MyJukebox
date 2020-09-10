@@ -28,6 +28,8 @@ namespace MyJukebox
 
         private bool _isLoaded = false;
         private bool _dataLoaded = false;
+        //private bool _queryActive = false;
+        private int _datasource = -1;
         private bool _userIsDraggingSlider;
         private bool _mediaPlayerIsPlaying = false;
         private int _lastTab = -1;
@@ -57,6 +59,13 @@ namespace MyJukebox
             _lastTab = Convert.ToInt32(SettingsDb.GetSetting("LastTab", "0"));
             _lastPlaylist = Convert.ToInt32(SettingsDb.GetSetting("LastPlaylist", "0"));
             FillPlaylists();
+        }
+
+        public enum DataSource
+        {
+            Songs,
+            Playlist,
+            Query
         }
 
         #region FormEvents
@@ -303,16 +312,18 @@ namespace MyJukebox
                 datagrid.CurrentItem = 1;
             }
 
-            TabItem tab = tabcontrol.SelectedItem as TabItem;
+            //TabItem tab = tabcontrol.SelectedItem as TabItem;
 
-            if (tab.Header.ToString() == "Audio")
+            //if (tab.Header.ToString() == "Audio" || _datasource == (int)DataSource.Songs)
+            if (_datasource == (int)DataSource.Songs)
             {
                 var rowlist = (vSong)datagrid.SelectedItem;
                 fullpath = $"{rowlist.Pfad}\\{rowlist.FileName}";
                 this.Title = $"{rowlist.Artist} - {rowlist.Titel}";
             }
 
-            if (tab.Header.ToString() == "Playlist")
+            //if (tab.Header.ToString() == "Playlist" || _datasource == (int)DataSource.Playlist)
+            if (_datasource == (int)DataSource.Playlist)
             {
                 var rowlist = (vPlaylistSong)datagrid.SelectedItem;
                 if (rowlist != null)
@@ -321,6 +332,7 @@ namespace MyJukebox
                     this.Title = $"{rowlist.Artist} - {rowlist.Titel}";
                 }
             }
+
 
             mediaPlayer.Source = new Uri(fullpath);
         }
@@ -331,6 +343,8 @@ namespace MyJukebox
             List<vSong> results = DataGetSet.GetTablogicalResults();
             datagrid.ItemsSource = results;
             _dataLoaded = true;
+            _datasource = (int)DataSource.Songs;
+
             random.InitRandomNumbers(datagrid.Items.Count - 1);
         }
         #endregion
@@ -373,7 +387,16 @@ namespace MyJukebox
         #region Query Elements
         private void buttonQueryClear_Click(object sender, RoutedEventArgs e)
         {
+            QueryClear();
+        }
+
+        private void QueryClear()
+        {
             textboxQuery.Text = "";
+            //_queryActive = false;
+
+            comboboxStoredQueries.Text = "";
+
             TabItem tab = tabcontrol.SelectedItem as TabItem;
             if (tab.Header.ToString() == "Audio")
                 FillDatagridByTabAudio();
@@ -435,8 +458,12 @@ namespace MyJukebox
                     datagrid.SelectedIndex = 0;
                     datagrid.ScrollIntoView(datagrid.SelectedItem);
                     datagrid.Focus();
+                    _datasource = (int)DataSource.Songs;
                 }
             }
+            else
+                QueryClear();
+
             _dataLoaded = true;
         }
 
@@ -456,6 +483,7 @@ namespace MyJukebox
             timer.Stop();
             mediaPlayer.Stop();
             textboxQuery.Text = (string)comboboxStoredQueries.SelectedItem;
+            //_queryActive = true;
             FillDatagridByQuery();
         }
 
@@ -572,6 +600,7 @@ namespace MyJukebox
         {
             var results = DataGetSet.GetPlaylistEntries(playlistID);
             datagrid.ItemsSource = results;
+            _datasource = (int)DataSource.Playlist;
 
             if (datagrid.Items.Count > 1)
                 datagrid.SelectedIndex = 0;

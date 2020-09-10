@@ -9,7 +9,7 @@
         <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource WindowBackground}"/>
         <Color x:Key="ToolBarTrayBackground">LightBlue</Color>
         <SolidColorBrush x:Key="ToolBarTrayBackgroundBrush" Color="{StaticResource ToolBarTrayBackground}"/>
-        <Color x:Key="SliderBackground">#FF75B9CF</Color>
+        <Color x:Key="SliderBackground">#FF8BCADE</Color>
         <SolidColorBrush x:Key="SliderBackgroundBrush"  Color="{StaticResource SliderBackground}"/>
         <Color x:Key="ListboxBackground">#FFC4F7F7</Color>
         <SolidColorBrush x:Key="ListboxBackgroundBrush" Color="{StaticResource ListboxBackground}"/>
