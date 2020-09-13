@@ -28,7 +28,6 @@ namespace MyJukebox
 
         private bool _isLoaded = false;
         private bool _dataLoaded = false;
-        //private bool _queryActive = false;
         private int _datasource = -1;
         private bool _userIsDraggingSlider;
         private bool _mediaPlayerIsPlaying = false;
@@ -94,6 +93,7 @@ namespace MyJukebox
             statusArtist.Text = AudioStates.Artist;
             statusAlbum.Text = AudioStates.Album;
             _isLoaded = true;
+            sliderVolume.Value = 0.05;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -337,16 +337,6 @@ namespace MyJukebox
             mediaPlayer.Source = new Uri(fullpath);
         }
 
-        private void FillDatagridByTabAudio()
-        {
-            _dataLoaded = false;
-            List<vSong> results = DataGetSet.GetTablogicalResults();
-            datagrid.ItemsSource = results;
-            _dataLoaded = true;
-            _datasource = (int)DataSource.Songs;
-
-            random.InitRandomNumbers(datagrid.Items.Count - 1);
-        }
         #endregion
 
         private void buttonTest_Click(object sender, RoutedEventArgs e)
@@ -357,7 +347,8 @@ namespace MyJukebox
         #region Slider Events
         private void sliderVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            mediaPlayer.Volume = sliderVolume.Value;
+            if (_dataLoaded)
+                mediaPlayer.Volume = sliderVolume.Value;
         }
         private void sliderVolume_MouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -551,28 +542,31 @@ namespace MyJukebox
             {
                 var nextRow = random.GetNextNumber;
                 datagrid.SelectedIndex = nextRow;
+                _mediaPlayerIsPlaying = true;
             }
             else if (Playback_Loop.IsChecked == true)
             {
                 mediaPlayer.Position = TimeSpan.FromSeconds(0);
+                _mediaPlayerIsPlaying = true;
             }
             else
             {
                 var currentItem = datagrid.SelectedIndex;
                 if (currentItem + 1 < datagrid.Items.Count)
                     datagrid.SelectedIndex = currentItem + 1;
+                _mediaPlayerIsPlaying = true;
             }
         }
 
-        private void Playback_Shuffle_Click(object sender, RoutedEventArgs e)
-        {
-            Playback_Loop.IsChecked = false;
-        }
+        //private void Playback_Shuffle_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Playback_Loop.IsChecked = false;
+        //}
 
-        private void Playback_Loop_Click(object sender, RoutedEventArgs e)
-        {
-            Playback_Shuffle.IsChecked = false;
-        }
+        //private void Playback_Loop_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Playback_Shuffle.IsChecked = false;
+        //}
 
         #endregion
 
@@ -596,14 +590,37 @@ namespace MyJukebox
             FillDatagridByTabPlaylist(playlist.ID);
         }
 
+        private void FillDatagridByTabAudio()
+        {
+            _dataLoaded = false;
+            List<vSong> results = DataGetSet.GetTablogicalResults();
+            if (results != null)
+            {
+                _datasource = (int)DataSource.Songs;
+                datagrid.ItemsSource = results;
+                _dataLoaded = true;
+                random.InitRandomNumbers(datagrid.Items.Count - 1);
+
+                if (datagrid.Items.Count > 1)
+                    datagrid.SelectedIndex = 0;
+            }
+        }
+
         private void FillDatagridByTabPlaylist(int playlistID)
         {
+            _dataLoaded = false;
             var results = DataGetSet.GetPlaylistEntries(playlistID);
-            datagrid.ItemsSource = results;
-            _datasource = (int)DataSource.Playlist;
+            if (results != null)
+            {
+                _datasource = (int)DataSource.Playlist;
+                datagrid.ItemsSource = results;
+                _dataLoaded = true;
 
-            if (datagrid.Items.Count > 1)
-                datagrid.SelectedIndex = 0;
+                random.InitRandomNumbers(datagrid.Items.Count - 1);
+
+                if (datagrid.Items.Count > 1)
+                    datagrid.SelectedIndex = 0;
+            }
         }
 
         private void tabcontrol_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -751,7 +768,59 @@ namespace MyJukebox
 
         }
 
-        private void datagridMenuitemCopyLine_Click(object sender, RoutedEventArgs e)
+        //private void datagridMenuitemCopyLine_Click(object sender, RoutedEventArgs e)
+        //{
+        //    int id = -1;
+
+        //    if (_lastTab == 1)
+        //    {
+        //        var song = (vPlaylistSong)datagrid.SelectedItem;
+        //        id = song.ID;
+        //    }
+        //    else
+        //    {
+        //        var song = (vSong)datagrid.SelectedItem;
+        //        id = song.ID;
+        //    }
+
+        //    string songFields = DataGetSet.GetSongFieldValuesByID(id);
+
+        //    Clipboard.Clear();
+        //    Clipboard.SetText(songFields);
+        //}
+
+        private void contextmenuDatagridRemoveFromAudio_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.Print("contextmenuDatagridRemoveFromAudio_Click");
+
+            var rowlist = (vSong)datagrid.SelectedItem;
+            int songId = rowlist.ID;
+
+            var result = DataGetSet.DeleteSong(songId);
+
+            FillDatagridByTabAudio();
+        }
+
+        private void contextmenuDatagridRemoveFromPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.Print("contextmenuDatagridRemoveFromPlaylist_Click");
+
+            var rowlist = (vPlaylistSong)datagrid.SelectedItem;
+            int songId = rowlist.ID;
+
+            var result = DataGetSet.RemoveSongFromPlaylist(songId, _lastPlaylist);
+
+            FillDatagridByTabPlaylist(_lastPlaylist);
+        }
+
+        #endregion
+
+        private void CopyDataRowCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void CopyDataRowExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             int id = -1;
 
@@ -772,37 +841,34 @@ namespace MyJukebox
             Clipboard.SetText(songFields);
         }
 
-        private void contextmenuDatagridRemoveFromAudio_Click(object sender, RoutedEventArgs e)
+        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            Debug.Print("contextmenuDatagridRemoveFromAudio_Click");
 
-            var rowlist = (vSong)datagrid.SelectedItem;
-            int songId = rowlist.ID;
-
-            var result = DataGetSet.DeleteSong(songId);
-
-            if (result != null)
-                MessageBox.Show(result.Message, "Delete Song");
-
-            FillDatagridByTabAudio();
         }
 
-        private void contextmenuDatagridRemoveFromPlaylist_Click(object sender, RoutedEventArgs e)
+        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            Debug.Print("contextmenuDatagridRemoveFromPlaylist_Click");
 
-            var rowlist = (vPlaylistSong)datagrid.SelectedItem;
-            int songId = rowlist.ID;
-
-            var result = DataGetSet.RemoveSongFromPlaylist(songId, _lastPlaylist);
-
-            if (result != null)
-                MessageBox.Show(result.Message, "RemoveSongFromPlaylist");
-
-            FillDatagridByTabPlaylist(_lastPlaylist);
         }
 
-        #endregion
+        private void PlaybackLoop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
 
+        private void PlaybackLoop_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Playback_Shuffle.IsChecked = false;
+        }
+
+        private void PlaybackShuffle_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void PlaybackShuffle_Execute(object sender, ExecutedRoutedEventArgs e)
+        {
+            Playback_Loop.IsChecked = false;
+        }
     }
 }

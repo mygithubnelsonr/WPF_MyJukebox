@@ -31,7 +31,7 @@
             <MenuItem x:Name="datagridMenuitemSendTo" Header="Send to"/>
             <MenuItem x:Name="datagridMenuitemRemove" Header="Remove"/>
             <MenuItem x:Name="datagridMenuitemCopyCell" Header="Copy Cell to Clipboard" Click="datagridMenuitemCopyCell_Click"/>
-            <MenuItem x:Name="datagridMenuitemCopyLine" Header="Copy Line to Clipboard" Click="datagridMenuitemCopyLine_Click"/>
+            <MenuItem x:Name="datagridMenuitemCopyLine" Header="Copy Line to Clipboard" Command="{x:Static local:MyJukeboxCommands.CopyDataRow}"/>
             <Separator />
             <MenuItem Header="Open Folder" Command="ApplicationCommands.Open"/>
         </ContextMenu>
@@ -41,6 +41,15 @@
         <CommandBinding Command="MediaCommands.Pause" CanExecute="Pause_CanExecute" Executed="Pause_Executed" />
         <CommandBinding Command="MediaCommands.Stop" CanExecute="Stop_CanExecute" Executed="Stop_Executed" />
         <CommandBinding Command="ApplicationCommands.Open" CanExecute="Open_CanExecute" Executed="Open_Executed"/>
+        <CommandBinding Command="{x:Static local:MyJukeboxCommands.CopyDataRow}" x:Name="CopyDataRow"
+                        CanExecute="CopyDataRowCanExecute" 
+                        Executed="CopyDataRowExecuted"/>
+        <CommandBinding Command="{x:Static local:MyJukeboxCommands.PlaybackLoop}" 
+                        CanExecute="PlaybackLoop_CanExecute" 
+                        Executed="PlaybackLoop_Executed"/>
+        <CommandBinding Command="{x:Static local:MyJukeboxCommands.PlaybackShuffle}"
+                        CanExecute="PlaybackShuffle_CanExecute"
+                        Executed="PlaybackShuffle_Execute"/>
     </Window.CommandBindings>
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
@@ -113,9 +122,9 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="1" Margin="10 0" HorizontalAlignment="Left" Width="300">
                 <TextBlock x:Name="textblockHeader" Foreground="White" FontSize="26">
-                    <Bold FontWeight="ExtraBold" Foreground="LightGray">
-                        My</Bold><Run FontWeight="ExtraBold" FontSize="28" Foreground="Red">J</Run>
-                        <Italic>ukebox</Italic>
+                    <Bold FontWeight="ExtraBold" Foreground="LightGray">My</Bold>
+                    <Run FontWeight="ExtraBold" FontSize="26" Foreground="Red">J</Run>
+                    ukebox
                 </TextBlock>
                 <Rectangle Height="14" Width="192">
                     <Rectangle.Fill>
@@ -310,17 +319,17 @@
                         <Image Source="/Images/PlaybackStop.png" Width="32" Height="32" />
                     </Button>
                     <ToggleButton x:Name="Playback_Loop" Height="38" Width="38" Margin="20 0 0 0" Template="{StaticResource toggleButton}"
-                                  Click="Playback_Loop_Click">
+                                  Command="{x:Static local:MyJukeboxCommands.PlaybackLoop}">
                         <Image Source="/Images/PlaybackLoop.png" Width="24" Height="24"  Margin="3 0 0 0"/>
                     </ToggleButton>
                     <ToggleButton x:Name="Playback_Shuffle"  Height="38" Width="38" Margin="10 0 0 0" Template="{StaticResource toggleButton}"
-                                  Click="Playback_Shuffle_Click">
+                                  Command="{x:Static local:MyJukeboxCommands.PlaybackShuffle}">
                         <Image Source="/Images/PlaybackShuffel.png" Width="26" Height="26" />
                     </ToggleButton>
                     <ToggleButton Margin="40 0 0 0">
                         <Image Source="/Images/SpeakerOn.ico" />
                     </ToggleButton>
-                    <Slider x:Name="sliderVolume" Minimum="0.1" Maximum="1"  Width="120" Height="24" Margin="5 0 10 0"
+                    <Slider x:Name="sliderVolume" Minimum="0.0" Maximum="1"  Width="120" Height="24" Margin="5 0 10 0"
                             Background="{StaticResource SliderBackgroundBrush}"
                             IsSnapToTickEnabled="False"
                             TickPlacement="TopLeft"

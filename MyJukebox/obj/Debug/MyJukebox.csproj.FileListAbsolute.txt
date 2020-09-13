@@ -37,4 +37,3 @@ A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\bin\Debug\MyJukebox.exe.manif
 A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\bin\Debug\MyJukebox.application
 A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\obj\Debug\MyJukebox.exe.manifest
 A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\obj\Debug\MyJukebox.application
-A:\Source\Repos\90_Work\WPF\MyJukeboxWPF\MyJukebox\obj\Debug\MyJukebox.csprojAssemblyReference.cache

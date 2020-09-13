@@ -1,10 +1,12 @@
 ﻿using MyJukebox.Common;
 using MyJukebox.DAL;
+using MyJukebox.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MyJukebox.BLL
 {
@@ -61,7 +63,7 @@ namespace MyJukebox.BLL
             }
             catch (Exception ex)
             {
-                Debug.Print($"TruncateTableImportTest_Error: {ex.Message}");
+                MessageBox.Show(ex.Message, "ERROR:TruncateTable");
                 return false;
             }
 
@@ -337,28 +339,6 @@ namespace MyJukebox.BLL
         //}
         #endregion
 
-        #region TruncateTestTables()
-        //public static bool 
-        //{
-        //    try
-        //    {
-        //        int result = -1;
-        //        var context = new MyJukeboxEntities();
-        //        result = context.Database.ExecuteSqlCommand("truncate table [tst].[tSongs]");
-        //        result = context.Database.ExecuteSqlCommand("truncate table [tst].[tFileInfos]");
-        //        result = context.Database.ExecuteSqlCommand("truncate table [tst].[tInfos]");
-        //        result = context.Database.ExecuteSqlCommand("truncate table [tst].[tMD5]");
-
-        //        return true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.Print($"TruncateTableImportTest_Error: {ex.Message}");
-        //        return false;
-        //    }
-        //}
-        #endregion
-
         #region MD5Exist(string MD5, bool testmode = false)
         //private static bool
         //{
@@ -381,68 +361,6 @@ namespace MyJukebox.BLL
         //    else
         //    {
         //        return false;
-        //    }
-        //}
-        #endregion
-
-        #region private static int SetRecord(MP3Record mp3Record)
-        //{
-        //    int lastSongID = -1;
-
-        //    if (MD5Exist(mp3Record.MD5, false) == false)
-        //    {
-        //        try
-        //        {
-        //            var context = new MyJukeboxEntities();
-        //            // tsongs data
-        //            var songs = new tSong();
-        //            songs.Album = mp3Record.Album;
-        //            songs.Artist = mp3Record.Artist;
-        //            songs.Titel = mp3Record.Titel;
-        //            songs.Pfad = mp3Record.Path;
-        //            songs.FileName = mp3Record.FileName;
-        //            songs.ID_Genre = mp3Record.Genre;
-        //            songs.ID_Catalog = mp3Record.Catalog;
-        //            songs.ID_Media = mp3Record.Media;
-        //            context.tSongs.Add(songs);
-        //            context.SaveChanges();
-
-        //            lastSongID = GetLastID("tSongs");
-
-        //            // tmd5 data
-        //            var md5 = new tMD5();
-        //            md5.MD5 = mp3Record.MD5;
-        //            md5.ID_Song = lastSongID;
-        //            context.tMD5.Add(md5);
-        //            context.SaveChanges();
-
-        //            // tfileinfo data
-        //            var file = new tFileInfo();
-        //            file.FileDate = mp3Record.FileDate;
-        //            file.FileSize = mp3Record.FileSize;
-        //            file.ImportDate = DateTime.Now;
-        //            file.ID_Song = lastSongID;
-        //            context.tFileInfos.Add(file);
-        //            context.SaveChanges();
-
-        //            // tinfos data
-        //            var info = new tInfo();
-        //            info.Sampler = mp3Record.IsSample;
-        //            info.ID_Song = lastSongID;
-        //            context.tInfos.Add(info);
-        //            context.SaveChanges();
-
-        //            return 1;
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Debug.Print($"SetNewTestRecord_Error: {ex.Message}");
-        //            return 0;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return 0;
         //    }
         //}
         #endregion
@@ -578,17 +496,17 @@ namespace MyJukebox.BLL
                                     .FirstOrDefault();
 
                 if (plentry == null)
-                    throw new IndexOutOfRangeException("Record not found!");
+                    throw new ExceptionPlaylistMove("Record not found!");
 
                 plentry.PLID = plnew;
                 plentry.Pos = 1;
-
                 context.SaveChanges();
 
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.Message, "ERROR: PlaylistEntryMove");
                 return false;
             }
         }
@@ -603,14 +521,14 @@ namespace MyJukebox.BLL
                                     .Select(p => p.ID).ToList();
 
                 if (playlist == null)
-                    throw new Exception("Wrong playlist!");
+                    throw new ExceptionPlaylistNotExist("Wrong playlist!");
 
                 var entry = context.tPLentries
                     .Where(p => p.ID == idPlaylist && p.SongID == idSong)
                     .FirstOrDefault();
 
                 if (entry != null)
-                    throw new Exception("Song is allready in this Playlist! playlist!");
+                    throw new ExceptionPlaylistSongExist("Song is allready in this Playlist! playlist!");
 
                 var playlistentry = new tPLentry()
                 {
@@ -626,11 +544,12 @@ namespace MyJukebox.BLL
             }
             catch (Exception ex)
             {
+                MessageBox.Show(ex.Message, "ERROR: AddSongToPlaylist");
                 return false;
             }
         }
 
-        public static Exception RemoveSongFromPlaylist(int idSong, int idPlaylist)
+        public static bool RemoveSongFromPlaylist(int idSong, int idPlaylist)
         {
             try
             {
@@ -641,7 +560,7 @@ namespace MyJukebox.BLL
 
                 if (playlist == null)
                 {
-                    throw new Exception($"Playlist {idPlaylist} not found!");
+                    throw new ExceptionPlaylistNotExist($"Playlist {idPlaylist} not found!");
                 }
 
                 var entry = context.tPLentries
@@ -649,20 +568,26 @@ namespace MyJukebox.BLL
                     .FirstOrDefault();
 
                 if (entry == null)
-                    throw new Exception($"Song not exist in the Playlist '{playlist.Name}'");
+                    throw new ExceptionPlaylistSongNotExist($"Song not exist in the Playlist '{playlist.Name}'");
 
                 context.tPLentries.Remove(entry);
                 context.SaveChanges();
 
-                return null;
+                return true;
             }
-            catch (Exception ex)
+            catch (ExceptionPlaylistNotExist ex)
             {
-                return ex;
+                MessageBox.Show(ex.Message, "ERROR: RemoveSongFromPlaylist");
+                return false;
+            }
+            catch (ExceptionPlaylistSongNotExist ex)
+            {
+                MessageBox.Show(ex.Message, "ERROR: RemoveSongFromPlaylist");
+                return false;
             }
         }
 
-        public static Exception DeleteSong(int id)
+        public static bool DeleteSong(int id)
         {
             try
             {
@@ -670,11 +595,17 @@ namespace MyJukebox.BLL
                 var songs = context.tSongs.First(s => s.ID == id);
                 context.tSongs.Remove(songs);
                 context.SaveChanges();
-                return null;
+                return true;
+            }
+            catch (ExceptionDeleteSong ex)
+            {
+                MessageBox.Show(ex.Message, "ERROR: DeleteSong");
+                return false;
             }
             catch (Exception ex)
             {
-                return ex;
+                MessageBox.Show(ex.Message, "ERROR: DeleteSong");
+                return false;
             }
         }
     }

@@ -30,7 +30,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>7</ApplicationRevision>
+    <ApplicationRevision>8</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -108,6 +108,7 @@
     <Compile Include="BLL\DataGetSet.cs" />
     <Compile Include="BLL\Playlist.cs" />
     <Compile Include="BLL\SettingsDb.cs" />
+    <Compile Include="Commands\MyJukeboxCommands.cs" />
     <Compile Include="Common\AudioStates.cs" />
     <Compile Include="Common\Helpers.cs" />
     <Compile Include="Common\Mp3Record.cs" />
@@ -172,6 +173,11 @@
     <Compile Include="DAL\vSongsLong.cs">
       <DependentUpon>MyJukeboxModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Exceptions\ExceptionPlaylistMove.cs" />
+    <Compile Include="Exceptions\ExceptionPlaylistSongExist.cs" />
+    <Compile Include="Exceptions\ExceptionPlaylistSongNotExist.cs" />
+    <Compile Include="Exceptions\ExceptionDeleteSong.cs" />
+    <Compile Include="Exceptions\ExceptionPlaylistNotExist.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -274,9 +280,7 @@
     <Resource Include="Images\Album.ico" />
     <Resource Include="Images\NiceImage01.PNG" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Exeptions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
