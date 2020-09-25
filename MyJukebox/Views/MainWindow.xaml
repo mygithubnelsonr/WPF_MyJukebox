@@ -32,6 +32,7 @@
             <MenuItem x:Name="datagridMenuitemRemove" Header="Remove"/>
             <MenuItem x:Name="datagridMenuitemCopyCell" Header="Copy Cell to Clipboard" Click="datagridMenuitemCopyCell_Click"/>
             <MenuItem x:Name="datagridMenuitemCopyLine" Header="Copy Line to Clipboard" Command="{x:Static local:MyJukeboxCommands.CopyDataRow}"/>
+            <MenuItem x:Name="datagridMenuitemOpenEditor" Header="Edit Record" Click="datagridMenuitemOpenEditor_Click"/>
             <Separator />
             <MenuItem Header="Open Folder" Command="ApplicationCommands.Open"/>
         </ContextMenu>
@@ -117,10 +118,12 @@
         <Grid DockPanel.Dock="Top" Height="50" Background="{StaticResource headerBackground}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="34"/>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="1" Margin="10 0" HorizontalAlignment="Left" Width="300">
+            <Image Grid.Column="1" Source="/Images/Jukebox.ico" Width="38" Height="32"/>
+            <StackPanel Grid.Column="2" Margin="10 0" HorizontalAlignment="Left" Width="300">
                 <TextBlock x:Name="textblockHeader" Foreground="White" FontSize="26">
                     <Bold FontWeight="ExtraBold" Foreground="LightGray">My</Bold>
                     <Run FontWeight="ExtraBold" FontSize="26" Foreground="Red">J</Run>
@@ -144,7 +147,7 @@
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </StackPanel>
-            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 18 0">
+            <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 18 0">
                 <ToggleButton x:Name="buttonMaximize" Style="{StaticResource maxButton}"
                               Checked="buttonMaximize_Checked" Unchecked="buttonMaximize_Unchecked">
                     <Rectangle Width="20" Height="20" Stroke="WhiteSmoke" StrokeThickness="4"/>
@@ -206,6 +209,7 @@
                 <MenuItem.Icon>
                     <Image Source="/images/settings.png" Margin="0 0 2 0" />
                 </MenuItem.Icon>
+                <MenuItem x:Name="menuEditRecordLocation" Header="Edit Record Location" Click="menuEditRecordLocation_Click"/>
             </MenuItem>
             <MenuItem Header="D_atabase" Margin="4 0" Background="Transparent" Foreground="LightGreen" FontSize="16">
                 <MenuItem.Icon>

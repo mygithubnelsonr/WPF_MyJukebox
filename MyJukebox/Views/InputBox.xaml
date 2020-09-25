@@ -1,0 +1,68 @@
+﻿<Window x:Class="MyJukebox.Views.InputBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MyJukebox.Views"
+        mc:Ignorable="d"
+        Title="Edit Record Location" Height="167" Width="319" WindowStartupLocation="CenterScreen" Background="#FF81BACF">
+    <Window.Resources>
+        <!--Button Style-->
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Background" Value="#FF0F52BA"/>
+            <Setter Property="Foreground" Value="Beige"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border Background="{TemplateBinding Background}" CornerRadius="5"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF18DEFD"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="Gray"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <!--textbox Style-->
+        <Style TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="TextBox.Text" Value="">
+                    <Setter Property="Background" Value="#FFE28787"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="CommandClose_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Save"
+                            CanExecute="CommandSave_CanExecute"
+                            Executed="CommandSave_Executed"/>
+
+    </Window.CommandBindings>
+
+    <Grid>
+        <StackPanel Margin="10">
+            <StackPanel Margin="10">
+                <TextBlock Text="Enter Location:" FontSize="14" FontWeight="Bold"/>
+                <TextBox x:Name="textboxLocation" Text=""/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0 10 0 0" HorizontalAlignment="Center">
+                <Button x:Name="buttonSave" Content="Save" Command="ApplicationCommands.Save"/>
+                <Button x:Name="buttonCancel" Content="Cancel" Command="ApplicationCommands.Close"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

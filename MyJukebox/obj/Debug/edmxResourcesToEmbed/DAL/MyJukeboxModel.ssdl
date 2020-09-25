@@ -15,6 +15,8 @@
     <Property Name="Name" Type="nvarchar" MaxLength="25" />
     <Property Name="Width" Type="int" />
   </EntityType>
+  <!--Errors Found During Generation:
+warning 6002: The table/view 'MyJukebox.dbo.tFileInfos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
   <EntityType Name="tFileInfos">
     <Key>
       <PropertyRef Name="ID" />
@@ -94,7 +96,7 @@
     </Key>
     <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
-    <Property Name="Value" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="Value" Type="nvarchar" MaxLength="128" />
     <Property Name="Editable" Type="bit" />
   </EntityType>
   <EntityType Name="tSongs">
@@ -214,7 +216,6 @@ warning 6002: The table/view 'MyJukebox.dbo.vSongsLong' does not have a primary 
   <EntityContainer Name="MyJukeboxModelStoreContainer">
     <EntitySet Name="tCatalogs" EntityType="Self.tCatalogs" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tColumns" EntityType="Self.tColumns" Schema="dbo" store:Type="Tables" />
-    <EntitySet Name="tFileInfos" EntityType="Self.tFileInfos" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tGenres" EntityType="Self.tGenres" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tInfos" EntityType="Self.tInfos" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tMD5" EntityType="Self.tMD5" Schema="dbo" store:Type="Tables" />
@@ -224,6 +225,17 @@ warning 6002: The table/view 'MyJukebox.dbo.vSongsLong' does not have a primary 
     <EntitySet Name="tQueries" EntityType="Self.tQueries" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tSettings" EntityType="Self.tSettings" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tSongs" EntityType="Self.tSongs" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="tFileInfos" EntityType="Self.tFileInfos" store:Type="Tables" store:Schema="dbo">
+      <DefiningQuery>SELECT 
+    [tFileInfos].[ID] AS [ID], 
+    [tFileInfos].[ID_Song] AS [ID_Song], 
+    [tFileInfos].[FileSize] AS [FileSize], 
+    [tFileInfos].[FileDate] AS [FileDate], 
+    [tFileInfos].[Duration] AS [Duration], 
+    [tFileInfos].[ImportDate] AS [ImportDate], 
+    [tFileInfos].[Link] AS [Link]
+    FROM [dbo].[tFileInfos] AS [tFileInfos]</DefiningQuery>
+    </EntitySet>
     <EntitySet Name="vPlaylistSongs" EntityType="Self.vPlaylistSongs" store:Type="Views" store:Schema="dbo">
       <DefiningQuery>SELECT 
     [vPlaylistSongs].[ID] AS [ID], 

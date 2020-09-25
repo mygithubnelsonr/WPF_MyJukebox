@@ -241,18 +241,26 @@ namespace MyJukebox.BLL
 
         public static void SetSetting(string keyName, string keyValue)
         {
-            var context = new MyJukeboxEntities();
-
-            var settingExits = context.tSettings
-                                        .Where(s => s.Name == keyName)
-                                        .FirstOrDefault();
-
-            if (settingExits == null)
+            using (var context = new MyJukeboxEntities())
             {
-                context.tSettings
-                    .Add(new tSetting { Name = keyName, Value = keyValue });
+                try
+                {
+                    var settingExits = context.tSettings
+                                                .Where(s => s.Name == keyName)
+                                                .FirstOrDefault();
 
-                context.SaveChanges();
+                    if (settingExits == null)
+                    {
+                        context.tSettings
+                            .Add(new tSetting { Name = keyName, Value = keyValue });
+
+                        context.SaveChanges();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.Print(ex.Message);
+                }
             }
         }
 

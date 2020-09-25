@@ -8,12 +8,12 @@ using System.Reflection;
 
 namespace MyJukebox.BLL
 {
+    // ToDo add new setting for Record Editor location
     public class SettingsDb
     {
         private static Dictionary<string, object> _settings = new Dictionary<string, object>();
 
         #region public properties
-        public readonly static string PlaceHolderText = $"  enter search text  ";
         // Query
         public static List<string> QueryList = new List<string>();
         // DatagridView
@@ -47,7 +47,8 @@ namespace MyJukebox.BLL
         public static string ImagePath { get { return Convert.ToString(_settings["ImagePath"]); } set { _settings["ImagePath"] = value; } }
         public static string RootImagePath { get { return Convert.ToString(_settings["RootImagePath"]); } set { _settings["RootImagePath"] = value; } }
         public static int Volume { get { return Convert.ToInt32(_settings["Volume"]); } set { _settings["Volume"] = value.ToString(); } }
-
+        public static string RecordEditorLocation { get { return Convert.ToString(_settings["RecordEditorLocation"]); } set { _settings["RecordEditorLocation"] = value; } }
+        public readonly static string PlaceHolderText = $"  enter search text  ";
         #endregion public properties
 
         #region CTOR
@@ -121,6 +122,7 @@ namespace MyJukebox.BLL
             RootImagePath = Convert.ToString(GetSetting("RootImagePath", "C:\\"));
             QueryList = DataGetSet.GetQueryList();
             LastPlaylist = Convert.ToInt16(GetSetting("LastPlaylist", "0"));
+            RecordEditorLocation = Convert.ToString(GetSetting("RecordEditorLocation", @"C:\Company\Apps\Multimedia\DbRecordEditor\DbRecordEditor.exe"));
         }
 
         public static void Save()
@@ -129,6 +131,9 @@ namespace MyJukebox.BLL
 
             foreach (KeyValuePair<string, object> item in _settings)
             {
+
+                Debug.Print(item.Key);
+
                 var value = context.tSettings.SingleOrDefault(n => n.Name == item.Key);
 
                 if (value == null)
