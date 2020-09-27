@@ -124,11 +124,11 @@
             </Grid.ColumnDefinitions>
             <Image Grid.Column="1" Source="/Images/Jukebox.ico" Width="38" Height="32"/>
             <StackPanel Grid.Column="2" Margin="10 0" HorizontalAlignment="Left" Width="300">
-                <TextBlock x:Name="textblockHeader" Foreground="White" FontSize="26">
-                    <Bold FontWeight="ExtraBold" Foreground="LightGray">My</Bold>
-                    <Run FontWeight="ExtraBold" FontSize="26" Foreground="Red">J</Run>
-                    ukebox
-                </TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="My" Foreground="LightGray" FontSize="26" FontWeight="Bold"/>
+                    <TextBlock Text="J" Margin="-3 -4 0 0" FontFamily="Arial" FontWeight="ExtraBold" FontSize="38" FontStyle="Italic" Foreground="Red"/>
+                    <TextBlock Text="ukebox" Margin="-4 0 0 0" FontSize="26" Foreground="LightGray"/>
+                </StackPanel>
                 <Rectangle Height="14" Width="192">
                     <Rectangle.Fill>
                         <VisualBrush Visual="{Binding ElementName=textblockHeader}"/>
@@ -204,6 +204,7 @@
                 <MenuItem.Icon>
                     <Image Source="/Images/tools.png" Margin="0 0 2 0" />
                 </MenuItem.Icon>
+                <Button x:Name="buttonTest" Content="Test" Padding="10 2 10 2" Margin="10 0 10 0" Background="#FF75B9CF" Foreground="DarkBlue" Click="buttonTest_Click"/>
             </MenuItem>
             <MenuItem Header="Settin_gs" Margin="2 2" Background="Transparent" Foreground="Orange" FontSize="16">
                 <MenuItem.Icon>
@@ -371,7 +372,6 @@
                     <Button x:Name="buttonQueryDelete" Click="buttonQueryDelete_Click">
                         <Image Source="/Images/QueryDelete.ico" />
                     </Button>
-                    <Button x:Name="buttonTest" Content="Test" Padding="10 2 10 2" Margin="10 0 10 0" Background="#FF75B9CF" Foreground="DarkBlue" Click="buttonTest_Click"/>
                 </ToolBar>
             </ToolBarTray>
 

@@ -12,7 +12,7 @@ namespace MyJukebox.Views
         {
             InitializeComponent();
 
-            textboxLocation.Text = SettingsDb.RecordEditorLocation;
+            textboxLocation.Text = SettingsDb.Settings["RecordEditorLocation"];
         }
 
         private void CommandClose_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
@@ -27,7 +27,7 @@ namespace MyJukebox.Views
 
         private void CommandSave_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
-            SettingsDb.RecordEditorLocation = textboxLocation.Text;
+            SettingsDb.Settings["RecordEditorLocation"] = textboxLocation.Text;
         }
     }
 }

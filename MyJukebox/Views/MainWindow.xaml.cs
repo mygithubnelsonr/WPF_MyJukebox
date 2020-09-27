@@ -45,20 +45,18 @@ namespace MyJukebox
         {
             InitializeComponent();
 
-            SettingsDb.Load();
-
             mediaPlayer.Volume = 0;
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += timer_Tick;
 
-            AudioStates.Genre = SettingsDb.GetSetting("LastGenre", "").ToString();
-            AudioStates.Catalog = SettingsDb.GetSetting("LastCatalog", "").ToString();
-            AudioStates.Artist = SettingsDb.GetSetting("LastArtist", "").ToString();
-            AudioStates.Album = SettingsDb.GetSetting("LastAlbum", "").ToString();
+            AudioStates.Genre = SettingsDb.Settings["LastGenre"];
+            AudioStates.Catalog = SettingsDb.Settings["LastCatalog"];
+            AudioStates.Artist = SettingsDb.Settings["LastArtist"];
+            AudioStates.Album = SettingsDb.Settings["LastAlbum"];
 
-            _lastTab = Convert.ToInt32(SettingsDb.GetSetting("LastTab", "0"));
-            _lastPlaylist = Convert.ToInt32(SettingsDb.GetSetting("LastPlaylist", "0"));
+            _lastTab = Convert.ToInt32(SettingsDb.Settings["LastTab"]);
+            _lastPlaylist = Convert.ToInt32(SettingsDb.Settings["LastPlaylist"]);
             FillPlaylists();
         }
         #endregion
@@ -96,7 +94,7 @@ namespace MyJukebox
             statusArtist.Text = AudioStates.Artist;
             statusAlbum.Text = AudioStates.Album;
             _isLoaded = true;
-            sliderVolume.Value = 0.05;
+            sliderVolume.Value = Convert.ToDouble(SettingsDb.Settings["Volume"]);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -187,6 +185,11 @@ namespace MyJukebox
             this.WindowState = WindowState.Normal;
         }
 
+        private void buttonTest_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         #endregion
 
         #region Methods
@@ -194,14 +197,15 @@ namespace MyJukebox
         {
             try
             {
-                SettingsDb.LastGenre = AudioStates.Genre;
-                SettingsDb.LastCatalog = AudioStates.Catalog;
-                SettingsDb.LastArtist = AudioStates.Artist;
-                SettingsDb.LastAlbum = AudioStates.Album;
-                SettingsDb.LastTab = tabcontrol.SelectedIndex;
+                SettingsDb.Settings["LastGenre"] = AudioStates.Genre;
+                SettingsDb.Settings["LastCatalog"] = AudioStates.Catalog;
+                SettingsDb.Settings["LastArtist"] = AudioStates.Artist;
+                SettingsDb.Settings["LastAlbum"] = AudioStates.Album;
+                SettingsDb.Settings["LastTab"] = _lastTab.ToString();
+                SettingsDb.Settings["Volume"] = Convert.ToString(mediaPlayer.Volume);
                 SettingsDb.Save();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debug.Print(ex.Message);
             }
@@ -353,16 +357,14 @@ namespace MyJukebox
 
         #endregion
 
-        private void buttonTest_Click(object sender, RoutedEventArgs e)
-        {
-            Debug.Print(SettingsDb.RecordEditorLocation);
-        }
 
         #region Slider Events
         private void sliderVolume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (_dataLoaded)
+            {
                 mediaPlayer.Volume = sliderVolume.Value;
+            }
         }
         private void sliderVolume_MouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -596,7 +598,7 @@ namespace MyJukebox
         private void listboxPlaylists_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Playlist playlist = listboxPlaylists.SelectedItem as Playlist;
-            SettingsDb.LastPlaylist = playlist.ID;
+            SettingsDb.Settings["LastPlaylist"] = playlist.ID.ToString();
             _lastPlaylist = playlist.ID;
             FillDatagridByTabPlaylist(playlist.ID);
         }
@@ -636,6 +638,7 @@ namespace MyJukebox
 
         private void tabcontrol_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            _lastTab = tabcontrol.SelectedIndex;
             if (_isLoaded == false)
                 return;
 
@@ -751,6 +754,27 @@ namespace MyJukebox
             DataGetSet.AddSongToPlaylist(songId, playlistID);
         }
 
+        private void datagridMenuitemOpenEditor_Click(object sender, RoutedEventArgs e)
+        {
+            int lastIndex = datagrid.SelectedIndex;
+
+            try
+            {
+                Process.Start(SettingsDb.Settings["RecordEditorLocation"], _lastID.ToString());
+
+                if (_lastTab == 0)
+                    FillDatagridByTabAudio();
+                else
+                    FillDatagridByTabPlaylist(_lastPlaylist);
+
+                datagrid.SelectedIndex = lastIndex;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ERROR: Open Record Editor");
+            }
+        }
+
         private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
@@ -851,27 +875,6 @@ namespace MyJukebox
 
             Clipboard.Clear();
             Clipboard.SetText(songFields);
-        }
-
-        private void datagridMenuitemOpenEditor_Click(object sender, RoutedEventArgs e)
-        {
-            int lastIndex = datagrid.SelectedIndex;
-
-            try
-            {
-                Process.Start(SettingsDb.RecordEditorLocation, _lastID.ToString());
-
-                if (_lastTab == 0)
-                    FillDatagridByTabAudio();
-                else
-                    FillDatagridByTabPlaylist(_lastPlaylist);
-
-                datagrid.SelectedIndex = lastIndex;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "ERROR: Open Record Editor");
-            }
         }
 
         private void PlaybackLoop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
