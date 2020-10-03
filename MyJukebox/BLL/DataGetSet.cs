@@ -616,6 +616,144 @@ namespace MyJukebox.BLL
                 return false;
             }
         }
+
+        public static bool SetAlbumLastRow(string albumname, int row)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var album = context.tAlbums
+                                .Where(a => a.Name == albumname)
+                                .FirstOrDefault();
+                if (album == null)
+                {
+                    album.Name = albumname;
+                    album.Row = row;
+                }
+                else
+                    album.Row = row;
+
+                context.SaveChanges();
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static int GetAlbumLastRow(string albumname)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var album = context.tAlbums
+                                .Where(a => a.Name == albumname)
+                                .FirstOrDefault();
+                if (album == null)
+                    return 0;
+                else
+                    return (int)album.Row;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.Message);
+                return 0;
+            }
+        }
+
+        public static bool SetPlaylistLastRow(int id, int row)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var playlist = context.tPlaylists
+                                .Where(p => p.ID == id)
+                                .FirstOrDefault();
+                if (playlist == null)
+                {
+                    playlist.ID = id;
+                    playlist.Row = row;
+                }
+                else
+                    playlist.Row = row;
+
+                context.SaveChanges();
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static int GetPlaylistLastRow(int id)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var playlist = context.tPlaylists
+                                .Where(p => p.ID == id)
+                                .FirstOrDefault();
+                if (playlist == null)
+                    return 0;
+                else
+                    return (int)playlist.Row;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.Message);
+                return 0;
+            }
+        }
+
+        public static bool SetQueryLastRow(string name, int row)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var query = context.tQueries
+                                .Where(q => q.Query == name)
+                                .FirstOrDefault();
+                if (query == null)
+                {
+                    query.Query = name;
+                    query.Row = row;
+                }
+                else
+                    query.Row = row;
+
+                context.SaveChanges();
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public static int GetQueryLastRow(string name)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var query = context.tQueries
+                                .Where(q => q.Query == name)
+                                .FirstOrDefault();
+                if (query == null)
+                    return 0;
+                else
+                    return query.Row == null ? 0 : (int)query.Row;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.Message);
+                return 0;
+            }
+        }
     }
 }
 

@@ -1,5 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Schema Namespace="MyJukeboxModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="tAlbums">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="Row" Type="int" />
+  </EntityType>
   <EntityType Name="tCatalogs">
     <Key>
       <PropertyRef Name="ID" />
@@ -89,6 +97,7 @@ warning 6002: The table/view 'MyJukebox.dbo.tFileInfos' does not have a primary 
     </Key>
     <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Query" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="Row" Type="int" />
   </EntityType>
   <EntityType Name="tSettings">
     <Key>
@@ -214,6 +223,7 @@ warning 6002: The table/view 'MyJukebox.dbo.vSongsLong' does not have a primary 
     </ReferentialConstraint>
   </Association>
   <EntityContainer Name="MyJukeboxModelStoreContainer">
+    <EntitySet Name="tAlbums" EntityType="Self.tAlbums" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tCatalogs" EntityType="Self.tCatalogs" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tColumns" EntityType="Self.tColumns" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tGenres" EntityType="Self.tGenres" Schema="dbo" store:Type="Tables" />

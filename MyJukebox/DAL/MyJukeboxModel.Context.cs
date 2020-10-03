@@ -40,5 +40,6 @@ namespace MyJukebox.DAL
         public virtual DbSet<vPlaylistSong> vPlaylistSongs { get; set; }
         public virtual DbSet<vSong> vSongs { get; set; }
         public virtual DbSet<vSongsLong> vSongsLongs { get; set; }
+        public virtual DbSet<tAlbum> tAlbums { get; set; }
     }
 }

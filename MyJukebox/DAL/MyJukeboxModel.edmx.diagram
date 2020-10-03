@@ -24,6 +24,7 @@
         <AssociationConnector Association="MyJukeboxModel.FK_tSongsNew_tGenres" ManuallyRouted="false" />
         <AssociationConnector Association="MyJukeboxModel.FK_tSongsNew_tMedia" ManuallyRouted="false" />
         <AssociationConnector Association="MyJukeboxModel.FK_tPLentries_tPlaylists" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="MyJukeboxModel.tAlbum" Width="1.5" PointX="10.25" PointY="0.875" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -94,6 +94,7 @@
     <EntitySetMapping Name="tQueries">
       <EntityTypeMapping TypeName="MyJukeboxModel.tQuery">
         <MappingFragment StoreEntitySet="tQueries">
+          <ScalarProperty Name="Row" ColumnName="Row" />
           <ScalarProperty Name="ID" ColumnName="ID" />
           <ScalarProperty Name="Query" ColumnName="Query" />
         </MappingFragment>
@@ -166,6 +167,15 @@
           <ScalarProperty Name="Pfad" ColumnName="Pfad" />
           <ScalarProperty Name="FileName" ColumnName="FileName" />
           <ScalarProperty Name="Media" ColumnName="Media" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="tAlbums">
+      <EntityTypeMapping TypeName="MyJukeboxModel.tAlbum">
+        <MappingFragment StoreEntitySet="tAlbums">
+          <ScalarProperty Name="Row" ColumnName="Row" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
