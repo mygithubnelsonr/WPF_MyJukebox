@@ -115,17 +115,7 @@ namespace MyJukebox.BLL
                 else
                     value.Value = item.Value.ToString();
             }
-
             context.SaveChanges();
-
-            //var result = DataGetSet.TruncateTableQueries();
-            //foreach (string query in QueryList)
-            //{
-            //    if (query != "")
-            //        context.tQueries.Add(new tQuery { Query = query });
-            //}
-
-            //context.SaveChanges();
         }
 
         private static string GetSetting(string name)

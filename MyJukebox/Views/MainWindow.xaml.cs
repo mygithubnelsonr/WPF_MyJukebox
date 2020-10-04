@@ -63,6 +63,11 @@ namespace MyJukebox
             _lastTab = Convert.ToInt32(SettingsDb.Settings["LastTab"]);
             _lastPlaylist = Convert.ToInt32(SettingsDb.Settings["LastPlaylist"]);
             _lastQuery = SettingsDb.Settings["LastQuery"];
+
+            this.Height = Convert.ToInt32(SettingsDb.Settings["FormHeight"]);
+            this.Width = Convert.ToInt32(SettingsDb.Settings["FormWidth"]);
+            expanderLeftPanel.IsExpanded = Convert.ToBoolean(SettingsDb.Settings["LeftPanel"]);
+
             FillPlaylists();
         }
         #endregion
@@ -123,6 +128,7 @@ namespace MyJukebox
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+
             SaveSettings();
         }
 
@@ -212,7 +218,10 @@ namespace MyJukebox
         private void buttonTest_Click(object sender, RoutedEventArgs e)
         {
             //SaveSettings();
-            SetPlaylistRow(_lastPlaylist, _lastRow);
+            //SetPlaylistRow(_lastPlaylist, _lastRow);
+            SettingsDb.Settings["LeftPanel"] = "false";
+            expanderLeftPanel.IsExpanded = Convert.ToBoolean(SettingsDb.Settings["LeftPanel"]);
+
         }
 
         private void SetAlbumRow(string name, int row)
@@ -244,6 +253,9 @@ namespace MyJukebox
                 SettingsDb.Settings["LastTab"] = _lastTab.ToString();
                 SettingsDb.Settings["Volume"] = Convert.ToString(mediaPlayer.Volume);
                 SettingsDb.Settings["LastRow"] = Convert.ToString(_lastRow);
+                SettingsDb.Settings["FormHeight"] = this.Height.ToString();
+                SettingsDb.Settings["FormWidth"] = this.Width.ToString();
+                SettingsDb.Settings["LeftPanel"] = expanderLeftPanel.IsExpanded.ToString();
                 SettingsDb.Save();
             }
             catch (Exception ex)

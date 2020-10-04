@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyJukebox"
         mc:Ignorable="d"
-        Title="MyJukebox" Height="900" Width="1200" WindowStartupLocation="CenterScreen" Background="{StaticResource WindowBackgroundBrush}"
+        Title="MyJukebox" Height="900" Width="1254" WindowStartupLocation="CenterScreen" Background="{StaticResource WindowBackgroundBrush}"
             Icon="/Images/Jukebox.ico" WindowStyle="None"
             MouseLeftButtonDown="Move_Window" Loaded="Window_Loaded">
     <Window.Resources>
@@ -218,7 +218,7 @@
                 </MenuItem.Icon>
             </MenuItem>
         </Menu>
-        <Expander x:Name="expanderHide" ExpandDirection="Right" IsExpanded="True">
+        <Expander x:Name="expanderLeftPanel" ExpandDirection="Right" IsExpanded="True">
             <Grid DockPanel.Dock="Left" Width="220">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -351,7 +351,7 @@
                             ValueChanged="sliderPosition_ValueChanged">
                     </Slider>
                 </ToolBar>
-                <ToolBar Band="1" Height="34" FontSize="14" Foreground="Blue">
+                <ToolBar x:Name="barQuery" Band="1" Height="34" FontSize="14" Foreground="Blue">
                     <Label Content="Enter Query: " Foreground="DarkBlue"/>
                     <TextBox x:Name="textboxQuery" Text="" Height="24" Width="200" Background="Beige" FontWeight="Medium"
                              IsReadOnly="False" KeyDown="textboxQuery_KeyDown">
@@ -368,8 +368,9 @@
                     </Button>
                     <Label Content="Stored Queries:" Margin="20 0 0 0" Foreground="DarkBlue" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
                     <ComboBox x:Name="comboboxStoredQueries" Width="200" Margin="10 0" IsEditable="True" FontWeight="Medium"
+                              ToolBar.OverflowMode="AsNeeded"
                              SelectionChanged="comboboxStoredQueries_SelectionChanged" KeyDown="comboboxStoredQueries_KeyDown"/>
-                    <Button x:Name="buttonQueryDelete" Click="buttonQueryDelete_Click">
+                    <Button x:Name="buttonQueryDelete" ToolBar.OverflowMode="AsNeeded" Click="buttonQueryDelete_Click">
                         <Image Source="/Images/QueryDelete.ico" />
                     </Button>
                 </ToolBar>
