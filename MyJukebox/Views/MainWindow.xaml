@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyJukebox"
         mc:Ignorable="d"
-        Title="MyJukebox" Height="900" Width="1254" WindowStartupLocation="CenterScreen" Background="{StaticResource WindowBackgroundBrush}"
+        Title="MyJukebox" Height="900" Width="1254" WindowStartupLocation="Manual" Background="{StaticResource WindowBackgroundBrush}"
             Icon="/Images/Jukebox.ico" WindowStyle="None"
             MouseLeftButtonDown="Move_Window" Loaded="Window_Loaded">
     <Window.Resources>
@@ -69,7 +69,6 @@
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock x:Name="statusProgress" Text="00:00" Foreground="White"/>
             </StatusBarItem>
-
             <Separator/>
             <StatusBarItem DockPanel.Dock="Left">
                 <TextBlock Text="Genre:" Foreground="DarkBlue"/>
@@ -112,7 +111,6 @@
                 <TextBlock x:Name="statusCount" Text="{Binding Items.Count, ElementName=datagrid}" Foreground="White"/>
             </StatusBarItem>
             <Separator/>
-
             <StatusBarItem DockPanel.Dock="Left" Content="" Width="Auto"/>
         </StatusBar>
         <Grid DockPanel.Dock="Top" Height="50" Background="{StaticResource headerBackground}">
@@ -300,7 +298,7 @@
                 </TabControl>
 
                 <Border Grid.Row="1" Background="#FF1D1B1B" Height="120">
-                    <Image Source="/Images/NiceImage01.PNG" Stretch="Fill" />
+                    <Image x:Name="imageArtist" Source="/Images/NiceImage01.PNG" Stretch="Fill" />
                 </Border>
                 <Border Grid.Row="2" Height="120" Background="Blue">
                     <Image Source="/Images/MyBitmap.gif"/>
@@ -383,6 +381,19 @@
                       AlternatingRowBackground="{StaticResource AlternatingRowBackgroundBrush}"
                       IsReadOnly="True" SelectionMode="Single" ColumnHeaderStyle="{StaticResource datagridHeaderStyle}"
                       SelectionChanged="datagrid_SelectionChanged">
+
+                <DataGrid.RowValidationRules>
+                    <local:FileExistValidationRule/>
+                </DataGrid.RowValidationRules>
+                <DataGrid.RowValidationErrorTemplate>
+                    <ControlTemplate>
+                        <Grid ToolTip="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGridRow}},Path=(Validation.Errors)[0].ErrorContent}">
+                            <Ellipse Width="16" Height="16" Fill="Red"/>
+                            <TextBlock Text="!" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </DataGrid.RowValidationErrorTemplate>
+
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF0078D7"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="WhiteSmoke"/>

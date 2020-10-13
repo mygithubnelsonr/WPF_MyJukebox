@@ -5,13 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
-// ToDo set lastrow on album and playlist
 namespace MyJukebox
 {
     /// <summary>
@@ -26,21 +27,23 @@ namespace MyJukebox
         private ObservableCollection<string> _albums;
         private ObservableCollection<string> _queries;
         private ObservableCollection<Playlist> _playlists;
+        private List<string> _artistImageList;
 
         private int _lastID = -1;
         private int _lastRow = -1;
         private int _lastTab = -1;
         private int _lastPlaylist = -1;
-        private int _datasource = -1;
+        //private int _datasource = -1;
         private string _lastQuery = "";
+        private string _artist = "";
         private bool _dataLoaded = false;
         private bool _isLoaded = false;
         private bool _userIsDraggingSlider;
         private bool _mediaPlayerIsPlaying = false;
 
         private RandomH random = new RandomH();
-
-        private DispatcherTimer timer;
+        private DispatcherTimer timerDuration;
+        private DispatcherTimer timerFlipImage;
 
         #endregion
 
@@ -50,9 +53,16 @@ namespace MyJukebox
             InitializeComponent();
 
             mediaPlayer.Volume = 0;
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += timer_Tick;
+            timerDuration = new DispatcherTimer();
+            timerDuration.Interval = TimeSpan.FromSeconds(1);
+            timerDuration.Tick += timerDuration_Tick;
+            timerDuration.IsEnabled = false;
+
+            timerFlipImage = new DispatcherTimer();
+            timerFlipImage.Interval = TimeSpan.FromSeconds(10);
+            timerFlipImage.Tick += timerFlipImage_Tick;
+            timerFlipImage.IsEnabled = true;
+            timerFlipImage.Stop();
 
             AudioStates.Genre = SettingsDb.Settings["LastGenre"];
             AudioStates.Catalog = SettingsDb.Settings["LastCatalog"];
@@ -66,6 +76,7 @@ namespace MyJukebox
 
             this.Height = Convert.ToInt32(SettingsDb.Settings["FormHeight"]);
             this.Width = Convert.ToInt32(SettingsDb.Settings["FormWidth"]);
+
             expanderLeftPanel.IsExpanded = Convert.ToBoolean(SettingsDb.Settings["LeftPanel"]);
 
             FillPlaylists();
@@ -80,8 +91,49 @@ namespace MyJukebox
         }
 
         #region FormEvents
+
+        private void buttonTest_Click(object sender, RoutedEventArgs e)
+        {
+            //imageArtist.Tag = 0;
+
+            //var imageFlipper = ImageFlipper.Instanz();
+            //string rootPath = SettingsDb.Settings["RootImagePath"];
+            //string imagePath = SettingsDb.Settings["ImagePath"];
+            //string fullpath = Path.Combine(
+            //    rootPath,
+            //    AudioStates.Genre,
+            //    imagePath);
+
+            //_artistImageList = imageFlipper.GetImagesFullNames(fullpath, _artist);
+
+            //timerFlipImage.Start();
+
+            //ImageFlipperLoad();
+        }
+
+        private void ImageFlipperLoad()
+        {
+            imageArtist.Tag = 0;
+
+            var imageFlipper = ImageFlipper.Instanz();
+            string rootPath = SettingsDb.Settings["RootImagePath"];
+            string imagePath = SettingsDb.Settings["ImagePath"];
+            string fullpath = Path.Combine(
+                rootPath,
+                AudioStates.Genre,
+                imagePath);
+
+            _artistImageList = imageFlipper.GetImagesFullNames(fullpath, _artist);
+
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            var t = Convert.ToInt32(SettingsDb.Settings["FormTop"]);
+
+            this.Top = Convert.ToInt32(SettingsDb.Settings["FormTop"]);
+            this.Left = Convert.ToInt32(SettingsDb.Settings["FormLeft"]);
+
             FillListboxesAsync();
             FillQueryCombo();
 
@@ -115,6 +167,20 @@ namespace MyJukebox
                 datagrid.SelectedItem = _lastRow;
                 datagrid.ScrollIntoView(datagrid.SelectedItem);
                 datagrid.Focus();
+
+                //DataGetSet.Datasource == DataGetSet.DataSourceEnum.Songs
+                if (DataGetSet.Datasource == DataGetSet.DataSourceEnum.Songs ||
+                    DataGetSet.Datasource == DataGetSet.DataSourceEnum.Query)
+                {
+                    var rowlist = (vSong)datagrid.SelectedItem;
+                    _artist = rowlist.Artist;
+                }
+
+                if (DataGetSet.Datasource == DataGetSet.DataSourceEnum.Playlist)
+                {
+                    var rowlist = (vPlaylistSong)datagrid.SelectedItem;
+                    _artist = rowlist.Artist;
+                }
                 _dataLoaded = true;
             }
 
@@ -123,12 +189,12 @@ namespace MyJukebox
             statusArtist.Text = AudioStates.Artist;
             statusAlbum.Text = AudioStates.Album;
             sliderVolume.Value = Convert.ToDouble(SettingsDb.Settings["Volume"]);
+
             _isLoaded = true;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
             SaveSettings();
         }
 
@@ -215,15 +281,6 @@ namespace MyJukebox
             this.WindowState = WindowState.Normal;
         }
 
-        private void buttonTest_Click(object sender, RoutedEventArgs e)
-        {
-            //SaveSettings();
-            //SetPlaylistRow(_lastPlaylist, _lastRow);
-            SettingsDb.Settings["LeftPanel"] = "false";
-            expanderLeftPanel.IsExpanded = Convert.ToBoolean(SettingsDb.Settings["LeftPanel"]);
-
-        }
-
         private void SetAlbumRow(string name, int row)
         {
             bool result = DataGetSet.SetAlbumLastRow(name, row);
@@ -255,6 +312,8 @@ namespace MyJukebox
                 SettingsDb.Settings["LastRow"] = Convert.ToString(_lastRow);
                 SettingsDb.Settings["FormHeight"] = this.Height.ToString();
                 SettingsDb.Settings["FormWidth"] = this.Width.ToString();
+                SettingsDb.Settings["FormTop"] = this.Top.ToString();
+                SettingsDb.Settings["FormLeft"] = this.Left.ToString();
                 SettingsDb.Settings["LeftPanel"] = expanderLeftPanel.IsExpanded.ToString();
                 SettingsDb.Save();
             }
@@ -263,6 +322,19 @@ namespace MyJukebox
                 Debug.Print(ex.Message);
             }
         }
+
+        private bool hasDataGridErrors()
+        {
+            var rowIndex = datagrid.SelectedIndex;
+
+            DataGridRow row = (DataGridRow)datagrid.ItemContainerGenerator.ContainerFromIndex(rowIndex);
+
+            if (row != null && Validation.GetHasError(row))
+                return true;
+            else
+                return false;
+        }
+
         #endregion
 
         #region async Methods
@@ -386,18 +458,21 @@ namespace MyJukebox
                 datagrid.CurrentItem = _lastRow;
             }
 
-            if (_datasource == (int)DataSource.Songs || _datasource == (int)DataSource.Query)
+            if (DataGetSet.Datasource == DataGetSet.DataSourceEnum.Songs ||
+                DataGetSet.Datasource == DataGetSet.DataSourceEnum.Query)
             {
                 var rowlist = (vSong)datagrid.SelectedItem;
                 _lastID = rowlist.ID;
+                _artist = rowlist.Artist;
                 fullpath = $"{rowlist.Pfad}\\{rowlist.FileName}";
                 this.Title = $"{rowlist.Artist} - {rowlist.Titel}";
             }
 
-            if (_datasource == (int)DataSource.Playlist)
+            if (DataGetSet.Datasource == DataGetSet.DataSourceEnum.Playlist)
             {
                 var rowlist = (vPlaylistSong)datagrid.SelectedItem;
                 _lastID = rowlist.ID;
+                _artist = rowlist.Artist;
                 if (rowlist != null)
                 {
                     fullpath = $"{rowlist.Pfad}\\{rowlist.FileName}";
@@ -407,15 +482,16 @@ namespace MyJukebox
 
             _lastRow = datagrid.SelectedIndex;
 
-            if (_datasource == (int)DataSource.Songs)
+            if (DataGetSet.Datasource == DataGetSet.DataSourceEnum.Songs)
                 SetAlbumRow(AudioStates.Album, _lastRow);
 
-            if (_datasource == (int)DataSource.Query)
+            if (DataGetSet.Datasource == DataGetSet.DataSourceEnum.Query)
                 SetQueryRow(textboxQuery.Text, _lastRow);
 
-            if (_datasource == (int)DataSource.Playlist)
+            if (DataGetSet.Datasource == DataGetSet.DataSourceEnum.Playlist)
                 SetPlaylistRow(_lastPlaylist, _lastRow);
 
+            ImageFlipperLoad();
             mediaPlayer.Source = new Uri(fullpath);
         }
 
@@ -519,9 +595,8 @@ namespace MyJukebox
 
                 if (results != null)
                 {
-                    _datasource = (int)DataSource.Query;
+                    DataGetSet.Datasource = DataGetSet.DataSourceEnum.Query;
                     datagrid.ItemsSource = results;
-                    //_dataLoaded = true;
                     random.InitRandomNumbers(datagrid.Items.Count - 1);
 
                     _lastRow = DataGetSet.GetQueryLastRow((string)comboboxStoredQueries.SelectedItem);
@@ -563,7 +638,7 @@ namespace MyJukebox
 
         private void comboboxStoredQueries_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            timer.Stop();
+            timerDuration.Stop();
             mediaPlayer.Stop();
             textboxQuery.Text = (string)comboboxStoredQueries.SelectedItem;
             SettingsDb.Settings["LastQuery"] = textboxQuery.Text;
@@ -588,6 +663,7 @@ namespace MyJukebox
 
         #region MediaPlayer Elements
 
+        #region Commands
         private void Play_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = (mediaPlayer != null) && (mediaPlayer.Source != null);
@@ -595,7 +671,17 @@ namespace MyJukebox
 
         private void Play_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            timer.Start();
+            if (_artistImageList == null || _artistImageList.Count == 0)
+            {
+                Uri uri = new Uri("/Images/ShadowMen.gif", UriKind.Relative);
+                BitmapImage image = new BitmapImage(uri);
+                imageArtist.Source = image;
+                imageArtist.Stretch = System.Windows.Media.Stretch.Uniform;
+            }
+
+            timerDuration.Start();
+            timerFlipImage.Start();
+
             mediaPlayer.Play();
             _mediaPlayerIsPlaying = true;
             statusDuration.Text = TimeSpan.FromSeconds(sliderPosition.Maximum).ToString(@"mm\:ss");
@@ -610,7 +696,8 @@ namespace MyJukebox
         private void Pause_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             mediaPlayer.Pause();
-            timer.Stop();
+            timerDuration.Stop();
+            timerFlipImage.Stop();
         }
 
         private void Stop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -622,10 +709,58 @@ namespace MyJukebox
         {
             mediaPlayer.Stop();
             _mediaPlayerIsPlaying = false;
-            timer.Stop();
+            timerDuration.Stop();
+            timerFlipImage.Stop();
         }
 
-        //buttonPlay.Command?.Execute(Button.CommandProperty);
+        private void CopyDataRowCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void CopyDataRowExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            int id = -1;
+
+            if (_lastTab == 1)
+            {
+                var song = (vPlaylistSong)datagrid.SelectedItem;
+                id = song.ID;
+            }
+            else
+            {
+                var song = (vSong)datagrid.SelectedItem;
+                id = song.ID;
+            }
+
+            string songFields = DataGetSet.GetSongFieldValuesByID(id);
+
+            Clipboard.Clear();
+            Clipboard.SetText(songFields);
+        }
+
+        private void PlaybackLoop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void PlaybackLoop_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Playback_Shuffle.IsChecked = false;
+        }
+
+        private void PlaybackShuffle_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void PlaybackShuffle_Execute(object sender, ExecutedRoutedEventArgs e)
+        {
+            Playback_Loop.IsChecked = false;
+        }
+
+        #endregion
+
         private void mediaplayer_MediaEnded(object sender, RoutedEventArgs e)
         {
             _mediaPlayerIsPlaying = false;
@@ -643,16 +778,51 @@ namespace MyJukebox
             }
             else
             {
-                var currentItem = datagrid.SelectedIndex;
-                if (currentItem + 1 < datagrid.Items.Count)
-                    datagrid.SelectedIndex = currentItem + 1;
+                //var currentIndex = datagrid.SelectedIndex;
+                //if (currentIndex + 1 < datagrid.Items.Count)
+                //    datagrid.SelectedIndex = currentIndex + 1;
+
+                //int nextIndex = -1;
+                //while (hasDataGridErrors())
+                //{
+                //    if (currentIndex + 1 < datagrid.Items.Count)
+                //        datagrid.SelectedIndex = nextIndex;
+
+                //    Debug.Print($"hasError={hasDataGridErrors()}");
+
+                //    nextIndex = GetNextIndex();
+                //}
+
+                datagrid.SelectedIndex = GetNextIndex();
                 _mediaPlayerIsPlaying = true;
             }
         }
 
+        private int GetNextIndex()
+        {
+            int newIndex = -1;
+            int currentIndex = datagrid.SelectedIndex;
+
+            if (currentIndex + 1 < datagrid.Items.Count)
+            {
+                datagrid.SelectedIndex = currentIndex + 1;
+
+                while (hasDataGridErrors())
+                {
+                    datagrid.SelectedIndex = datagrid.SelectedIndex + 1;
+                }
+
+                newIndex = datagrid.SelectedIndex;
+            }
+            else
+                newIndex = currentIndex;
+
+            return newIndex;
+        }
+
         #endregion
 
-        private void timer_Tick(object sender, EventArgs e)
+        private void timerDuration_Tick(object sender, EventArgs e)
         {
             if ((mediaPlayer.Source != null) && (mediaPlayer.NaturalDuration.HasTimeSpan) && (!_userIsDraggingSlider))
             {
@@ -662,6 +832,35 @@ namespace MyJukebox
                 sliderPosition.TickFrequency = sliderPosition.Maximum / 10;
                 statusDuration.Text = TimeSpan.FromSeconds(sliderPosition.Maximum).ToString(@"mm\:ss");
             }
+        }
+
+        private void SetArtistImage(string path)
+        {
+            Uri uri;
+            BitmapImage image;
+
+            uri = new Uri(path, UriKind.RelativeOrAbsolute);
+            image = new BitmapImage(uri);
+            imageArtist.Source = image;
+            imageArtist.Stretch = System.Windows.Media.Stretch.Uniform;
+        }
+
+        private void timerFlipImage_Tick(object sender, EventArgs e)
+        {
+            if (_artistImageList.Count == 0)
+            {
+                SetArtistImage("/Images/ShadowMen.gif");
+                return;
+            }
+
+            if (Tag == null || (int)Tag >= _artistImageList.Count) Tag = 0;
+            int counter = (int)Tag;
+
+            SetArtistImage(_artistImageList[counter]);
+
+            Tag = ++counter;
+
+            //Debug.Print("timerFlipImage_Tick");
         }
 
         private void listboxPlaylists_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -678,7 +877,7 @@ namespace MyJukebox
             List<vSong> results = DataGetSet.GetTablogicalResults();
             if (results != null)
             {
-                _datasource = (int)DataSource.Songs;
+                DataGetSet.Datasource = DataGetSet.DataSourceEnum.Songs;
                 datagrid.ItemsSource = results;
                 _dataLoaded = true;
                 random.InitRandomNumbers(datagrid.Items.Count - 1);
@@ -696,7 +895,7 @@ namespace MyJukebox
             var results = DataGetSet.GetPlaylistEntries(playlistID);
             if (results != null)
             {
-                _datasource = (int)DataSource.Playlist;
+                DataGetSet.Datasource = DataGetSet.DataSourceEnum.Playlist;
                 datagrid.ItemsSource = results;
                 _dataLoaded = true;
 
@@ -768,7 +967,7 @@ namespace MyJukebox
 
             // remove menuitem 'remove'
             MenuItem mi = (MenuItem)contextmenu.Items[1];
-            Debug.Print(mi.Header.ToString());
+            //Debug.Print(mi.Header.ToString());
             contextmenu.Items.Remove(mi);
 
             MenuItem miRemove = new MenuItem();
@@ -905,50 +1104,5 @@ namespace MyJukebox
 
         #endregion
 
-        private void CopyDataRowCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-
-        private void CopyDataRowExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            int id = -1;
-
-            if (_lastTab == 1)
-            {
-                var song = (vPlaylistSong)datagrid.SelectedItem;
-                id = song.ID;
-            }
-            else
-            {
-                var song = (vSong)datagrid.SelectedItem;
-                id = song.ID;
-            }
-
-            string songFields = DataGetSet.GetSongFieldValuesByID(id);
-
-            Clipboard.Clear();
-            Clipboard.SetText(songFields);
-        }
-
-        private void PlaybackLoop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-
-        private void PlaybackLoop_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            Playback_Shuffle.IsChecked = false;
-        }
-
-        private void PlaybackShuffle_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-
-        private void PlaybackShuffle_Execute(object sender, ExecutedRoutedEventArgs e)
-        {
-            Playback_Loop.IsChecked = false;
-        }
     }
 }

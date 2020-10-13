@@ -1,0 +1,61 @@
+
+
+I think the same question must have been asked, but I just don't know how to describe it properly.
+
+I am using Entity Framework, and I have a table called vendor, consisting of many columns:
+
+[vendor] 
+ - [Id] [INT]
+ - [Name] [NVARCHAR]
+ - [ApiUrl] [NVARCHAR]
+ - ...
+I am writing a Web Api to expose the function which users can get vendor records by. However, I want to provide only three columns.
+
+So I created a model class, as below:
+
+public class OM_Vendor
+{
+    public int Id { set; get; }
+    public string Name { set; get; }
+    public string ApiUrl { set; get; }
+}
+After building the model classes with EF, the context object of EF has a property named vendors now. Then, in an API controller, I coded like this:
+
+var vendors = this.objEntity.vendors
+.Where<OM_Vendor>(v => v.Status == "1")
+.OrderBy(v => v.Id)
+.Skip(intSkip)
+.Take(intLimit)
+.ToList();
+It doesn't work, neither does this:
+
+    var vendors = this.objEntity.vendors
+.Where(v => v.Status == "1")
+.OrderBy(v => v.Id)
+.Skip(intSkip)
+.Take(intLimit)
+.ToList<OM_Vendor>();
+Is there a way to convert the objects returned by the methods like above to my custom type?
+
+Thanks a lot.
+
+In addition, I know that I can get it to work in this way:
+
+var vendors = new List<OM_Vendor>();
+vendors = objCont.ExecuteStoreQuery<OM_Vendor>("SELECT * FROM vendor").ToList();
+And this way works too:
+
+var vendors = this.objCont.vendors
+                .Where(v => v.Status == "1")
+                .OrderBy(v => v.Id)
+                .Select(
+                    row => new
+                        {
+                            Id= row.Id,
+                            Name = row.Name,
+                            ApiUrl = row.ApiUrl
+                        }
+                )
+                .Skip(intSkip)
+                .Take(intLimit)
+                .ToList();

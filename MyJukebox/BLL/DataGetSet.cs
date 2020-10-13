@@ -12,6 +12,15 @@ namespace MyJukebox.BLL
 {
     public class DataGetSet
     {
+        public enum DataSourceEnum
+        {
+            Songs,
+            Playlist,
+            Query
+        }
+
+        public static DataSourceEnum Datasource { get; set; }
+
         #region GetData
 
         public static List<string> GetGenres()
@@ -625,10 +634,13 @@ namespace MyJukebox.BLL
                 var album = context.tAlbums
                                 .Where(a => a.Name == albumname)
                                 .FirstOrDefault();
+                // create new entry
                 if (album == null)
                 {
+                    album = new tAlbum();
                     album.Name = albumname;
                     album.Row = row;
+                    context.tAlbums.Add(album);
                 }
                 else
                     album.Row = row;
@@ -637,7 +649,7 @@ namespace MyJukebox.BLL
                 return true;
 
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -671,19 +683,17 @@ namespace MyJukebox.BLL
                 var playlist = context.tPlaylists
                                 .Where(p => p.ID == id)
                                 .FirstOrDefault();
-                if (playlist == null)
-                {
-                    playlist.ID = id;
-                    playlist.Row = row;
-                }
-                else
-                    playlist.Row = row;
 
-                context.SaveChanges();
+                if (playlist != null)
+                {
+                    playlist.Row = row;
+                    context.SaveChanges();
+                }
+
                 return true;
 
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
