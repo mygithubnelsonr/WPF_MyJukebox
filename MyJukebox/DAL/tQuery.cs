@@ -15,7 +15,7 @@ namespace MyJukebox.DAL
     public partial class tQuery
     {
         public int ID { get; set; }
-        public string Query { get; set; }
+        public string Name { get; set; }
         public Nullable<int> Row { get; set; }
     }
 }

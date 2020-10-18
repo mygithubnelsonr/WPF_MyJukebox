@@ -352,22 +352,33 @@
                 <ToolBar x:Name="barQuery" Band="1" Height="34" FontSize="14" Foreground="Blue">
                     <Label Content="Enter Query: " Foreground="DarkBlue"/>
                     <TextBox x:Name="textboxQuery" Text="" Height="24" Width="200" Background="Beige" FontWeight="Medium"
-                             IsReadOnly="False" KeyDown="textboxQuery_KeyDown">
+                             IsReadOnly="False" KeyDown="textboxQuery_KeyDown" Tag=""
+                             Style="{StaticResource placeHolder}">
 
                     </TextBox>
                     <Button x:Name="buttonQueryClear" Margin="4 0" Click="buttonQueryClear_Click">
                         <Image Source="/Images/QueryClear.png" />
+                        <Button.ToolTip>
+                            <ToolTip Content="Clear"/>
+                        </Button.ToolTip>
                     </Button>
                     <Button x:Name="buttonQuerySearch" Margin="4 0" Click="buttonQuerySearch_Click">
                         <Image Source="/Images/QuerySearch.ico" />
+                        <Button.ToolTip>
+                            <ToolTip Content="Start search"/>
+                        </Button.ToolTip>
                     </Button>
                     <Button x:Name="buttonQuerySave" Margin="4 0"  Click="buttonQuerySave_Click">
                         <Image Source="/Images/QuerySave.ico" />
+                        <Button.ToolTip>
+                            <ToolTip Content="Save Query"/>
+                        </Button.ToolTip>
                     </Button>
                     <Label Content="Stored Queries:" Margin="20 0 0 0" Foreground="DarkBlue" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
                     <ComboBox x:Name="comboboxStoredQueries" Width="200" Margin="10 0" IsEditable="True" FontWeight="Medium"
                               ToolBar.OverflowMode="AsNeeded"
-                             SelectionChanged="comboboxStoredQueries_SelectionChanged" KeyDown="comboboxStoredQueries_KeyDown"/>
+                             SelectionChanged="comboboxStoredQueries_SelectionChanged">
+                    </ComboBox>
                     <Button x:Name="buttonQueryDelete" ToolBar.OverflowMode="AsNeeded" Click="buttonQueryDelete_Click">
                         <Image Source="/Images/QueryDelete.ico" />
                     </Button>

@@ -15,14 +15,6 @@
     <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Name" Type="nvarchar" MaxLength="12" />
   </EntityType>
-  <EntityType Name="tColumns">
-    <Key>
-      <PropertyRef Name="ID" />
-    </Key>
-    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="Name" Type="nvarchar" MaxLength="25" />
-    <Property Name="Width" Type="int" />
-  </EntityType>
   <!--Errors Found During Generation:
 warning 6002: The table/view 'MyJukebox.dbo.tFileInfos' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
   <EntityType Name="tFileInfos">
@@ -96,7 +88,7 @@ warning 6002: The table/view 'MyJukebox.dbo.tFileInfos' does not have a primary 
       <PropertyRef Name="ID" />
     </Key>
     <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="Query" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
     <Property Name="Row" Type="int" />
   </EntityType>
   <EntityType Name="tSettings">
@@ -225,7 +217,6 @@ warning 6002: The table/view 'MyJukebox.dbo.vSongsLong' does not have a primary 
   <EntityContainer Name="MyJukeboxModelStoreContainer">
     <EntitySet Name="tAlbums" EntityType="Self.tAlbums" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tCatalogs" EntityType="Self.tCatalogs" Schema="dbo" store:Type="Tables" />
-    <EntitySet Name="tColumns" EntityType="Self.tColumns" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tGenres" EntityType="Self.tGenres" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tInfos" EntityType="Self.tInfos" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="tMD5" EntityType="Self.tMD5" Schema="dbo" store:Type="Tables" />

@@ -26,7 +26,6 @@ namespace MyJukebox.DAL
         }
     
         public virtual DbSet<tCatalog> tCatalogs { get; set; }
-        public virtual DbSet<tColumn> tColumns { get; set; }
         public virtual DbSet<tFileInfo> tFileInfos { get; set; }
         public virtual DbSet<tGenre> tGenres { get; set; }
         public virtual DbSet<tInfo> tInfos { get; set; }
@@ -34,12 +33,12 @@ namespace MyJukebox.DAL
         public virtual DbSet<tMedia> tMedias { get; set; }
         public virtual DbSet<tPlaylist> tPlaylists { get; set; }
         public virtual DbSet<tPLentry> tPLentries { get; set; }
-        public virtual DbSet<tQuery> tQueries { get; set; }
         public virtual DbSet<tSetting> tSettings { get; set; }
         public virtual DbSet<tSong> tSongs { get; set; }
         public virtual DbSet<vPlaylistSong> vPlaylistSongs { get; set; }
         public virtual DbSet<vSong> vSongs { get; set; }
         public virtual DbSet<vSongsLong> vSongsLongs { get; set; }
         public virtual DbSet<tAlbum> tAlbums { get; set; }
+        public virtual DbSet<tQuery> tQueries { get; set; }
     }
 }

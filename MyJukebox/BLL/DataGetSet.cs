@@ -78,19 +78,6 @@ namespace MyJukebox.BLL
 
         }
 
-        public static List<string> GetQueryList()
-        {
-            List<string> queries = null;
-
-            var context = new MyJukeboxEntities();
-
-            queries = context.tQueries
-                            .Select(q => q.Query)
-                            .OrderBy(q => q).ToList();
-
-            return queries;
-        }
-
         public static List<vSong> GetQueryResult(string queryText)
         {
             List<vSong> songs = null;
@@ -130,6 +117,22 @@ namespace MyJukebox.BLL
                 return playLists;
             }
         }
+
+        //public static void SaveQueryList()
+        //{
+        //var context = new MyJukeboxEntities();
+
+        //TruncateTableQueries();
+
+        //foreach (var item in SettingsDb.QueryList)
+        //{
+        //    var query = new tQuery() { Name = item.Name, Row = item.Row };
+        //    if (item.ID > 0)
+        //        context.tQueries.Add(query);
+        //}
+
+        //context.SaveChanges();
+        //}
 
         public static List<vPlaylistSong> GetPlaylistEntries(int playlistID)
         {
@@ -604,6 +607,105 @@ namespace MyJukebox.BLL
             }
         }
 
+        public static List<string> QueryGetList()
+        {
+            List<string> queries = null;
+
+            var context = new MyJukeboxEntities();
+
+            queries = context.tQueries
+                            .Select(q => q.Name)
+                            .OrderBy(q => q)
+                            .ToList();
+
+            return queries;
+        }
+
+        public static bool QueryAdd(string query)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+
+                var result = context.tQueries
+                        .Where(q => q.Name == query)
+                        .FirstOrDefault();
+
+                if (result != null)
+                {
+                    MessageBox.Show("The Query allready exist!", "Warning");
+                    return true;
+                }
+
+                var newQuery = new tQuery()
+                { Name = query, Row = 0 };
+
+                context.tQueries.Add(newQuery);
+                context.SaveChanges();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool QueryRemove(string query)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+
+                var result = context.tQueries
+                        .Where(q => q.Name == query)
+                        .FirstOrDefault();
+
+                if (result == null)
+                {
+                    MessageBox.Show("The Query not exist!", "ERROR");
+                    return true;
+                }
+
+                context.tQueries.Remove(result);
+                context.SaveChanges();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool QuerySetRow(string query, int row)
+        {
+            try
+            {
+                using (var context = new MyJukeboxEntities())
+                {
+                    var result = context.tQueries
+                            .Where(q => q.Name == query)
+                            .FirstOrDefault();
+
+                    if (result == null)
+                    {
+                        MessageBox.Show("The Query not exist!", "ERROR");
+                        return true;
+                    }
+
+                    result.Row = row;
+                    context.SaveChanges();
+
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static bool DeleteSong(int id)
         {
             try
@@ -725,33 +827,30 @@ namespace MyJukebox.BLL
             {
                 var context = new MyJukeboxEntities();
                 var query = context.tQueries
-                                .Where(q => q.Query == name)
+                                .Where(q => q.Name == name)
                                 .FirstOrDefault();
+
                 if (query == null)
-                {
-                    query.Query = name;
-                    query.Row = row;
-                }
-                else
-                    query.Row = row;
+                    return true;
 
+                query.Row = row;
                 context.SaveChanges();
-                return true;
 
+                return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
         }
 
-        public static int GetQueryLastRow(string name)
+        public static int GetQueryLastRow(int index)
         {
             try
             {
                 var context = new MyJukeboxEntities();
                 var query = context.tQueries
-                                .Where(q => q.Query == name)
+                                .Where(q => q.ID == index)
                                 .FirstOrDefault();
                 if (query == null)
                     return 0;
@@ -764,6 +863,27 @@ namespace MyJukebox.BLL
                 return 0;
             }
         }
+
+        public static int GetQueryLastRow(string name)
+        {
+            try
+            {
+                var context = new MyJukeboxEntities();
+                var query = context.tQueries
+                                .Where(q => q.Name == name)
+                                .FirstOrDefault();
+                if (query == null)
+                    return 0;
+                else
+                    return query.Row == null ? 0 : (int)query.Row;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.Message);
+                return 0;
+            }
+        }
+
     }
 }
 

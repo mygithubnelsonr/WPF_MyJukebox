@@ -8,14 +8,6 @@
     <Property Name="Name" Type="String" MaxLength="12" FixedLength="false" Unicode="true" />
     <NavigationProperty Name="tSongs" Relationship="Self.FK_tSongsNew_tCatalogs" FromRole="tCatalogs" ToRole="tSongs" />
   </EntityType>
-  <EntityType Name="tColumn">
-    <Key>
-      <PropertyRef Name="ID" />
-    </Key>
-    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="Name" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
-    <Property Name="Width" Type="Int32" />
-  </EntityType>
   <EntityType Name="tFileInfo">
     <Key>
       <PropertyRef Name="ID" />
@@ -85,14 +77,6 @@
     <Property Name="SongID" Type="Int32" Nullable="false" />
     <Property Name="Pos" Type="Int32" Nullable="false" />
     <NavigationProperty Name="tPlaylist" Relationship="Self.FK_tPLentries_tPlaylists" FromRole="tPLentries" ToRole="tPlaylists" />
-  </EntityType>
-  <EntityType Name="tQuery">
-    <Key>
-      <PropertyRef Name="ID" />
-    </Key>
-    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="Query" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-    <Property Name="Row" Type="Int32" />
   </EntityType>
   <EntityType Name="tSetting">
     <Key>
@@ -216,7 +200,6 @@
   </Association>
   <EntityContainer Name="MyJukeboxEntities" annotation:LazyLoadingEnabled="true">
     <EntitySet Name="tCatalogs" EntityType="Self.tCatalog" />
-    <EntitySet Name="tColumns" EntityType="Self.tColumn" />
     <EntitySet Name="tFileInfos" EntityType="Self.tFileInfo" />
     <EntitySet Name="tGenres" EntityType="Self.tGenre" />
     <EntitySet Name="tInfos" EntityType="Self.tInfo" />
@@ -224,7 +207,6 @@
     <EntitySet Name="tMedias" EntityType="Self.tMedia" />
     <EntitySet Name="tPlaylists" EntityType="Self.tPlaylist" />
     <EntitySet Name="tPLentries" EntityType="Self.tPLentry" />
-    <EntitySet Name="tQueries" EntityType="Self.tQuery" />
     <EntitySet Name="tSettings" EntityType="Self.tSetting" />
     <EntitySet Name="tSongs" EntityType="Self.tSong" />
     <EntitySet Name="vPlaylistSongs" EntityType="Self.vPlaylistSong" />
@@ -247,8 +229,17 @@
       <End Role="tPLentries" EntitySet="tPLentries" />
     </AssociationSet>
     <EntitySet Name="tAlbums" EntityType="MyJukeboxModel.tAlbum" />
+    <EntitySet Name="tQueries" EntityType="MyJukeboxModel.tQuery" />
   </EntityContainer>
   <EntityType Name="tAlbum">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Row" Type="Int32" />
+  </EntityType>
+  <EntityType Name="tQuery">
     <Key>
       <PropertyRef Name="ID" />
     </Key>

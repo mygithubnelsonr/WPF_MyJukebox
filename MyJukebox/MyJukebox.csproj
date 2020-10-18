@@ -30,7 +30,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>15</ApplicationRevision>
+    <ApplicationRevision>16</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -100,6 +100,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Common\Query.cs" />
+    <Compile Include="Common\QueryList.cs" />
     <Compile Include="Common\FileExistValidationRule.cs" />
     <Compile Include="Common\ImageFlipper.cs" />
     <Compile Include="DAL\tAlbum.cs">
@@ -144,9 +146,6 @@
       <DependentUpon>MyJukeboxModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="DAL\tCatalog.cs">
-      <DependentUpon>MyJukeboxModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DAL\tColumn.cs">
       <DependentUpon>MyJukeboxModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DAL\tFileInfo.cs">
