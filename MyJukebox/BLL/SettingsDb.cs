@@ -40,7 +40,7 @@ namespace MyJukebox.BLL
                 Settings["LastPlaylist"] = "5";
                 Settings["LastQuery"] = "";
                 Settings["LastTab"] = "0";
-                Settings["RecordEditorLocation"] = @"C:\Company\Apps\Multimedia\DbRecordEditor\DbRecordEditor.exe";
+                Settings["RecordEditorLocation"] = @"C:\Company\Apps\Multimedia\MyRecordEditor\MyRecordEditor.exe";
                 Settings["RootImagePath"] = @"C:\\";
                 Settings["Volume"] = "0.1";
                 Settings["PlaceHolder"] = "enter search text here";

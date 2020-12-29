@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyJukebox"
         mc:Ignorable="d"
-        Title="MyJukebox" Height="900" Width="1254" WindowStartupLocation="Manual" Background="{StaticResource WindowBackgroundBrush}"
+        Title="MyJukebox" Height="900" Width="1339" WindowStartupLocation="Manual" Background="{StaticResource WindowBackgroundBrush}"
             Icon="/Images/Jukebox.ico" WindowStyle="None"
             MouseLeftButtonDown="Move_Window" Loaded="Window_Loaded">
     <Window.Resources>
@@ -145,17 +145,17 @@
                     </Rectangle.OpacityMask>
                 </Rectangle>
             </StackPanel>
-            <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 18 0">
-                <ToggleButton x:Name="buttonMaximize" Style="{StaticResource maxButton}"
+            <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 4 10 0">
+                <ToggleButton x:Name="buttonMaximize" Margin="2" Style="{StaticResource maxButton}"
                               Checked="buttonMaximize_Checked" Unchecked="buttonMaximize_Unchecked">
                     <Rectangle Width="20" Height="20" Stroke="WhiteSmoke" StrokeThickness="4"/>
                 </ToggleButton>
-                <Button x:Name="buttonMinimize" Style="{StaticResource exitButton}" Click="buttonMinimize_Click">
+                <Button x:Name="buttonMinimize" Margin="2" Style="{StaticResource exitButton}" Click="buttonMinimize_Click">
                     <Button.Content>
                         <Rectangle Width="20" Height="6" Fill="White"/>
                     </Button.Content>
                 </Button>
-                <Button x:Name="buttonClose" Content="X" Style="{StaticResource exitButton}" Click="buttonClose_Click"/>
+                <Button x:Name="buttonClose" Content="X" Margin="2" Style="{StaticResource exitButton}" Click="buttonClose_Click"/>
             </StackPanel>
         </Grid>
         <Menu DockPanel.Dock="Top" Margin="0 0 0 10" Foreground="White" FontSize="16" FontWeight="Bold" Opacity="0.82" BorderThickness="1">
@@ -197,12 +197,17 @@
                 <MenuItem Header="_Kopieren"/>
                 <MenuItem Header="_Einfügen"/>
                 <MenuItem Header="_Löschen"/>
+                <Separator/>
+                <MenuItem Header="Enable Multiline" Click="MenuEditMultiline_Click"/>
             </MenuItem>
             <MenuItem Header="_Tools" Margin="2 2" Background="Transparent" Foreground="White">
                 <MenuItem.Icon>
                     <Image Source="/Images/tools.png" Margin="0 0 2 0" />
                 </MenuItem.Icon>
-                <Button x:Name="buttonTest" Content="Test" Padding="10 2 10 2" Margin="10 0 10 0" Background="#FF75B9CF" Foreground="DarkBlue" Click="buttonTest_Click"/>
+                <MenuItem Header="Test 1" Click="buttonTest1_Click"/>
+                <!--<Button x:Name="buttonTest" Content="Test 1" Padding="10 2 10 2" Margin="10 0 10 0" Background="#FF75B9CF" Foreground="DarkBlue" Click="buttonTest1_Click"/>-->
+                <MenuItem Header="Test2 " Click="buttonTest2_Click"/>
+                <!--<Button x:Name="buttonTest2" Content="Test 2" Padding="10 2 10 2" Margin="10 0 10 0" Background="#FF75B9CF" Foreground="DarkBlue" Click="buttonTest2_Click"/>-->
             </MenuItem>
             <MenuItem Header="Settin_gs" Margin="2 2" Background="Transparent" Foreground="Orange" FontSize="16">
                 <MenuItem.Icon>
@@ -329,8 +334,9 @@
                                   Command="{x:Static local:MyJukeboxCommands.PlaybackShuffle}">
                         <Image Source="/Images/PlaybackShuffel.png" Width="26" Height="26" />
                     </ToggleButton>
-                    <ToggleButton Margin="40 0 0 0">
-                        <Image Source="/Images/SpeakerOn.ico" />
+                    <ToggleButton x:Name="touglebuttonSpeaker" Margin="40 0 0 0"
+                                  Style="{StaticResource simpleImageTouggleButton}"
+                                  Click="touglebuttonSpeaker_Click">
                     </ToggleButton>
                     <Slider x:Name="sliderVolume" Minimum="0.0" Maximum="1"  Width="120" Height="24" Margin="5 0 10 0"
                             Background="{StaticResource SliderBackgroundBrush}"

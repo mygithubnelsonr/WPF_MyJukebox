@@ -118,22 +118,6 @@ namespace MyJukebox.BLL
             }
         }
 
-        //public static void SaveQueryList()
-        //{
-        //var context = new MyJukeboxEntities();
-
-        //TruncateTableQueries();
-
-        //foreach (var item in SettingsDb.QueryList)
-        //{
-        //    var query = new tQuery() { Name = item.Name, Row = item.Row };
-        //    if (item.ID > 0)
-        //        context.tQueries.Add(query);
-        //}
-
-        //context.SaveChanges();
-        //}
-
         public static List<vPlaylistSong> GetPlaylistEntries(int playlistID)
         {
             List<vPlaylistSong> songs = null;

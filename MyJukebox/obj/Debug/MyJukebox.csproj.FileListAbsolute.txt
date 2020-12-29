@@ -67,3 +67,4 @@ A:\Source\Repos\90_Work\WPF\MyTools\MyJukeboxWPF\MyJukebox\obj\Debug\Views\Input
 A:\Source\Repos\90_Work\WPF\MyTools\MyJukeboxWPF\MyJukebox\obj\Debug\Views\Test.g.cs
 A:\Source\Repos\90_Work\WPF\MyTools\MyJukeboxWPF\MyJukebox\obj\Debug\Views\Test.baml
 A:\Source\Repos\90_Work\WPF\MyTools\MyJukeboxWPF\MyJukebox\obj\Debug\GeneratedInternalTypeHelper.g.cs
+A:\Source\Repos\90_Work\WPF\MyTools\MyJukeboxWPF\MyJukebox\obj\Debug\MyJukebox.csprojAssemblyReference.cache

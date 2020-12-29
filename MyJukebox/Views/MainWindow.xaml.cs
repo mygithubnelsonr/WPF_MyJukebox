@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,6 +19,7 @@ namespace MyJukebox
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+
     public partial class MainWindow : Window
     {
         #region Fields
@@ -92,11 +94,6 @@ namespace MyJukebox
         }
 
         #region FormEvents
-
-        private void buttonTest_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void ImageFlipperLoad()
         {
@@ -543,19 +540,9 @@ namespace MyJukebox
 
         private void AddQueryToComboBox(string query)
         {
-            bool itemExist = false;
-
-            // ToDo replace with LINQ
-            foreach (var item in comboboxStoredQueries.Items)
-            {
-                if (item.ToString().ToUpper() == query.ToUpper())
-                    itemExist = true;
-            }
-
+            var itemExist = _queries.Any(q => q.Contains(query));
             if (itemExist == false)
             {
-                //SettingsDb.QueryList.Add(query);
-
                 bool result = DataGetSet.QueryAdd(query);
                 if (result == true)
                     _queries.Add(query);
@@ -564,12 +551,9 @@ namespace MyJukebox
 
         public void FillQueryCombo()
         {
-            //List<string> list = SettingsDb.QueryList;
-
             List<string> list = null;
 
             list = DataGetSet.QueryGetList();
-
             list.Insert(0, "");
 
             _queries = new ObservableCollection<string>(list);
@@ -936,7 +920,6 @@ namespace MyJukebox
 
             // remove menuitem 'remove'
             MenuItem mi = (MenuItem)contextmenu.Items[1];
-            //Debug.Print(mi.Header.ToString());
             contextmenu.Items.Remove(mi);
 
             MenuItem miRemove = new MenuItem();
@@ -1054,13 +1037,15 @@ namespace MyJukebox
 
         private void contextmenuDatagridRemoveFromAudio_Click(object sender, RoutedEventArgs e)
         {
-            //Debug.Print("contextmenuDatagridRemoveFromAudio_Click");
+            foreach (var item in datagrid.SelectedItems)
+            {
+                var rowlist = (vSong)item;
+                int songId = rowlist.ID;
+                Debug.Print(songId.ToString());
+                var result = DataGetSet.DeleteSong(songId);
+            }
 
-            var rowlist = (vSong)datagrid.SelectedItem;
-            int songId = rowlist.ID;
-
-            var result = DataGetSet.DeleteSong(songId);
-
+            datagrid.SelectionMode = DataGridSelectionMode.Single;
             FillDatagridByTabAudio();
         }
 
@@ -1076,5 +1061,37 @@ namespace MyJukebox
 
         #endregion
 
+
+        private void touglebuttonSpeaker_Click(object sender, RoutedEventArgs e)
+        {
+            mediaPlayer.IsMuted = (bool)touglebuttonSpeaker.IsChecked;
+        }
+
+        private void buttonTest1_Click(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private void buttonTest2_Click(object sender, RoutedEventArgs e)
+        {
+            //foreach (var item in datagrid.SelectedItems)
+            //{
+            //    var rowlist = (vSong)item;
+            //    int songId = rowlist.ID;
+            //    Debug.Print(songId.ToString());
+            //    var result = DataGetSet.DeleteSong(songId);
+            //}
+
+            //datagrid.SelectionMode = DataGridSelectionMode.Single;
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuEditMultiline_Click(object sender, RoutedEventArgs e)
+        {
+            datagrid.SelectionMode = DataGridSelectionMode.Extended;
+        }
     }
 }
