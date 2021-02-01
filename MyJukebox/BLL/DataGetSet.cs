@@ -868,6 +868,44 @@ namespace MyJukebox.BLL
             }
         }
 
+        public static List<string> GetSongPathList()
+        {
+            try
+            {
+                using (var context = new MyJukeboxEntities())
+                {
+                    string fullpath = context.tSongs
+                                .Select(s => s.Pfad)
+                                .FirstOrDefault().ToString();
+
+                    var ar = fullpath.Split('\\');
+
+                    string shortpath = "";
+
+                    if (ar[0] == "" && ar[1] == "")    // shared folder
+                    {
+                        shortpath = String.Join("\\", ar[0], ar[1], ar[2], ar[3]);
+                    }
+                    else
+                    {
+                        shortpath = String.Join("\\", ar[0], ar[1], ar[2], ar[3]);
+                    }
+
+                    var result = context.tSongs
+                            .Where(s => s.Pfad.Contains(shortpath))
+                            .Select(s => s.Pfad.Substring(0, shortpath.Length))
+                            .Distinct()
+                            .ToList();
+
+                    return result;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
     }
 }
 

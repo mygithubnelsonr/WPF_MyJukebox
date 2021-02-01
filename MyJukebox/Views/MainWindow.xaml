@@ -41,7 +41,7 @@
         <CommandBinding Command="MediaCommands.Play" CanExecute="Play_CanExecute" Executed="Play_Executed"  />
         <CommandBinding Command="MediaCommands.Pause" CanExecute="Pause_CanExecute" Executed="Pause_Executed" />
         <CommandBinding Command="MediaCommands.Stop" CanExecute="Stop_CanExecute" Executed="Stop_Executed" />
-        <CommandBinding Command="ApplicationCommands.Open" CanExecute="Open_CanExecute" Executed="Open_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Open" CanExecute="OpenFolder_CanExecute" Executed="OpenFolder_Executed"/>
         <CommandBinding Command="{x:Static local:MyJukeboxCommands.CopyDataRow}" x:Name="CopyDataRow"
                         CanExecute="CopyDataRowCanExecute" 
                         Executed="CopyDataRowExecuted"/>
@@ -198,15 +198,15 @@
                 <MenuItem Header="_Einfügen"/>
                 <MenuItem Header="_Löschen"/>
                 <Separator/>
-                <MenuItem Header="Enable Multiline" Click="MenuEditMultiline_Click"/>
+                <MenuItem Header="Enable Multiline" Click="menuEditMultiline_Click"/>
             </MenuItem>
             <MenuItem Header="_Tools" Margin="2 2" Background="Transparent" Foreground="White">
                 <MenuItem.Icon>
                     <Image Source="/Images/tools.png" Margin="0 0 2 0" />
                 </MenuItem.Icon>
-                <MenuItem Header="Test 1" Click="buttonTest1_Click"/>
+                <MenuItem Header="Test 1" Click="menuToolsTest1_Click"/>
                 <!--<Button x:Name="buttonTest" Content="Test 1" Padding="10 2 10 2" Margin="10 0 10 0" Background="#FF75B9CF" Foreground="DarkBlue" Click="buttonTest1_Click"/>-->
-                <MenuItem Header="Test2 " Click="buttonTest2_Click"/>
+                <MenuItem Header="Test2 " Click="menuToolsTest2_Click"/>
                 <!--<Button x:Name="buttonTest2" Content="Test 2" Padding="10 2 10 2" Margin="10 0 10 0" Background="#FF75B9CF" Foreground="DarkBlue" Click="buttonTest2_Click"/>-->
             </MenuItem>
             <MenuItem Header="Settin_gs" Margin="2 2" Background="Transparent" Foreground="Orange" FontSize="16">
@@ -410,7 +410,6 @@
                         </Grid>
                     </ControlTemplate>
                 </DataGrid.RowValidationErrorTemplate>
-
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF0078D7"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="WhiteSmoke"/>
