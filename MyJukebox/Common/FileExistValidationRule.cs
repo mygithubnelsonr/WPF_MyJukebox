@@ -1,10 +1,9 @@
-﻿using MyJukebox.BLL;
-using MyJukebox.DAL;
+﻿using MyJukeboxWMPDapper.DataAccess;
 using System.IO;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace MyJukebox
+namespace MyJukeboxWMPDapper
 {
     public class FileExistValidationRule : ValidationRule
     {
@@ -15,17 +14,19 @@ namespace MyJukebox
             try
             {
                 var bindingGroup = value as BindingGroup;
-                if (DataGetSet.Datasource == DataGetSet.DataSourceEnum.Songs ||
-                    DataGetSet.Datasource == DataGetSet.DataSourceEnum.Query
+                if (GetSetData.Datasource == GetSetData.DataSourceEnum.Songs ||
+                    GetSetData.Datasource == GetSetData.DataSourceEnum.Query
                     )
                 {
-                    var song = bindingGroup.Items[0] as vSong;
-                    fullpath = Path.Combine(song.Pfad, song.FileName);
+                    var song = bindingGroup.Items[0] as vSongModel;
+                    if (song != null)
+                        fullpath = Path.Combine(song.Path, song.FileName);
                 }
                 else
                 {
-                    var song = bindingGroup.Items[0] as vPlaylistSong;
-                    fullpath = Path.Combine(song.Pfad, song.FileName);
+                    var song = bindingGroup.Items[0] as vPlaylistSongModel;
+                    if (song != null)
+                        fullpath = Path.Combine(song.Path, song.FileName);
                 }
 
                 if (!File.Exists(fullpath))

@@ -1,4 +1,4 @@
-﻿namespace MyJukebox
+﻿namespace MyJukeboxWMPDapper
 {
     public class Query
     {

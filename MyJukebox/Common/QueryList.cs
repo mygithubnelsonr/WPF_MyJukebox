@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MyJukebox
+namespace MyJukeboxWMPDapper
 {
     public class QueryList : List<Query>
     {

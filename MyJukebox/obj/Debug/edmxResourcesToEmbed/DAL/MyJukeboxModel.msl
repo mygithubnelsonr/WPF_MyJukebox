@@ -82,16 +82,6 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="tSettings">
-      <EntityTypeMapping TypeName="MyJukeboxModel.tSetting">
-        <MappingFragment StoreEntitySet="tSettings">
-          <ScalarProperty Name="ID" ColumnName="ID" />
-          <ScalarProperty Name="Name" ColumnName="Name" />
-          <ScalarProperty Name="Value" ColumnName="Value" />
-          <ScalarProperty Name="Editable" ColumnName="Editable" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
     <EntitySetMapping Name="tSongs">
       <EntityTypeMapping TypeName="MyJukeboxModel.tSong">
         <MappingFragment StoreEntitySet="tSongs">
@@ -152,19 +142,29 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="tAlbums">
-      <EntityTypeMapping TypeName="MyJukeboxModel.tAlbum">
-        <MappingFragment StoreEntitySet="tAlbums">
+    <EntitySetMapping Name="tQueries">
+      <EntityTypeMapping TypeName="MyJukeboxModel.tQuery">
+        <MappingFragment StoreEntitySet="tQueries">
           <ScalarProperty Name="Row" ColumnName="Row" />
           <ScalarProperty Name="Name" ColumnName="Name" />
           <ScalarProperty Name="ID" ColumnName="ID" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="tQueries">
-      <EntityTypeMapping TypeName="MyJukeboxModel.tQuery">
-        <MappingFragment StoreEntitySet="tQueries">
+    <EntitySetMapping Name="tSettingsAlbums">
+      <EntityTypeMapping TypeName="MyJukeboxModel.tSettingsAlbum">
+        <MappingFragment StoreEntitySet="tSettingsAlbums">
           <ScalarProperty Name="Row" ColumnName="Row" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="tSettingsGenerals">
+      <EntityTypeMapping TypeName="MyJukeboxModel.tSettingsGeneral">
+        <MappingFragment StoreEntitySet="tSettingsGeneral">
+          <ScalarProperty Name="Editable" ColumnName="Editable" />
+          <ScalarProperty Name="Value" ColumnName="Value" />
           <ScalarProperty Name="Name" ColumnName="Name" />
           <ScalarProperty Name="ID" ColumnName="ID" />
         </MappingFragment>

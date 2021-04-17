@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace MyJukebox
+namespace MyJukeboxWMPDapper
 {
     public static class MyJukeboxCommands
     {

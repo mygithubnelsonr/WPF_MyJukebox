@@ -1,4 +1,4 @@
-﻿namespace MyJukebox.Common
+﻿namespace MyJukeboxWMPDapper.Common
 {
     public class AudioStates
     {

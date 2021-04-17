@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 
-namespace MyJukebox.Common
+namespace MyJukeboxWMPDapper.Common
 {
     public class RandomH
     {
@@ -22,7 +22,9 @@ namespace MyJukebox.Common
         {
             get
             {
-                Debug.Print($"numberArray.Length={numberArray.Length}");
+                var numbers = $"{ String.Join(Environment.NewLine, numberArray)}";
+                Debug.Print($"numberArray numbers: { String.Join(",", numberArray)}");
+
                 if (numberArray.Length == numberCounter)
                     numberCounter = 0;
 

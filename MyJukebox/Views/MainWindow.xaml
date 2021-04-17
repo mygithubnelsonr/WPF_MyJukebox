@@ -1,13 +1,14 @@
-﻿<Window x:Class="MyJukebox.MainWindow"
+﻿<Window x:Class="MyJukeboxWMPDapper.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MyJukebox"
+        xmlns:local="clr-namespace:MyJukeboxWMPDapper"
+        xmlns:ax="clr-namespace:AxWMPLib;assembly=AxInterop.WMPLib"
         mc:Ignorable="d"
         Title="MyJukebox" Height="900" Width="1339" WindowStartupLocation="Manual" Background="{StaticResource WindowBackgroundBrush}"
             Icon="/Images/Jukebox.ico" WindowStyle="None"
-            MouseLeftButtonDown="Move_Window" Loaded="Window_Loaded">
+            MouseLeftButtonDown="Move_Window" SizeChanged="Window_SizeChanged"  Loaded="Window_Loaded">
     <Window.Resources>
         <Style TargetType="TabItem">
             <Setter Property="Background" Value="Aqua"/>
@@ -55,7 +56,7 @@
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Text="v1.0.1" Margin="0,0,4,0" Foreground="White"/>
+                <TextBlock x:Name="statusVersion" Text="v2.0.2" Margin="0,0,4,0" Foreground="White"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock Text="c NRSoft" Foreground="White"/>
@@ -219,39 +220,54 @@
                 <MenuItem.Icon>
                     <Image Source="/images/database.png" Margin="0 0 2 0" />
                 </MenuItem.Icon>
+                <MenuItem x:Name="menuDatabaseCheckPath" Header="Check all Path" Click="menuDatabaseCheckPath_Click"/>
             </MenuItem>
         </Menu>
         <Expander x:Name="expanderLeftPanel" ExpandDirection="Right" IsExpanded="True">
             <Grid DockPanel.Dock="Left" Width="220">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="60"/>
                     <RowDefinition Height="120"/>
-                    <RowDefinition Height="120"/>
+                    <RowDefinition Height="80"/>
                 </Grid.RowDefinitions>
                 <TabControl Grid.Row="0" x:Name="tabcontrol" Height="Auto" Foreground="AliceBlue" SelectionChanged="tabcontrol_SelectionChanged">
                     <TabItem x:Name="tabitemAudio" Header="Audio">
                         <StackPanel>
-                            <Expander Header="Genre" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="True">
-                                <ListBox x:Name="listboxGenres" Height="Auto" MaxHeight="100" Tag="Genre" ItemContainerStyle="{DynamicResource listboxItemStyle}"
+                            <Expander Header="Genre" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="False">
+                                <ListBox x:Name="listboxGenres" Height="Auto" MaxHeight="100" Tag="Genre" ItemContainerStyle="{DynamicResource listboxItemStyle}" ItemsSource="{Binding}"
                                      Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxGenres_MouseLeftButtonUp">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
                                                 <Image Source="/Images/genre.png" Width="20" Height="20" Margin="0,0,20,0" />
-                                                <TextBlock Text="{Binding}"/>
+                                                <TextBlock Text="{Binding Path=Name}"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
                             </Expander>
                             <Expander Header="Catalog" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="True">
-                                <ListBox x:Name="listboxCatalogs" Height="Auto" MaxHeight="100" Tag="Catalog" ItemContainerStyle="{DynamicResource listboxItemStyle}"
+                                <ListBox x:Name="listboxCatalogs" Height="Auto" MaxHeight="100" Tag="Catalog" ItemContainerStyle="{DynamicResource listboxItemStyle}" ItemsSource="{Binding}"
                                      Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxCatalogs_MouseLeftButtonUp">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
                                                 <Image Source="/Images/catalog.png" Width="20" Height="20" Margin="0,0,20,0" />
-                                                <TextBlock Text="{Binding}"/>
+                                                <TextBlock Text="{Binding Path=Name}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Expander>
+                            <Expander Header="Album" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="True">
+                                <ListBox x:Name="listboxAlbums" Height="Auto" MaxHeight="100" Tag="Album" ItemContainerStyle="{DynamicResource listboxItemStyle}" ItemsSource="{Binding}"
+                                     Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxAlbums_MouseLeftButtonUp">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="/Images/album.ico" Width="20" Height="20" Margin="0,0,20,0" />
+                                                <TextBlock Text="{Binding Path=Name}"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
@@ -264,19 +280,6 @@
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
                                                 <Image Source="/Images/artist.png" Width="20" Height="20" Margin="0,0,20,0" />
-                                                <TextBlock Text="{Binding}"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                            </Expander>
-                            <Expander Header="Album" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="False">
-                                <ListBox x:Name="listboxAlbums" Height="Auto" MaxHeight="100" Tag="Album" ItemContainerStyle="{DynamicResource listboxItemStyle}"
-                                     Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxAlbums_MouseLeftButtonUp">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Image Source="/Images/album.ico" Width="20" Height="20" Margin="0,0,20,0" />
                                                 <TextBlock Text="{Binding}"/>
                                             </StackPanel>
                                         </DataTemplate>
@@ -301,11 +304,13 @@
                         </StackPanel>
                     </TabItem>
                 </TabControl>
-
-                <Border Grid.Row="1" Background="#FF1D1B1B" Height="120">
+                <WindowsFormsHost Grid.Row="1" Name="formsHost" Height="60" VerticalAlignment="Bottom">
+                    <ax:AxWindowsMediaPlayer x:Name="axWmp"/>
+                </WindowsFormsHost>
+                <Border Grid.Row="2" Background="#FF1D1B1B">
                     <Image x:Name="imageArtist" Source="/Images/NiceImage01.PNG" Stretch="Fill" />
                 </Border>
-                <Border Grid.Row="2" Height="120" Background="Blue">
+                <Border Grid.Row="3" Background="Blue">
                     <Image Source="/Images/MyBitmap.gif"/>
                 </Border>
             </Grid>
@@ -380,7 +385,7 @@
                             <ToolTip Content="Save Query"/>
                         </Button.ToolTip>
                     </Button>
-                    <Label Content="Stored Queries:" Margin="20 0 0 0" Foreground="DarkBlue" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+                    <Label Content="Stored Queries:" Margin="20 0 0 0" Foreground="DarkBlue"/>
                     <ComboBox x:Name="comboboxStoredQueries" Width="200" Margin="10 0" IsEditable="True" FontWeight="Medium"
                               ToolBar.OverflowMode="AsNeeded"
                              SelectionChanged="comboboxStoredQueries_SelectionChanged">

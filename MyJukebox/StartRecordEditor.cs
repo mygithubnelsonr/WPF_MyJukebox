@@ -1,7 +1,8 @@
-﻿using System;
+﻿using MyJukeboxWMPDapper.DataAccess;
+using System;
 using System.Diagnostics;
 
-namespace MyJukebox
+namespace MyJukeboxWMPDapper
 {
     class MyProcess : Process
     {
@@ -15,11 +16,11 @@ namespace MyJukebox
 
     class StartRecordEditor : Process
     {
-        public void DefineProcess(string id)
+        public void DefineProcess(string ids)
         {
             MyProcess p = new MyProcess();
-            p.StartInfo.FileName = @"C:\Company\Apps\Multimedia\MyRecordEditor\MyRecordEditor.exe";
-            p.StartInfo.Arguments = id;
+            p.StartInfo.FileName = SettingsDb.Settings["RecordEditorLocation"];     // @"C:\Company\Apps\Multimedia\MyRecordEditor\MyRecordEditor.exe";
+            p.StartInfo.Arguments = ids;
             p.EnableRaisingEvents = true;
             p.Exited += new EventHandler(myProcess_HasExited);
             p.Start();

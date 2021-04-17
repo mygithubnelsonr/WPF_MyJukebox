@@ -78,15 +78,6 @@
     <Property Name="Pos" Type="Int32" Nullable="false" />
     <NavigationProperty Name="tPlaylist" Relationship="Self.FK_tPLentries_tPlaylists" FromRole="tPLentries" ToRole="tPlaylists" />
   </EntityType>
-  <EntityType Name="tSetting">
-    <Key>
-      <PropertyRef Name="ID" />
-    </Key>
-    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-    <Property Name="Value" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
-    <Property Name="Editable" Type="Boolean" />
-  </EntityType>
   <EntityType Name="tSong">
     <Key>
       <PropertyRef Name="ID" />
@@ -207,7 +198,6 @@
     <EntitySet Name="tMedias" EntityType="Self.tMedia" />
     <EntitySet Name="tPlaylists" EntityType="Self.tPlaylist" />
     <EntitySet Name="tPLentries" EntityType="Self.tPLentry" />
-    <EntitySet Name="tSettings" EntityType="Self.tSetting" />
     <EntitySet Name="tSongs" EntityType="Self.tSong" />
     <EntitySet Name="vPlaylistSongs" EntityType="Self.vPlaylistSong" />
     <EntitySet Name="vSongs" EntityType="Self.vSong" />
@@ -228,17 +218,10 @@
       <End Role="tPlaylists" EntitySet="tPlaylists" />
       <End Role="tPLentries" EntitySet="tPLentries" />
     </AssociationSet>
-    <EntitySet Name="tAlbums" EntityType="MyJukeboxModel.tAlbum" />
     <EntitySet Name="tQueries" EntityType="MyJukeboxModel.tQuery" />
+    <EntitySet Name="tSettingsAlbums" EntityType="MyJukeboxModel.tSettingsAlbum" />
+    <EntitySet Name="tSettingsGenerals" EntityType="MyJukeboxModel.tSettingsGeneral" />
   </EntityContainer>
-  <EntityType Name="tAlbum">
-    <Key>
-      <PropertyRef Name="ID" />
-    </Key>
-    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-    <Property Name="Row" Type="Int32" />
-  </EntityType>
   <EntityType Name="tQuery">
     <Key>
       <PropertyRef Name="ID" />
@@ -246,5 +229,22 @@
     <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
     <Property Name="Row" Type="Int32" />
+  </EntityType>
+  <EntityType Name="tSettingsAlbum">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Row" Type="Int32" />
+  </EntityType>
+  <EntityType Name="tSettingsGeneral">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Value" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="Editable" Type="Boolean" />
   </EntityType>
 </Schema>

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace MyJukebox.Common
+namespace MyJukeboxWMPDapper.Common
 {
     public class ImageFlipper
     {
-        private static ImageFlipper _imageFlipper = new ImageFlipper();
-        private string _imagePath = "";
-        private string _artist = "";
+        //private static ImageFlipper _imageFlipper = new ImageFlipper();
+        //private string _imagePath = "";
+        //private string _artist = "";
 
         #region CTOR
         private ImageFlipper()
@@ -16,18 +16,12 @@ namespace MyJukebox.Common
         }
         #endregion
 
-        public static ImageFlipper Instanz()
-        {
-            return new ImageFlipper();
-        }
-
-        //private void ImageCollector(string artist)
+        //public static ImageFlipper Instanz()
         //{
-        //    _artist = artist.ToLower();
-        //    _imagePath = SettingsDb.Settings["ImagePath"];
+        //    return new ImageFlipper();
         //}
 
-        public List<string> GetImagesFullNames(string fullPath, string artist)
+        public static List<string> GetImagesFullNames(string fullPath, string artist)
         {
             List<string> artistImageFiles = new List<string>();
 

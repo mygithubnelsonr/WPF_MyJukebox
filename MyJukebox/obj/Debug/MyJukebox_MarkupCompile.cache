@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-A:\Source\Repos\90_Work\WPF\MyTools\MyJukeboxWPF\MyJukebox\obj\Debug\
+A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_WMP_Dapper\MyJukebox\obj\Debug\
 MyJukebox
 none
 false
 DEBUG;TRACE
-A:\Source\Repos\90_Work\WPF\MyTools\MyJukeboxWPF\MyJukebox\App.xaml
-2-2069728141
-2-1000094962
-42-401710401
-18158419999
-Views\InputBox.xaml;Views\MainWindow.xaml;
+A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_WMP_Dapper\MyJukebox\App.xaml
+3281161030
+
+331074276803
+24-375921184
+Views\InputBox.xaml;Views\MainWindow.xaml;Views\MyMessageBox.xaml;
 
 False
 

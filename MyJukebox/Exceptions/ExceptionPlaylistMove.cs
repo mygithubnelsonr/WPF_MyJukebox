@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MyJukebox.Exceptions
+namespace MyJukeboxWMPDapper.Exceptions
 {
     class ExceptionPlaylistMove : Exception
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MyJukebox.Exceptions
+namespace MyJukeboxWMPDapper.Exceptions
 {
     public class ExceptionPlaylistSongExist : Exception
     {

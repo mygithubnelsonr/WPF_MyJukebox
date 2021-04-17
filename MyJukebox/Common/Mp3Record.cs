@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MyJukebox.Common
+namespace MyJukeboxWMPDapper.Common
 {
     public class MP3Record
     {
