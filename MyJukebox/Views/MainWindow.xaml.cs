@@ -17,6 +17,8 @@ namespace MyJukeboxWMPDapper
     /// Interaction logic for MainWindow.xaml
     /// </summary>
 
+    // ToDo Implement WMP
+
     public partial class MainWindow : Window
     {
         #region Fields
@@ -38,10 +40,12 @@ namespace MyJukeboxWMPDapper
         private int _lastGenreID = -1;
         private int _lastCatalogID = -1;
         private int _lastAlbumID = -1;
+        private int _lastArtistID = -1;
         private int _lastPlaylistID = -1;
         private string _lastPlaylist = "";
         private string _lastQuery = "";
         private string _artist = "";
+        private string _lastArtist = "";
         private bool _dataLoaded = false;
         private bool _isLoaded = false;
         private bool _userIsDraggingSlider;
@@ -200,19 +204,18 @@ namespace MyJukeboxWMPDapper
         {
             this.DragMove();
 
-            GetSetData.SetSetting("FormLeft", this.Left.ToString());
-            GetSetData.SetSetting("FormTop", this.Top.ToString());
+            GetSetData.SetSettingGeneral("FormLeft", this.Left.ToString());
+            GetSetData.SetSettingGeneral("FormTop", this.Top.ToString());
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            GetSetData.SetSetting("FormHeight", this.Height.ToString());
-            GetSetData.SetSetting("FormWidth", this.Width.ToString());
+            GetSetData.SetSettingGeneral("FormHeight", this.Height.ToString());
+            GetSetData.SetSettingGeneral("FormWidth", this.Width.ToString());
         }
 
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
-            //SaveSettings();
             this.Close();
         }
 
@@ -233,15 +236,26 @@ namespace MyJukeboxWMPDapper
 
         private void menuExit_Click(object sender, RoutedEventArgs e)
         {
-            //SaveSettings();
             this.Close();
         }
 
         private void menuEditRecordLocation_Click(object sender, RoutedEventArgs e)
         {
-            Window input = new Views.InputBox();
-            input.Show();
-            input = null;
+            Views.InputBox inputBox = new Views.InputBox();
+            inputBox.ITitle = "EditRecord Location";
+            inputBox.ILabel = "Enter new Path:";
+            inputBox.IText = GetSetData.GetSetting("RecordEditorLocation");
+            inputBox.IKeepText = true;
+            var result = inputBox.ShowDialog();
+
+            if (result == true)
+            {
+                string path = inputBox.IText;
+                // check and save new location
+            }
+
+            inputBox = null;
+
         }
 
         private void menuEditMultiline_Click(object sender, RoutedEventArgs e)
@@ -251,17 +265,6 @@ namespace MyJukeboxWMPDapper
 
         private void menuToolsTest1_Click(object sender, RoutedEventArgs e)
         {
-            //List<string> artists = GetSetData.GetArtists(AudioStates.Genre, AudioStates.Catalog, AudioStates.Album);
-            //listboxArtists.ItemsSource = artists;
-
-            //if (!ApplicationDeployment.IsNetworkDeployed)
-            //{
-            //    MessageBox.Show(string.Format("Your application name - v{0}",
-            //        ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString(4))
-            //        );
-            //}
-
-            //statusVersion.Text = ConfigurationManager.AppSettings.GetKey["Version"]
 
         }
 
@@ -286,7 +289,7 @@ namespace MyJukeboxWMPDapper
                 return;
 
             _lastTab = tabcontrol.SelectedIndex;
-            GetSetData.SetSetting("LastTab", _lastTab.ToString());
+            GetSetData.SetSettingGeneral("LastTab", _lastTab.ToString());
 
             mediaPlayer.Stop();
             _mediaPlayerIsPlaying = false;
@@ -300,7 +303,7 @@ namespace MyJukeboxWMPDapper
 
         }
 
-        private void listboxGenres_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void listboxGenres_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             _lastRow = 0;
 
@@ -314,8 +317,8 @@ namespace MyJukeboxWMPDapper
 
             GetSetData.SetGenreCatalog(_lastGenreID, item.LastCatalog, item.LastCatalogID);
 
-            GetSetData.SetSetting("LastGenre", AudioStates.Genre);
-            GetSetData.SetSetting("LastGenreID", _lastGenreID.ToString());
+            GetSetData.SetSettingGeneral("LastGenre", AudioStates.Genre);
+            GetSetData.SetSettingGeneral("LastGenreID", _lastGenreID.ToString());
 
             FillListboxCatalogs();
 
@@ -323,7 +326,7 @@ namespace MyJukeboxWMPDapper
             FillDatagridByTabAudio();
         }
 
-        private void listboxCatalogs_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void listboxCatalogs_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             var item = (CatalogModel)listboxCatalogs.SelectedItem;
 
@@ -334,17 +337,13 @@ namespace MyJukeboxWMPDapper
                 AudioStates.Catalog = item.Name;
                 _lastCatalogID = GetSetData.GetCatalogID(AudioStates.Catalog);
 
-                //AudioStates.Catalog = _lastCatalog == "Alle" ? "" : _lastCatalog;
-
                 _lastAlbumID = 0;
                 AudioStates.Album = "Alle";
 
-                //AudioStates.Album = _lastAlbum == "Alle" ? "" : _lastAlbum;
-
-                GetSetData.SetSetting("LastCatalog", AudioStates.Catalog);
-                GetSetData.SetSetting("LastCatalogID", _lastCatalogID.ToString());
-                GetSetData.SetSetting("LastAlbum", AudioStates.Album);
-                GetSetData.SetSetting("LastAlbumID", _lastAlbumID.ToString());
+                GetSetData.SetSettingGeneral("LastCatalog", AudioStates.Catalog);
+                GetSetData.SetSettingGeneral("LastCatalogID", _lastCatalogID.ToString());
+                GetSetData.SetSettingGeneral("LastAlbum", AudioStates.Album);
+                GetSetData.SetSettingGeneral("LastAlbumID", _lastAlbumID.ToString());
 
                 FillListboxAlbums();
             };
@@ -355,30 +354,37 @@ namespace MyJukeboxWMPDapper
                 listboxAlbums.SelectedItem = 0;
             }
 
-            //var album = (AlbumModel)listboxAlbums.SelectedItem;
-            //AudioStates.Album = album.Name == "Alle" ? "" : album.Name;
-            //statusAlbum.Text = album.Name;
-
-
             FillDatagridByTabAudio();
         }
 
-        private void listboxArtists_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            string artist = listboxArtists.SelectedItem.ToString();
-            AudioStates.Artist = artist == "Alle" ? "" : artist;
-            //FillAlbumsAsync();
-            statusArtist.Text = artist;
-            FillDatagridByTabAudio();
-        }
-
-        private void listboxAlbums_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void listboxAlbums_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             var item = (AlbumModel)listboxAlbums.SelectedItem;
 
             AudioStates.Album = item.Name;
             _lastAlbumID = item.ID;
+
+            GetSetData.SetSettingGeneral("LastAlbum", AudioStates.Album);
+            GetSetData.SetSettingGeneral("LastAlbumID", _lastAlbumID.ToString());
+            GetSetData.SetSettingGeneral("LastArtist", "Alle");
+            GetSetData.SetSettingAlbumLastRow("Name", 0);
+
             statusAlbum.Text = AudioStates.Album;
+
+            FillListboxArtists();
+            FillDatagridByTabAudio();
+        }
+
+        private void listboxArtists_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            string artist = listboxArtists.SelectedItem.ToString();
+
+            AudioStates.Artist = artist;
+            _lastArtist = artist;
+
+            GetSetData.SetSettingGeneral("LastArtist", AudioStates.Artist);
+
+            statusArtist.Text = AudioStates.Artist;
 
             FillDatagridByTabAudio();
         }
@@ -386,13 +392,98 @@ namespace MyJukeboxWMPDapper
         private void listboxPlaylists_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             PlaylistModel playlist = listboxPlaylists.SelectedItem as PlaylistModel;
-            GetSetData.SetSetting("LastPlaylist", playlist.Name);
-            GetSetData.SetSetting("LastPlaylistID", playlist.ID.ToString());
+            GetSetData.SetSettingGeneral("LastPlaylist", playlist.Name);
+            GetSetData.SetSettingGeneral("LastPlaylistID", playlist.ID.ToString());
 
             _lastPlaylistID = playlist.ID;
             _lastPlaylist = playlist.Name;
 
             FillDatagridByTabPlaylist();
+        }
+
+        private void contextmenuPlaylistAdd_Click(object sender, RoutedEventArgs e)
+        {
+            Views.InputBox inputBox = new Views.InputBox();
+            inputBox.ITitle = "New Playlist";
+            inputBox.ILabel = "Enter Playlist name:";
+            inputBox.IText = "<Playlistname>";
+            var result = inputBox.ShowDialog();
+
+            if (result == true)
+            {
+                try
+                {
+                    string plname = inputBox.IText;
+                    int lastid = GetSetData.PlaylisAddNew(plname);
+
+                    PlaylistModel pl = GetSetData.GetPlaylist(lastid);
+                    _playlists.Add(pl);
+                }
+                catch (Exception ex)
+                {
+                    Views.MyMessageBox messageBox = new Views.MyMessageBox();
+                    messageBox.MTitle = "New Playlist";
+                    messageBox.MMessage = "PlaylistAdd:\n" + ex.Message + "\n" + ex.StackTrace;
+                    messageBox.ShowDialog();
+                }
+            }
+
+            inputBox = null;
+        }
+
+        private void contextmenuPlaylistRemove_Click(object sender, RoutedEventArgs e)
+        {
+            var playlist = (PlaylistModel)listboxPlaylists.SelectedItem;
+            int id = playlist.ID;
+
+            try
+            {
+                GetSetData.PlaylistRemove(id);
+                _playlists.Remove(playlist);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void contextmenuPlaylistRename_Click(object sender, RoutedEventArgs e)
+        {
+            var playlist = (PlaylistModel)listboxPlaylists.SelectedItem;
+            int index = listboxPlaylists.SelectedIndex;
+
+            Views.InputBox inputBox = new Views.InputBox();
+            inputBox.ITitle = "New Playlist";
+            inputBox.ILabel = "Enter Playlist name:";
+            inputBox.IText = playlist.Name;
+            inputBox.IKeepText = true;
+            var result = inputBox.ShowDialog();
+
+            if (result == true)
+            {
+                try
+                {
+                    string plname = inputBox.IText;
+
+                    GetSetData.PlaylistRename(playlist.ID, plname);
+
+                    List<PlaylistModel> list = GetSetData.GetAllPlaylists();
+
+                    _playlists = null;
+                    _playlists = new ObservableCollection<PlaylistModel>(list);
+
+                    listboxPlaylists.ItemsSource = null;
+                    listboxPlaylists.ItemsSource = _playlists;
+                    listboxPlaylists.SelectedIndex = index;
+                    listboxPlaylists.SelectedItem = index;
+
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
 
         #endregion
@@ -439,36 +530,6 @@ namespace MyJukeboxWMPDapper
 
         }
 
-        //private void CheckSongPathExist()
-        //{
-        //    var pathlist = DataGetSet.GetSongPathList();
-
-        //    bool found = true;
-
-        //    if (pathlist != null)
-        //    {
-        //        foreach (var p in pathlist)
-        //        {
-        //            Debug.Print($"path={p}");
-        //            if (!Directory.Exists(p))
-        //                found = false;
-        //        }
-        //    }
-        //    else
-        //        found = false;
-
-        //    if (found == false)
-        //    {
-        //        Views.MyMessageBox messageBox = new Views.MyMessageBox();
-        //        messageBox.MTitle = "Check Song Path";
-        //        messageBox.MMessage = "No song path found!\n\nExit Application.";
-
-        //        var result = messageBox.ShowDialog();
-
-        //        Application.Current.Shutdown();
-        //    }
-        //}
-
         private void SaveSettings()
         {
             try
@@ -514,7 +575,6 @@ namespace MyJukeboxWMPDapper
             _artistImageList = ImageFlipper.GetImagesFullNames(Helpers.GetImagePath(), _artist);
         }
 
-        // ToDo refactor fill datagrid
         private void FillDatagridByTabAudio()
         {
             _dataLoaded = false;
@@ -530,13 +590,16 @@ namespace MyJukeboxWMPDapper
                 string album = AudioStates.Album;
                 _lastRow = album == "Alle" ? 0 : GetSetData.GetAlbumLastRow(AudioStates.Album);
 
-                if (datagrid.Items.Count > 1)
+                if (datagrid.Items.Count > 0)
                 {
                     datagrid.SelectedIndex = _lastRow;
                     datagrid.SelectedItem = _lastRow;
+                    datagrid.ScrollIntoView(datagrid.SelectedItem);
                 }
-
-                datagrid.ScrollIntoView(datagrid.SelectedItem);
+            }
+            else
+            {
+                datagrid.ItemsSource = null;
             }
         }
 
@@ -552,13 +615,20 @@ namespace MyJukeboxWMPDapper
 
                 _lastRow = GetSetData.GetPlaylistLastRow(_lastPlaylistID);
 
-                if (datagrid.Items.Count > 1)
+                if (datagrid.Items.Count > 0)
                 {
                     datagrid.SelectedIndex = _lastRow;
                     datagrid.SelectedItem = _lastRow;
+                    datagrid.ScrollIntoView(datagrid.SelectedItem);
                 }
-
-                datagrid.ScrollIntoView(datagrid.SelectedItem);
+                else
+                {
+                    datagrid.ItemsSource = null;
+                }
+            }
+            else
+            {
+                datagrid.ItemsSource = null;
             }
         }
 
@@ -590,7 +660,7 @@ namespace MyJukeboxWMPDapper
 
         private void SetAlbumRow(string name, int row)
         {
-            bool result = GetSetData.SetAlbumLastRow(name, row);
+            bool result = GetSetData.SetSettingAlbumLastRow(name, row);
         }
 
         private void SetPlaylistRow(string name, int row)
@@ -605,7 +675,7 @@ namespace MyJukeboxWMPDapper
 
         private void InitializeComboGenres()
         {
-            List<GenreModel> genres = DataAccess.GetSetData.GetGenres();
+            List<GenreModel> genres = GetSetData.GetGenres();
             genres.Insert(0, new GenreModel { ID = 0, Name = "Alle" });
 
             listboxGenres.ItemsSource = genres;
@@ -639,7 +709,7 @@ namespace MyJukeboxWMPDapper
 
         private void FillListboxAlbums()
         {
-            List<AlbumModel> albums;     // = new AlbumModel();
+            List<AlbumModel> albums;
 
             if (_lastCatalogID == 0)
                 albums = GetSetData.GetAlbumsByGenreID(_lastGenreID);
@@ -650,23 +720,40 @@ namespace MyJukeboxWMPDapper
                 albums.Insert(0, new AlbumModel { ID = 0, Name = "Alle", ID_Genre = _lastGenreID, ID_Catalog = _lastCatalogID });
 
             listboxAlbums.ItemsSource = albums;
-            listboxAlbums.SelectedIndex = _lastAlbumID;
-            listboxAlbums.SelectedItem = _lastAlbumID;
+            int index = GetAlbumIndex(AudioStates.Album);
+
+            listboxAlbums.SelectedIndex = index;
+            listboxAlbums.SelectedItem = index;
             listboxAlbums.ScrollIntoView(listboxAlbums.SelectedItem);
             listboxAlbums.Focus();
 
-            FillArtists();
+            FillListboxArtists();
         }
 
-        private void FillArtists()
+        private void FillListboxArtists()
         {
             List<string> artists = GetSetData.GetArtists(AudioStates.Genre, AudioStates.Catalog, AudioStates.Album);
+
+            if (artists.Count > 1)
+                artists.Insert(0, "Alle");
+
+            _lastArtist = GetSetData.GetSetting("LastArtist");
+            AudioStates.Artist = _lastArtist;
+
             listboxArtists.ItemsSource = artists;
+
+            int index = GetArtistIndex(AudioStates.Artist);
+
+            listboxArtists.SelectedIndex = index;
+            listboxArtists.SelectedItem = index;
+            listboxArtists.ScrollIntoView(listboxArtists.SelectedItem);
+            listboxArtists.Focus();
+
         }
 
         private void FillPlaylists()
         {
-            List<PlaylistModel> list = GetSetData.GetPlaylists();
+            List<PlaylistModel> list = GetSetData.GetAllPlaylists();
 
             _playlists = new ObservableCollection<PlaylistModel>(list);
 
@@ -700,83 +787,34 @@ namespace MyJukeboxWMPDapper
                 if (c.Name == catalog)
                     break;
             }
-
             return listindex;
         }
 
-        //private async Task FillListboxesAsync()
-        //{
-        //    await FillGenresAsync();
-        //    await FillCatalogsAsync();
-        //    await FillArtistsAsync();
-        //    await FillAlbumsAsync();
-        //}
+        private int GetAlbumIndex(string album)
+        {
+            int listindex = -1;
 
-        //private async Task FillPlaylistsAsync()
-        //{
-        //    //List<Playlist> list = await DataGetSet.GetPlaylistsAsync();
+            foreach (AlbumModel c in listboxAlbums.Items)
+            {
+                listindex += 1;
+                if (c.Name == album)
+                    break;
+            }
+            return listindex;
+        }
 
-        //    //_playlists = new ObservableCollection<Playlist>(list);
+        private int GetArtistIndex(string artist)
+        {
+            int listindex = -1;
 
-        //    //ListBox lb = listboxPlaylists;
-        //    //lb.ItemsSource = _playlists;
-        //    //lb.SelectedIndex = _lastPlaylist;
-        //    //lb.ScrollIntoView(lb.SelectedItem);
-        //}
-
-        //private async Task FillGenresAsync()
-        //{
-        //    List<string> list = await DataGetSet.GetGenresAsync();
-
-        //    _genres = new ObservableCollection<string>(list);
-        //    _genres.Insert(0, "Alle");
-
-        //    ListBox lb = listboxGenres;
-        //    lb.ItemsSource = _genres;
-        //    lb.SelectedItem = AudioStates.Genre;
-        //    lb.ScrollIntoView(lb.SelectedItem);
-        //}
-
-        //private async Task FillCatalogsAsync()
-        //{
-        //    List<string> list = await DataGetSet.GetCatalogsAsync();
-        //    _catalogs = new ObservableCollection<string>(list);
-        //    _catalogs.Insert(0, "Alle");
-        //    ListBox lb = listboxCatalogs;
-        //    lb.ItemsSource = _catalogs;
-        //    lb.SelectedItem = AudioStates.Catalog;
-        //    lb.ScrollIntoView(lb.SelectedItem);
-        //}
-
-        //private async Task FillArtistsAsync()
-        //{
-        //    List<string> list = await DataGetSet.GetArtistsAsync();
-        //    _artists = new ObservableCollection<string>(list);
-        //    _artists.Insert(0, "Alle");
-        //    ListBox lb = listboxArtists;
-        //    lb.ItemsSource = _artists;
-        //    lb.SelectedItem = AudioStates.Artist;
-        //    if (lb.SelectedItem == null)
-        //    {
-        //        AudioStates.Artist = "";
-        //        lb.SelectedItem = "Alle";
-        //    }
-        //}
-
-        //private async Task FillAlbumsAsync()
-        //{
-        //    List<string> list = await DataGetSet.GetAlbumsAsync();
-        //    _albums = new ObservableCollection<string>(list);
-        //    _albums.Insert(0, "Alle");
-        //    ListBox lb = listboxAlbums;
-        //    lb.ItemsSource = _albums;
-        //    lb.SelectedItem = AudioStates.Album;
-        //    if (lb.SelectedItem == null)
-        //    {
-        //        AudioStates.Artist = "";
-        //        lb.SelectedItem = "Alle";
-        //    }
-        //}
+            foreach (string a in listboxArtists.Items)
+            {
+                listindex += 1;
+                if (a == artist)
+                    break;
+            }
+            return listindex;
+        }
         #endregion
 
         #region Datagrid
@@ -890,7 +928,7 @@ namespace MyJukeboxWMPDapper
         private void QueryClear()
         {
             textboxQuery.Text = comboboxStoredQueries.Text = "";
-            GetSetData.SetSetting("LastQuery", "");
+            GetSetData.SetSettingGeneral("LastQuery", "");
 
             if (tabcontrol.SelectedIndex == (int)Tab.Audio)
                 FillDatagridByTabAudio();
@@ -963,7 +1001,7 @@ namespace MyJukeboxWMPDapper
             timerDuration.Stop();
             mediaPlayer.Stop();
             textboxQuery.Text = (string)comboboxStoredQueries.SelectedItem;
-            GetSetData.SetSetting("LastQuery", textboxQuery.Text);
+            GetSetData.SetSettingGeneral("LastQuery", textboxQuery.Text);
             FillDatagridByQuery();
         }
 
@@ -1194,15 +1232,18 @@ namespace MyJukeboxWMPDapper
 
         private void contextmenuDatagridMovetoPlaylist_Click(object sender, RoutedEventArgs e)
         {
-            var rowlist = (vPlaylistSongModel)datagrid.SelectedItem;
-            int songId = rowlist.ID;
-
-            var menuitem = sender as MenuItem;
-            int plidnew = (int)menuitem.Tag;
-
             try
             {
-                GetSetData.PlaylistEntryMove(songId, _lastPlaylistID, plidnew);
+                foreach (var item in datagrid.SelectedItems)
+                {
+                    var rowlist = (vPlaylistSongModel)item;
+                    int songId = rowlist.ID;
+
+                    var menuitem = sender as MenuItem;
+                    int plidnew = (int)menuitem.Tag;
+
+                    GetSetData.PlaylistEntryMove(songId, _lastPlaylistID, plidnew);
+                }
 
                 FillDatagridByTabPlaylist();
             }
@@ -1218,15 +1259,14 @@ namespace MyJukeboxWMPDapper
 
         private void contextmenuDatagridSendtoPlaylist_Click(object sender, RoutedEventArgs e)
         {
-            var rowlist = (vSongModel)datagrid.SelectedItem;
-            int songId = rowlist.ID;
-
-            var menuitem = sender as MenuItem;
-            var playlistID = (int)menuitem.Tag;
-
             try
             {
-                GetSetData.AddSongToPlaylist(songId, playlistID);
+                foreach (var item in datagrid.SelectedItems)
+                {
+                    var rowlist = (vSongModel)item;
+                    int songId = rowlist.ID;
+                    GetSetData.AddSongToPlaylist(songId, _lastPlaylistID);
+                }
             }
             catch (Exception ex)
             {
@@ -1267,7 +1307,6 @@ namespace MyJukeboxWMPDapper
                 if (GetSetData.Datasource == GetSetData.DataSourceEnum.Playlist)
                     FillDatagridByTabPlaylist();
 
-                //datagrid.SelectedIndex = lastIndex;
             }
             catch (Exception ex)
             {
@@ -1298,9 +1337,6 @@ namespace MyJukeboxWMPDapper
             }
             catch { }
         }
-        #endregion
-
-        #region datagrid contentmenu old
 
         private void datagridMenuitemCopyCell_Click(object sender, RoutedEventArgs e)
         {
@@ -1315,8 +1351,7 @@ namespace MyJukeboxWMPDapper
                 {
                     var rowlist = (vSongModel)item;
                     int songId = rowlist.ID;
-                    Debug.Print(songId.ToString());
-                    var result = DataGetSet.DeleteSong(songId);
+                    var result = GetSetData.DeleteSong(songId);
                 }
 
                 datagrid.SelectionMode = DataGridSelectionMode.Single;
@@ -1333,12 +1368,16 @@ namespace MyJukeboxWMPDapper
 
         private void contextmenuDatagridRemoveFromPlaylist_Click(object sender, RoutedEventArgs e)
         {
-            var rowlist = (vPlaylistSongModel)datagrid.SelectedItem;
-            int songId = rowlist.ID;
-
             try
             {
-                GetSetData.RemoveEntryFromPlaylist(songId, _lastPlaylistID);
+                foreach (var item in datagrid.SelectedItems)
+                {
+                    var rowlist = (vPlaylistSongModel)item;
+                    int songId = rowlist.ID;
+
+                    GetSetData.RemoveEntryFromPlaylist(songId, _lastPlaylistID);
+                }
+
                 FillDatagridByTabPlaylist();
             }
             catch (Exception ex)

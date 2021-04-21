@@ -194,7 +194,7 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
-        public static bool SetAlbumLastRow(string name, int row)
+        public static bool SetSettingAlbumLastRow(string name, int row)
         {
             string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
 
@@ -258,6 +258,11 @@ namespace MyJukeboxWMPDapper.DataAccess
                 var result = String.Join(",", songs);
                 return result;
             }
+        }
+
+        internal static object DeleteSong(int songId)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -421,7 +426,7 @@ namespace MyJukeboxWMPDapper.DataAccess
         #endregion
 
         #region Playlist
-        public static List<PlaylistModel> GetPlaylists()
+        public static List<PlaylistModel> GetAllPlaylists()
         {
             List<PlaylistModel> playLists = new List<PlaylistModel>();
 
@@ -432,6 +437,29 @@ namespace MyJukeboxWMPDapper.DataAccess
                 playLists = conn.Query<PlaylistModel>(sql).ToList();
 
                 return playLists;
+            }
+        }
+
+        public static PlaylistModel GetPlaylist(int id)
+        {
+            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
+            using (IDbConnection conn = new SqlConnection(connection))
+            {
+                string sql = $"select * from tSettingsPlaylists where id={id}";
+                var playList = conn.QuerySingle<PlaylistModel>(sql);
+                return playList;
+            }
+        }
+
+        public static int GetLastPlaylistID()   // no reference!
+        {
+            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
+            using (var conn = new SqlConnection(connection))
+            {
+                string sql = $"select max(id) from tSettingsPlaylists";
+                int plid = conn.ExecuteScalar<int>(sql);
+
+                return plid;
             }
         }
 
@@ -577,6 +605,75 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
+        public static int PlaylisAddNew(string playlistname)
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                string sql = "";
+                try
+                {
+                    sql = $"insert into [dbo].[tSettingsPlaylists] (Name,Last,Row) Values('{playlistname}','false',0)";
+                    var retval = conn.Execute(sql);
+
+                    sql = $"select max(id) from tSettingsPlaylists";
+                    int plid = conn.ExecuteScalar<int>(sql);
+                    return plid;
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+        }
+
+        public static bool PlaylistRemove(int idPlaylist)
+        {
+            string sql = "";
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                try
+                {
+                    sql = $"delete from tPLentries where plid={idPlaylist}";
+                    var retval = conn.Execute(sql);
+
+                    // retval can be 0 if no songs in zhe playlist
+                    //if (retval == 0)
+                    //    throw new ExceptionPlaylistSongNotExist("Playlist or Song not found!");
+
+                    sql = $"delete from dbo.tSettingsPlaylists where id={idPlaylist}";
+                    var result = conn.Execute(sql);
+
+                    if (result == 0)
+                        throw new ExceptionPlaylistSongNotExist("Playlist or Song not found!");
+
+                    return true;
+                }
+                catch (ExceptionPlaylistSongNotExist ex)
+                {
+                    throw;
+                }
+            }
+        }
+
+        public static bool PlaylistRename(int id, string playlistname)
+        {
+            string sql = "";
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                try
+                {
+                    sql = $"update dbo.tSettingsPlaylists set name = '{playlistname}' where id = {id}";
+                    var retval = conn.Execute(sql);
+
+                    return true;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
         #endregion
 
         #region SettingsGeneral
@@ -608,7 +705,7 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
-        public static void SetSetting(string keyName, string keyValue)
+        public static void SetSettingGeneral(string keyName, string keyValue)
         {
             string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
 
@@ -666,6 +763,7 @@ namespace MyJukeboxWMPDapper.DataAccess
                 return null;
             }
         }
+
 
         #endregion
     }

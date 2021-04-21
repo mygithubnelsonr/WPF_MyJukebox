@@ -37,6 +37,11 @@
             <Separator />
             <MenuItem Header="Open Folder" Command="ApplicationCommands.Open"/>
         </ContextMenu>
+        <ContextMenu x:Key="contextmenuTabcontrol">
+            <MenuItem Header="Add new Playlist" Click="contextmenuPlaylistAdd_Click" />
+            <MenuItem Header="Rename Playlist" Click="contextmenuPlaylistRename_Click" />
+            <MenuItem Header="Remove selected Playlist" Click="contextmenuPlaylistRemove_Click" />
+        </ContextMenu>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="MediaCommands.Play" CanExecute="Play_CanExecute" Executed="Play_Executed"  />
@@ -231,7 +236,8 @@
                     <RowDefinition Height="120"/>
                     <RowDefinition Height="80"/>
                 </Grid.RowDefinitions>
-                <TabControl Grid.Row="0" x:Name="tabcontrol" Height="Auto" Foreground="AliceBlue" SelectionChanged="tabcontrol_SelectionChanged">
+                <TabControl Grid.Row="0" x:Name="tabcontrol" Height="Auto" Foreground="AliceBlue"
+                            SelectionChanged="tabcontrol_SelectionChanged">
                     <TabItem x:Name="tabitemAudio" Header="Audio">
                         <StackPanel>
                             <Expander Header="Genre" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="False">
@@ -288,10 +294,11 @@
                             </Expander>
                         </StackPanel>
                     </TabItem>
-                    <TabItem x:Name="tabitemPlaylist" Header="Playlist">
+                    <TabItem x:Name="tabitemPlaylist" Header="Playlist"  ContextMenu="{StaticResource contextmenuTabcontrol}" Margin="-2,2,-2,-4">
                         <StackPanel>
                             <ListBox x:Name="listboxPlaylists" Height="Auto" Tag="Playlists" ItemContainerStyle="{DynamicResource listboxItemStyle}"
-                                     Background="#FFC4F7F7" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxPlaylists_MouseLeftButtonUp">
+                                     Background="#FFC4F7F7" ScrollViewer.VerticalScrollBarVisibility="Visible" 
+                                     MouseLeftButtonUp="listboxPlaylists_MouseLeftButtonUp">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">

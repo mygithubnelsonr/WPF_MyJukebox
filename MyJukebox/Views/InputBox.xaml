@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MyJukeboxWMPDapper.Views"
         mc:Ignorable="d"
-        Title="Edit Record Location" Height="180" Width="320" Background="#FF05023C"
-            WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+        Title="Inputbox" Height="180" Width="320" Background="{StaticResource headerBackground}" WindowStartupLocation="CenterScreen" 
+                WindowStyle="None" Loaded="Window_Loaded" MouseLeftButtonDown="Window_Move" >
     <Window.Resources>
         <!--textbox Style-->
         <Style TargetType="TextBox">
@@ -23,20 +23,28 @@
                             CanExecute="CommandSave_CanExecute"
                             Executed="CommandSave_Executed"/>
     </Window.CommandBindings>
-
-    <DockPanel Margin="10 10 10 0">
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0 10 0 0" HorizontalAlignment="Center">
+    <DockPanel>
+        <Grid DockPanel.Dock="Bottom" Margin="0 0 0 0" Background="{StaticResource bottomBackground}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
             <Button x:Name="buttonSave" Content="Save" Style="{StaticResource designButton}" Command="ApplicationCommands.Save"/>
-            <Button x:Name="buttonCancel" Content="Cancel" Style="{StaticResource designButton}" Command="ApplicationCommands.Close"/>
-        </StackPanel>
-
-        <Grid Background="#FF02123C">
-            <StackPanel>
+            <Button Grid.Column="1" x:Name="buttonCancel" Content="Cancel" Style="{StaticResource designButton}" Command="ApplicationCommands.Close"/>
+        </Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" Background="{StaticResource headerBackground}">
+                <TextBlock Text="Inputbox" Margin="14 6" FontSize="18" FontWeight="Bold" Foreground="AntiqueWhite"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Background="{StaticResource centerBackground}">
                 <StackPanel Margin="10">
-                    <TextBlock Text="Enter Location:" FontSize="14" Margin="4" FontWeight="Bold" Foreground="AntiqueWhite"/>
-                    <TextBox x:Name="textboxLocation" Text="" Margin="4"/>
+                    <TextBlock x:Name="textblockInput" Text="Enter Value:" FontSize="14" Margin="4" FontWeight="Bold" Foreground="#FF1F1F27"/>
+                    <TextBox x:Name="textboxInput" Text="" Margin="4" MouseEnter="textboxInput_MouseEnter" TabIndex="0" />
                 </StackPanel>
-
             </StackPanel>
         </Grid>
     </DockPanel>

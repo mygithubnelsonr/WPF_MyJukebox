@@ -26,8 +26,20 @@
         <!-- Hintergrund für Header von MainWindow -->
         <LinearGradientBrush x:Key="headerBackground" StartPoint="0,0" EndPoint="0,1">
             <GradientStop Offset="0" Color="Blue"/>
-            <GradientStop Offset="0.7" Color="Blue"/>
+            <GradientStop Offset="0.3" Color="Blue"/>
             <GradientStop Offset="1" Color="#FF0991C3"/>
+        </LinearGradientBrush>
+        <!-- Hintergrund für Center von Inputbox -->
+        <LinearGradientBrush x:Key="centerBackground" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0" Color="#FF0991C3"/>
+            <GradientStop Offset="0.5" Color="DarkGray"/>
+            <GradientStop Offset="1" Color="DarkGray"/>
+        </LinearGradientBrush>
+        <!-- Hintergrund for Bottom of the Inputbox -->
+        <LinearGradientBrush x:Key="bottomBackground" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0" Color="DarkGray"/>
+            <GradientStop Offset="0.5" Color="#FF5F5B5B"/>
+            <GradientStop Offset="1" Color="DarkGray"/>
         </LinearGradientBrush>
         <!--Menu Background-->
         <LinearGradientBrush x:Key="menuBackground" StartPoint="0,0" EndPoint="0,1">
