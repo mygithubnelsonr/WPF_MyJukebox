@@ -61,60 +61,63 @@
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock x:Name="statusVersion" Text="v2.0.2" Margin="0,0,4,0" Foreground="White"/>
+                <TextBlock x:Name="statusVersion" Text="v2.2.0" Margin="0,0,4,0" Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Text="c NRSoft" Foreground="White"/>
+                <TextBlock Text="c NRSoft" Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock x:Name="statusDuration" Text="00:00" Margin="0 0 10 0" Foreground="White"/>
+                <TextBlock x:Name="statusDuration" Text="00:00" Margin="0 0 10 0" Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Text="/" Foreground="AliceBlue"/>
+                <TextBlock Text="/" Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock x:Name="statusProgress" Text="00:00" Foreground="White"/>
+                <TextBlock x:Name="statusProgress" Text="00:00" Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem DockPanel.Dock="Left">
                 <TextBlock Text="Genre:" Foreground="DarkBlue"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusGenre" Text="" Foreground="White"/>
+                <TextBlock x:Name="statusGenre" Text="" Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem DockPanel.Dock="Left">
                 <TextBlock Text="Catalog:"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusCatalog" Text="" Foreground="White"/>
-            </StatusBarItem>
-            <Separator/>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock Text="Artist:"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusArtist" Text="" Foreground="White"/>
+                <TextBlock x:Name="statusCatalog" Text="" Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem DockPanel.Dock="Left">
                 <TextBlock Text="Album:"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusAlbum" Text="" Foreground="White"/>
+                <TextBlock x:Name="statusAlbum" Text="" Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <Separator/>
-            <StatusBarItem DockPanel.Dock="Left" Margin="20 0 0 0">
-                <TextBlock Text="Row " Foreground="AliceBlue"/>
+            <StatusBarItem DockPanel.Dock="Left">
+                <TextBlock Text="Artist:"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusSelected" Text="{Binding SelectedIndex ,ElementName=datagrid}" Foreground="White"/>
+                <TextBlock x:Name="statusArtist" Text="" Foreground="AntiqueWhite"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem DockPanel.Dock="Left" Margin="10 0 0 0">
+                <TextBlock Text="Row " Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock Text=" of " Foreground="AliceBlue"/>
+                <TextBlock x:Name="statusSelected" Text="{Binding Text,ElementName=textblockRowSelected}" Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusCount" Text="{Binding Items.Count, ElementName=datagrid}" Foreground="White"/>
+                <TextBlock Text=" of " Foreground="AntiqueWhite"/>
+            </StatusBarItem>
+            <StatusBarItem DockPanel.Dock="Left">
+                <TextBlock x:Name="statusCount" Text="{Binding Items.Count, ElementName=datagrid}" Foreground="AntiqueWhite"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock x:Name="textblockRowSelected" Text="0" FontSize="4" Visibility="Hidden"/>
             </StatusBarItem>
             <Separator/>
             <StatusBarItem DockPanel.Dock="Left" Content="" Width="Auto"/>
@@ -328,7 +331,7 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <ToolBarTray Grid.Row="0" Background="{StaticResource ToolBarTrayBackgroundBrush}">
-                <ToolBar Band="0" Height="Auto">
+                <ToolBar Band="0" Height="Auto" Background="{StaticResource ToolBarTrayBackgroundBrush}">
                     <Button x:Name="buttonPlay" Command="MediaCommands.Play" Height="38" Width="38" Template="{StaticResource rundButton}">
                         <Image Source="/Images/PlaybackPlay.png" Width="32" Height="32"/>
                     </Button>
@@ -350,22 +353,29 @@
                                   Style="{StaticResource simpleImageTouggleButton}"
                                   Click="touglebuttonSpeaker_Click">
                     </ToggleButton>
-                    <Slider x:Name="sliderVolume" Minimum="0.0" Maximum="1"  Width="120" Height="24" Margin="5 0 10 0"
-                            Background="{StaticResource SliderBackgroundBrush}"
-                            IsSnapToTickEnabled="False"
-                            TickPlacement="TopLeft"
-                            TickFrequency="0.1"
-                            MouseWheel="sliderVolume_MouseWheel"
-                            ValueChanged="sliderVolume_ValueChanged"
-                            Value="{Binding ElementName=mediaPlayer, Path=Volume}">
-                    </Slider>
-                    <Slider x:Name="sliderPosition" Minimum="0" Maximum="1" Width="120" Height="24" Margin="10 0 10 0"
-                            Background="{StaticResource SliderBackgroundBrush}"
-                            TickPlacement="TopLeft"
-                            Thumb.DragStarted="sliderPosition_DragStarted"
-                            Thumb.DragCompleted="sliderPosition_DragCompleted"
-                            ValueChanged="sliderPosition_ValueChanged">
-                    </Slider>
+
+                    <Grid Height="24" Width="120" Margin="5 0 10 0">
+                        <ProgressBar Name="progressBarVolume" Foreground="#FF77AAF5" Background="{StaticResource SliderBackgroundBrush}"
+                                 Value="{Binding ElementName=sliderVolume, Path=Value}" />
+                        <Slider x:Name="sliderVolume" Minimum="0" Maximum="100" Value="10" Height="24"
+                                IsSnapToTickEnabled="False"
+                                TickPlacement="TopLeft"
+                                TickFrequency="10"
+                                MouseWheel="sliderVolume_MouseWheel"
+                                ValueChanged="sliderVolume_ValueChanged">
+                        </Slider>
+                    </Grid>
+                    <Grid Width="120" Height="24" Margin="10 0 10 0">
+                        <ProgressBar Name="progressBarPosition" Foreground="#FF77AAF5" Background="{StaticResource SliderBackgroundBrush}"
+                                 Value="{Binding ElementName=sliderPosition, Path=Value}" />
+                        <Slider x:Name="sliderPosition" Minimum="0" Maximum="100"
+                                TickPlacement="TopLeft"
+                                TickFrequency="10"
+                                MouseWheel="sliderPosition_MouseWheel"
+                                Thumb.DragStarted="sliderPosition_DragStarted"
+                                Thumb.DragCompleted="sliderPosition_DragCompleted">
+                        </Slider>
+                    </Grid>
                 </ToolBar>
                 <ToolBar x:Name="barQuery" Band="1" Height="34" FontSize="14" Foreground="Blue">
                     <Label Content="Enter Query: " Foreground="DarkBlue"/>
@@ -440,9 +450,7 @@
                     </Style>
                 </DataGrid.RowStyle>
             </DataGrid>
-
-            <MediaElement Grid.Row="1" Name="mediaPlayer" LoadedBehavior="Manual" Stretch="None" Volume="0" Height="20" Width="20"
-                          MediaEnded="mediaplayer_MediaEnded"/>
+            <!--<MediaElement Grid.Row="1" Name="mediaPlayer" LoadedBehavior="Manual" Stretch="None" Volume="0" Height="20" Width="20" MediaEnded="mediaplayer_MediaEnded"/>-->
         </Grid>
     </DockPanel>
 </Window>

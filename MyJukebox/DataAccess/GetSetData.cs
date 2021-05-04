@@ -136,6 +136,23 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
+        public static async void RefillTableAlbums()
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                try
+                {
+                    string sql = "[dbo].[spMyJukebox_FillAlbums]";
+                    await conn.ExecuteAsync(sql, commandType: CommandType.StoredProcedure);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+
         public static List<AlbumModel> GetAlbums(int genreId, int catalogId)
         {
             if (genreId == -1 || catalogId == -1)
