@@ -8,7 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("dal/myjukeboxmodel.context.tt")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("dal/myjukeboxmodel.tt")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("interop.wmplib.dll")]
 
 

@@ -18,6 +18,15 @@ namespace MyJukeboxWMPDapper.Common
             get { return _numbersAsString; }
         }
 
+        public int GetFirstNumber
+        {
+            get
+            {
+                numberCounter++;
+                return numberArray[0];
+            }
+        }
+
         public int GetNextNumber
         {
             get
@@ -108,7 +117,6 @@ namespace MyJukeboxWMPDapper.Common
             return temp_duplicate;
         }
 
-        // Print Array 
         public void PrintArray(Array arr)
         {
             Console.Write("{");

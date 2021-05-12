@@ -61,7 +61,7 @@
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock x:Name="statusVersion" Text="v2.2.0" Margin="0,0,4,0" Foreground="AntiqueWhite"/>
+                <TextBlock x:Name="statusVersion" Text="v2.2.2" Margin="0,0,4,0" Foreground="AntiqueWhite"/>
             </StatusBarItem>
             <StatusBarItem DockPanel.Dock="Right">
                 <TextBlock Text="c NRSoft" Foreground="AntiqueWhite"/>

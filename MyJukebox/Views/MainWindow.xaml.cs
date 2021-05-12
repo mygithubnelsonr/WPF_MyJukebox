@@ -20,8 +20,7 @@ namespace MyJukeboxWMPDapper
     public partial class MainWindow : Window
     {
         #region Fields
-        AxWMPLib.AxWindowsMediaPlayer wmp = new AxWMPLib.AxWindowsMediaPlayer();
-
+        private AxWMPLib.AxWindowsMediaPlayer wmp = null;   // new AxWMPLib.AxWindowsMediaPlayer();
         private ObservableCollection<string> _queries;
         private ObservableCollection<PlaylistModel> _playlists;
         private List<string> _artistImageList;
@@ -848,17 +847,15 @@ namespace MyJukeboxWMPDapper
         private int GetNextIndex()
         {
             int newIndex = -1;
-            int currentIndex = datagrid.SelectedIndex;
+            int currentIndex = datagrid.SelectedIndex + 1;
 
-            if (currentIndex + 1 < datagrid.Items.Count)
+            if (currentIndex < datagrid.Items.Count)
             {
-                datagrid.SelectedIndex = currentIndex + 1;
-
+                datagrid.SelectedIndex = currentIndex;
                 while (hasDataGridErrors())
                 {
                     datagrid.SelectedIndex = datagrid.SelectedIndex + 1;
                 }
-
                 newIndex = datagrid.SelectedIndex;
             }
             else
@@ -873,9 +870,6 @@ namespace MyJukeboxWMPDapper
         private void datagrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Debug.Print("datagrid_SelectionChanged");
-
-            string fullpath = "";
-            string path = "";
 
             statusProgress.Text = @"00:00";
             statusDuration.Text = @"00:00";
@@ -901,7 +895,6 @@ namespace MyJukeboxWMPDapper
 
                 _lastID = record.ID;
                 _artist = record.Artist;
-                path = record.Path;
                 _fullpath = $"{record.Path}\\{record.FileName}";
                 this.Title = $"{record.Artist} - {record.Title}";
             }
@@ -911,7 +904,6 @@ namespace MyJukeboxWMPDapper
                 var record = (vPlaylistSongModel)datagrid.SelectedItem;
                 _lastID = record.ID;
                 _artist = record.Artist;
-                path = record.Path;
 
                 if (record != null)
                 {
@@ -934,17 +926,8 @@ namespace MyJukeboxWMPDapper
             var root = Helpers.GetShortPath(_fullpath);
             ImageFlipperLoad(root + "\\" + AudioStates.Genre, _isLoaded);
 
-            //mediaPlayer.Source = new Uri(fullpath);
-            //wmp.URL = fullpath;
-            //sliderPosition.Value = 0;
-            // wmp.Ctlcontrols.play();
-
-            //var song = datagrid.SelectedItem as vSong;
-            //_fullpath = $"{song.Path}\\{song.FileName}";
-
             if (!_firstPlay)
                 Playback_Play();
-
         }
 
         #endregion
@@ -1115,10 +1098,6 @@ namespace MyJukeboxWMPDapper
         private void Pause_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Playback_Pause();
-
-            //wmp.Ctlcontrols.pause();
-            //timerDuration.Stop();
-            //timerFlipImage.Stop();
         }
 
         private void Stop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -1131,11 +1110,6 @@ namespace MyJukeboxWMPDapper
             _isStoped = true;
             _firstPlay = true;
             Playback_Stop();
-
-            //wmp.Ctlcontrols.stop();
-            //_isPlaying = false;
-            //timerDuration.Stop();
-            //timerFlipImage.Stop();
         }
 
         private void CopyDataRowCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -1182,6 +1156,9 @@ namespace MyJukeboxWMPDapper
         private void PlaybackShuffle_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             Playback_Loop.IsChecked = false;
+            int index = random.GetFirstNumber;
+            datagrid.SelectedIndex = index;
+            datagrid.SelectedItem = index;
         }
 
         #endregion
@@ -1207,7 +1184,6 @@ namespace MyJukeboxWMPDapper
             statusDuration.Text = TimeSpan.FromSeconds(sliderPosition.Maximum).ToString(@"mm\:ss");
             timerDuration.Start();
             timerFlipImage.Start();
-            _isPlaying = true;
         }
 
         private void Playback_PlayNext()
@@ -1222,7 +1198,7 @@ namespace MyJukeboxWMPDapper
             if ((bool)Playback_Shuffle.IsChecked)
                 nextindex = random.GetNextNumber;
             else
-                nextindex = GetNextIndex();     // datagrid.SelectedIndex + 1;
+                nextindex = GetNextIndex();
 
             if (nextindex < datagrid.Items.Count)
             {
@@ -1230,7 +1206,6 @@ namespace MyJukeboxWMPDapper
                 datagrid.SelectedItem = nextindex;
                 var song = datagrid.SelectedItem as vSongModel;
                 _fullpath = $"{song.Path}\\{song.FileName}";
-
             }
             else
                 _isLastDgRow = true;
@@ -1524,10 +1499,7 @@ namespace MyJukeboxWMPDapper
         {
             if ((wmp.URL != null) && (_isPlaying == true) && (_isDraggingSlider == false))
             {
-                //sliderPosition.Minimum = 0;
-                //sliderPosition.Maximum = wmp.currentMedia.duration;
                 sliderPosition.Value = wmp.Ctlcontrols.currentPosition;
-                //sliderPosition.TickFrequency = sliderPosition.Maximum / 10;
                 statusProgress.Text = TimeSpan.FromSeconds(sliderPosition.Value).ToString(@"mm\:ss");
             }
         }

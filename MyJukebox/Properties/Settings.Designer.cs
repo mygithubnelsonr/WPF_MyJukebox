@@ -25,7 +25,7 @@ namespace MyJukebox.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("v2.0.2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("v2.2.2")]
         public string Version {
             get {
                 return ((string)(this["Version"]));

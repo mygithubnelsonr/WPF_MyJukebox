@@ -128,4 +128,4 @@ A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_WMP_Dapper\MyJukebox\obj\Deb
 A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_WMP_Dapper\MyJukebox\obj\Debug\MyJukebox.csproj.CopyComplete
 A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_WMP_Dapper\MyJukebox\obj\Debug\MyJukebox.exe
 A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_WMP_Dapper\MyJukebox\obj\Debug\MyJukebox.pdb
-A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_WMP_Dapper\MyJukebox\bin\Debug\WmpFormsLib.pdb
+A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_WMP_Dapper\MyJukebox\bin\Debug\AxInterop.WMPLib.dll
