@@ -22,17 +22,5 @@ namespace MyJukebox.Properties {
                 return defaultInstance;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("v2.2.2")]
-        public string Version {
-            get {
-                return ((string)(this["Version"]));
-            }
-            set {
-                this["Version"] = value;
-            }
-        }
     }
 }

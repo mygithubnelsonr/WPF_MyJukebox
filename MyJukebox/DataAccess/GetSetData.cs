@@ -24,6 +24,80 @@ namespace MyJukeboxWMPDapper.DataAccess
         public static DataSourceEnum Datasource { get; set; }
 
         #region SongModel
+        public static List<GenreModel> GetGenres()
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                string sql = "dbo.spMyJukebox_GenresGetall";
+                var result = conn.Query<GenreModel>(sql).ToList();
+                return result;
+            }
+        }
+
+        public static List<CatalogModel> GetCatalogs(int genreId)
+        {
+            if (genreId == -1) return null;
+
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                var p = new DynamicParameters();
+                p.Add("@ID_Genre", genreId);
+
+                string sql = "dbo.spMyJukebox_CatalogsByGenreID";
+                var result = conn.Query<CatalogModel>(sql, p, commandType: CommandType.StoredProcedure).ToList();
+                return result;
+            }
+        }
+
+        public static List<string> GetArtists(string genre, string catalog, string album)
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                var p = new DynamicParameters();
+                p.Add("@Genre", genre == "Alle" ? "%" : genre);
+                p.Add("@Catalog", catalog == "Alle" ? "%" : catalog);
+                p.Add("@Album", album == "Alle" ? "%" : album);
+
+                string sql = "dbo.spMyJukebox_GetArtistsByGenreCatalog";
+
+                var result = conn.Query<string>(sql, p, commandType: CommandType.StoredProcedure).ToList();
+                return result;
+            }
+        }
+
+        public static List<AlbumModel> GetAlbums(int genreId, int catalogId)
+        {
+            if (genreId == -1 || catalogId == -1)
+                return null;
+
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                var p = new DynamicParameters();
+                p.Add("@ID_Genre", genreId);
+                p.Add("@ID_Catalog", catalogId);
+
+                string sql = "dbo.spMyJukebox_GetAlbums";
+                var albums = conn.Query<AlbumModel>(sql, p, commandType: CommandType.StoredProcedure).ToList();
+                return albums;
+            }
+        }
+
+        public static List<AlbumModel> GetAlbumsByGenreID(int genreId)
+        {
+            if (genreId == -1)
+                return null;
+
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                var p = new DynamicParameters();
+                p.Add("@ID_Genre", genreId);
+
+                string sql = "dbo.spMyJukebox_GetAlbumsByGenreID";
+                var albums = conn.Query<AlbumModel>(sql, p, commandType: CommandType.StoredProcedure).ToList();
+                return albums;
+            }
+        }
+
         public static List<vSongModel> GetTitles(int genreID, int catalogID, string album, string artist)
         {
             using (IDbConnection conn = new SqlConnection(_connectionstring))
@@ -40,28 +114,12 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
-        public static List<string> GetArtists(string genre, string catalog, string album)
-        {
-            using (var conn = new SqlConnection(_connectionstring))
-            {
-                var p = new DynamicParameters();
-                p.Add("@Genre", genre == "Alle" ? "%" : genre);
-                p.Add("@Catalog", catalog == "Alle" ? "%" : catalog);
-                p.Add("@Album", album == "Alle" ? "%" : album);
-
-                string sql = "dbo.spMyJukebox_GetArtistsByGenreCatalog";
-
-                var result = conn.Query<string>(sql, p, commandType: CommandType.StoredProcedure).ToList();
-                return result;
-            }
-        }
-
         public static List<vSongModel> GetQueryResult(string queryText)
         {
             List<vSongModel> songs;
             try
             {
-                using (var conn = new SqlConnection(_connectionstring))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = GetQueryString(queryText);
                     songs = conn.Query<vSongModel>(sql).ToList();
@@ -75,54 +133,12 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
-        public static List<GenreModel> GetGenres()
-        {
-            using (var conn = new SqlConnection(_connectionstring))
-            {
-                string sql = "dbo.spMyJukebox_GenresGetall";
-                var result = conn.Query<GenreModel>(sql).ToList();
-                return result;
-            }
-        }
-
-        //public static List<CatalogModel> GetCatalogs(string genre)
-        //{
-        //    if (String.IsNullOrEmpty(genre))
-        //        return null;
-
-        //    string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-        //    using (var conn = new SqlConnection(connection))
-        //    {
-        //        var p = new DynamicParameters();
-        //        p.Add("@Genre", genre);
-
-        //        string sql = "dbo.spMyJukebox_CatalogsByGenre";
-        //        var result = conn.Query<CatalogModel>(sql, p, commandType: CommandType.StoredProcedure).ToList();
-        //        return result;
-        //    }
-        //}
-
-        public static List<CatalogModel> GetCatalogs(int genreId)
-        {
-            if (genreId == -1) return null;
-
-            using (var conn = new SqlConnection(_connectionstring))
-            {
-                var p = new DynamicParameters();
-                p.Add("@ID_Genre", genreId);
-
-                string sql = "dbo.spMyJukebox_CatalogsByGenreID";
-                var result = conn.Query<CatalogModel>(sql, p, commandType: CommandType.StoredProcedure).ToList();
-                return result;
-            }
-        }
-
         public static int GetCatalogID(string catalog)
         {
             if (String.IsNullOrEmpty(catalog) || catalog == "Alle")
                 return 0;
 
-            using (var conn = new SqlConnection(_connectionstring))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 var p = new DynamicParameters();
                 p.Add("@Name", catalog);
@@ -152,48 +168,11 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
-
-        public static List<AlbumModel> GetAlbums(int genreId, int catalogId)
-        {
-            if (genreId == -1 || catalogId == -1)
-                return null;
-
-            using (var conn = new SqlConnection(_connectionstring))
-            {
-                var p = new DynamicParameters();
-                p.Add("@ID_Genre", genreId);
-                p.Add("@ID_Catalog", catalogId);
-
-                string sql = "dbo.spMyJukebox_GetAlbums";
-                var albums = conn.Query<AlbumModel>(sql, p, commandType: CommandType.StoredProcedure).ToList();
-                return albums;
-            }
-        }
-
-        public static List<AlbumModel> GetAlbumsByGenreID(int genreId)
-        {
-            if (genreId == -1)
-                return null;
-
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-            using (var conn = new SqlConnection(connection))
-            {
-                var p = new DynamicParameters();
-                p.Add("@ID_Genre", genreId);
-
-                string sql = "dbo.spMyJukebox_GetAlbumsByGenreID";
-                var albums = conn.Query<AlbumModel>(sql, p, commandType: CommandType.StoredProcedure).ToList();
-                return albums;
-            }
-        }
-
         public static int GetAlbumLastRow(string name)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
             try
             {
-                using (var conn = new SqlConnection(connection))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = $"select * from tSettingsAlbums where name = '{name}'";
                     var settings = conn.QueryFirstOrDefault(sql);
@@ -213,11 +192,9 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static bool SetSettingAlbumLastRow(string name, int row)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
             try
             {
-                using (var conn = new SqlConnection(connection))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = $"select * from tSettingsAlbums where name = '{name}'";
                     var settingExits = conn.QueryFirstOrDefault(sql);
@@ -247,10 +224,9 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static bool SetGenreCatalog(int genreID, string catalog, int catalogid)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
             try
             {
-                using (var conn = new SqlConnection(connection))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = $"update tGenres set LastCatalog = '{catalog}', LastCatalogID = {catalogid} where ID = {genreID}";
                     var result = conn.Execute(sql);
@@ -268,7 +244,7 @@ namespace MyJukeboxWMPDapper.DataAccess
         {
             string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
 
-            using (var conn = new SqlConnection(connection))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 string sql = $"select * from vsongs where id = {id}";
                 var songs = conn.Query(sql).ToList();
@@ -277,9 +253,26 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
-        internal static object DeleteSong(int songId)
+        internal static bool DeleteSong(int songId)
         {
-            throw new NotImplementedException();
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                try
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@SONGID", songId);
+
+                    string sql = $"[dbo].[spMyJukebox_DeleteSong]";
+
+                    var retval = conn.Execute(sql, p, commandType: CommandType.StoredProcedure);
+
+                    return true;
+                }
+                catch (ExceptionPlaylistSongNotExist ex)
+                {
+                    throw;
+                }
+            }
         }
 
         #endregion
@@ -287,15 +280,13 @@ namespace MyJukeboxWMPDapper.DataAccess
         #region Query
         public static List<string> QueryGetList()
         {
-            List<string> queries = null;
+            //List<string> queries = null;
 
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
-            using (var conn = new SqlConnection(connection))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 string sql = $"select name from tSettingsQueries order by name";
-                queries = conn.Query<string>(sql).ToList();
-                return queries;
+                var result = conn.Query<string>(sql).ToList();
+                return result;
             }
         }
 
@@ -307,11 +298,9 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static bool QueryAdd(string query)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
             try
             {
-                using (var conn = new SqlConnection(connection))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = "";
                     sql = $"select name from tSettingsQueries where name = '{query}'";
@@ -333,10 +322,9 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static bool QueryRemove(string query)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
             try
             {
-                using (var conn = new SqlConnection(connection))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = "";
                     sql = $"select name from tSettingsQueries where name = '{query}'";
@@ -356,41 +344,39 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
-        public static bool QuerySetRow(string query, int row)
-        {
-            try
-            {
-                //using (var context = new MyJukeboxEntities())
-                //{
-                //    var result = context.tQueries
-                //            .Where(q => q.Name == query)
-                //            .FirstOrDefault();
+        //public static bool QuerySetRow(string query, int row)
+        //{
+        //    try
+        //    {
+        //        using (var context = new MyJukeboxEntities())
+        //        {
+        //            var result = context.tQueries
+        //                    .Where(q => q.Name == query)
+        //                    .FirstOrDefault();
 
-                //    if (result == null)
-                //    {
-                //        MessageBox.Show("The Query not exist!", "ERROR");
-                //        return true;
-                //    }
+        //            if (result == null)
+        //            {
+        //                MessageBox.Show("The Query not exist!", "ERROR");
+        //                return true;
+        //            }
 
-                //    result.Row = row;
-                //    context.SaveChanges();
+        //            result.Row = row;
+        //            context.SaveChanges();
 
-                return true;
-                //}
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        //            return true;
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
 
         public static int GetQueryLastRow(string name)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
             try
             {
-                using (var conn = new SqlConnection(connection))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = $"select * from tSettingsQueries where name = '{name}'";
                     var settings = conn.QueryFirstOrDefault(sql);
@@ -412,7 +398,7 @@ namespace MyJukeboxWMPDapper.DataAccess
         {
             try
             {
-                using (var conn = new SqlConnection(_connectionstring))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = $"select * from tSettingsQueries where name = '{name}'";
                     var settingExits = conn.QueryFirstOrDefault(sql);
@@ -445,13 +431,12 @@ namespace MyJukeboxWMPDapper.DataAccess
         #region Playlist
         public static List<PlaylistModel> GetAllPlaylists()
         {
-            List<PlaylistModel> playLists = new List<PlaylistModel>();
+            //List<PlaylistModel> playLists = new List<PlaylistModel>();
 
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-            using (var conn = new SqlConnection(connection))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 string sql = $"select * from tSettingsPlaylists";
-                playLists = conn.Query<PlaylistModel>(sql).ToList();
+                var playLists = conn.Query<PlaylistModel>(sql).ToList();
 
                 return playLists;
             }
@@ -459,8 +444,7 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static PlaylistModel GetPlaylist(int id)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-            using (IDbConnection conn = new SqlConnection(connection))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 string sql = $"select * from tSettingsPlaylists where id={id}";
                 var playList = conn.QuerySingle<PlaylistModel>(sql);
@@ -468,29 +452,28 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
-        public static int GetLastPlaylistID()   // no reference!
+        //public static int GetLastPlaylistID()   // no reference!
+        //{
+        //    string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
+        //    using (var conn = new SqlConnection(connection))
+        //    {
+        //        string sql = $"select max(id) from tSettingsPlaylists";
+        //        int plid = conn.ExecuteScalar<int>(sql);
+
+        //        return plid;
+        //    }
+        //}
+
+        public static List<vSongModel> GetPlaylistEntries(int playlistID)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-            using (var conn = new SqlConnection(connection))
-            {
-                string sql = $"select max(id) from tSettingsPlaylists";
-                int plid = conn.ExecuteScalar<int>(sql);
+            //List<vSongModel> songs;
 
-                return plid;
-            }
-        }
-
-        public static List<vPlaylistSongModel> GetPlaylistEntries(int playlistID)
-        {
-            List<vPlaylistSongModel> songs;
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
-            using (var conn = new SqlConnection(_connectionstring))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 try
                 {
                     string sql = $"select * from vPlaylistSongs where plid = {playlistID}";
-                    songs = conn.Query<vPlaylistSongModel>(sql).ToList();
+                    var songs = conn.Query<vSongModel>(sql).ToList();
                     return songs;
                 }
                 catch (Exception ex)
@@ -503,7 +486,7 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static bool RemoveEntryFromPlaylist(int idSong, int idPlaylist)
         {
-            using (var conn = new SqlConnection(_connectionstring))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -524,7 +507,7 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static bool PlaylistEntryMove(int songId, int plold, int plnew)
         {
-            using (var conn = new SqlConnection(_connectionstring))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -545,7 +528,7 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static bool AddSongToPlaylist(int idSong, int idPlaylist)
         {
-            using (var conn = new SqlConnection(_connectionstring))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -566,11 +549,9 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static int GetPlaylistLastRow(int id)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
             try
             {
-                using (var conn = new SqlConnection(_connectionstring))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = $"select * from tSettingsPlaylists where id = {id}";
                     var settings = conn.QueryFirstOrDefault(sql);
@@ -590,11 +571,9 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static bool SetPlaylistLastRow(string name, int row)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
             try
             {
-                using (var conn = new SqlConnection(connection))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = $"select * from tSettingsPlaylists where name = '{name}'";
                     var settingExits = conn.QueryFirstOrDefault(sql);
@@ -626,9 +605,10 @@ namespace MyJukeboxWMPDapper.DataAccess
         {
             using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
-                string sql = "";
                 try
                 {
+                    string sql = "";
+
                     sql = $"insert into [dbo].[tSettingsPlaylists] (Name,Last,Row) Values('{playlistname}','false',0)";
                     var retval = conn.Execute(sql);
 
@@ -645,17 +625,14 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static bool PlaylistRemove(int idPlaylist)
         {
-            string sql = "";
             using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 try
                 {
+                    string sql = "";
+
                     sql = $"delete from tPLentries where plid={idPlaylist}";
                     var retval = conn.Execute(sql);
-
-                    // retval can be 0 if no songs in zhe playlist
-                    //if (retval == 0)
-                    //    throw new ExceptionPlaylistSongNotExist("Playlist or Song not found!");
 
                     sql = $"delete from dbo.tSettingsPlaylists where id={idPlaylist}";
                     var result = conn.Execute(sql);
@@ -674,14 +651,12 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static bool PlaylistRename(int id, string playlistname)
         {
-            string sql = "";
             using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 try
                 {
-                    sql = $"update dbo.tSettingsPlaylists set name = '{playlistname}' where id = {id}";
+                    string sql = $"update dbo.tSettingsPlaylists set name = '{playlistname}' where id = {id}";
                     var retval = conn.Execute(sql);
-
                     return true;
                 }
                 catch (Exception)
@@ -696,9 +671,7 @@ namespace MyJukeboxWMPDapper.DataAccess
         #region SettingsGeneral
         public static string GetSetting(string name)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
-            using (var conn = new SqlConnection(connection))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 string sql = $"select * from tSettingsGeneral where name = '{name}'";
                 var settings = conn.QueryFirstOrDefault(sql);
@@ -712,9 +685,7 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static List<SettingsModel> LoadSettings()
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
-            using (var conn = new SqlConnection(connection))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 string sql = $"select * from tSettingsGeneral order by name";
                 var result = conn.Query<SettingsModel>(sql).ToList();
@@ -724,9 +695,7 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static void SetSettingGeneral(string keyName, string keyValue)
         {
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
-            using (var conn = new SqlConnection(connection))
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
             {
                 try
                 {
@@ -757,14 +726,14 @@ namespace MyJukeboxWMPDapper.DataAccess
 
         public static List<string> GetSongPathList()
         {
-            string sql = "";
-            string shortpath = "";
-            string connection = ConnectionTools.GetConnectionString("MyJukeboxWMPDapper");
-
             try
             {
-                using (var conn = new SqlConnection(connection))
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
+
+                    string sql = "";
+                    string shortpath = "";
+
                     sql = "select top 1 path from tSongs";
                     string fullpath = conn.ExecuteScalar<string>(sql);
 
@@ -780,7 +749,6 @@ namespace MyJukeboxWMPDapper.DataAccess
                 return null;
             }
         }
-
 
         #endregion
     }

@@ -14,20 +14,11 @@ namespace MyJukeboxWMPDapper
             try
             {
                 var bindingGroup = value as BindingGroup;
-                if (GetSetData.Datasource == GetSetData.DataSourceEnum.Songs ||
-                    GetSetData.Datasource == GetSetData.DataSourceEnum.Query
-                    )
-                {
-                    var song = bindingGroup.Items[0] as vSongModel;
-                    if (song != null)
-                        fullpath = Path.Combine(song.Path, song.FileName);
-                }
-                else
-                {
-                    var song = bindingGroup.Items[0] as vPlaylistSongModel;
-                    if (song != null)
-                        fullpath = Path.Combine(song.Path, song.FileName);
-                }
+
+                var song = bindingGroup.Items[0] as vSongModel;
+
+                if (song != null)
+                    fullpath = Path.Combine(song.Path, song.FileName);
 
                 if (!File.Exists(fullpath))
                     return new ValidationResult(false, "File not found!");

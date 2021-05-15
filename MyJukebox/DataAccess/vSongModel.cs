@@ -11,5 +11,6 @@
         public string Path { get; set; }
         public string FileName { get; set; }
         public string Media { get; set; }
+        public int? PLID { get; set; }
     }
 }
