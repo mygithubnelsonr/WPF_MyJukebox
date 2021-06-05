@@ -14,7 +14,7 @@
             <Setter Property="Background" Value="Aqua"/>
         </Style>
         <!-- Style für die Statusbar -->
-        <Style TargetType="{x:Type StatusBar}">
+        <Style x:Key="sbgrid" TargetType="{x:Type Grid}">
             <Setter Property="Background">
                 <Setter.Value>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -24,6 +24,9 @@
                     </LinearGradientBrush>
                 </Setter.Value>
             </Setter>
+        </Style>
+        <!-- Style für die Statusbar -->
+        <Style TargetType="StatusBar">
             <Setter Property="Foreground" Value="Blue"/>
             <Setter Property="FontSize" Value="14"/>
         </Style>
@@ -59,69 +62,107 @@
                         Executed="PlaybackShuffle_Execute"/>
     </Window.CommandBindings>
     <DockPanel>
-        <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock x:Name="statusVersion" Text="v2.2.2" Margin="0,0,4,0" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Text="c NRSoft" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock x:Name="statusDuration" Text="00:00" Margin="0 0 10 0" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Text="/" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock x:Name="statusProgress" Text="00:00" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <Separator/>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock Text="Genre:" Foreground="DarkBlue"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusGenre" Text="" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <Separator/>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock Text="Catalog:"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusCatalog" Text="" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <Separator/>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock Text="Album:"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusAlbum" Text="" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <Separator/>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock Text="Artist:"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusArtist" Text="" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <Separator/>
-            <StatusBarItem DockPanel.Dock="Left" Margin="10 0 0 0">
-                <TextBlock Text="Row " Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusSelected" Text="{Binding Text,ElementName=textblockRowSelected}" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock Text=" of " Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <StatusBarItem DockPanel.Dock="Left">
-                <TextBlock x:Name="statusCount" Text="{Binding Items.Count, ElementName=datagrid}" Foreground="AntiqueWhite"/>
-            </StatusBarItem>
-            <StatusBarItem>
-                <TextBlock x:Name="textblockRowSelected" Text="0" FontSize="4" Visibility="Hidden"/>
-            </StatusBarItem>
-            <Separator/>
-            <StatusBarItem DockPanel.Dock="Left" Content="" Width="Auto"/>
-        </StatusBar>
+        <Grid DockPanel.Dock="Bottom" Style="{StaticResource sbgrid}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StatusBar Grid.Column="0" x:Name="sbaudio" Margin="10 0 0 0" Background="Transparent" Foreground="AntiqueWhite" Visibility="Hidden">
+                <Separator/>
+                <StatusBarItem>
+                    <TextBlock Text="Genre:" Foreground="DarkBlue"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="statusGenre" Text=""/>
+                </StatusBarItem>
+                <Separator/>
+                <StatusBarItem>
+                    <TextBlock Text="Catalog:" Foreground="DarkBlue"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="statusCatalog" Text=""/>
+                </StatusBarItem>
+                <Separator/>
+                <StatusBarItem>
+                    <TextBlock Text="Album:" Foreground="DarkBlue"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="statusAlbum" Text=""/>
+                </StatusBarItem>
+                <Separator/>
+                <StatusBarItem>
+                    <TextBlock Text="Artist:" Foreground="DarkBlue"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="statusArtist" Text=""/>
+                </StatusBarItem>
+                <Separator/>
+            </StatusBar>
+            <StatusBar  Grid.Column="0" x:Name="sbplaylist" Margin="10 0 0 0" Background="Transparent" Foreground="AntiqueWhite" Visibility="Hidden">
+                <Separator/>
+                <StatusBarItem>
+                    <TextBlock Text="Playlist:" Foreground="DarkBlue"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="textblockPlaylist" Text=""/>
+                </StatusBarItem>
+                <Separator/>
+                <TextBlock Text=""/>
+            </StatusBar>
+            <StatusBar  Grid.Column="0" x:Name="sbquery" Margin="10 0 0 0" Background="Transparent" Foreground="AntiqueWhite" Visibility="Hidden">
+                <Separator/>
+                <StatusBarItem>
+                    <TextBlock Text="Query:" Foreground="DarkBlue"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="textblockQuery" Text="{Binding ElementName=textboxQuery, Path=Text}"/>
+                </StatusBarItem>
+                <Separator/>
+                <TextBlock Text=""/>
+            </StatusBar>
+            <StatusBar Grid.Column="1" Background="Transparent" Foreground="AntiqueWhite" HorizontalAlignment="Center">
+                <Separator/>
+                <StatusBarItem>
+                    <TextBlock Text="Row "/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="statusSelected" Text="{Binding Text,ElementName=textblockRowSelected}"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock Text=" of "/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="statusCount" Text="{Binding Items.Count, ElementName=datagrid}"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="textblockRowSelected" Text="0" FontSize="4" Visibility="Hidden"/>
+                </StatusBarItem>
+                <Separator/>
+                <TextBlock Text=""/>
+            </StatusBar>
+            <StatusBar Grid.Column="2" Margin="0 0 10 0" Background="Transparent" Foreground="AntiqueWhite">
+                <Separator/>
+                <StatusBarItem>
+                    <TextBlock x:Name="statusDuration" Text="00:00"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock Text="/"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="statusProgress" Text="00:00"/>
+                </StatusBarItem>
+                <Separator/>
+                <StatusBarItem Content="" Width="Auto"/>
+                <StatusBarItem>
+                    <TextBlock Text="© NRSoft"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock x:Name="statusVersion" Text=""/>
+                </StatusBarItem>
+                <Separator/>
+            </StatusBar>
+        </Grid>
         <Grid DockPanel.Dock="Top" Height="50" Background="{StaticResource headerBackground}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10"/>
@@ -239,9 +280,34 @@
                     <RowDefinition Height="120"/>
                     <RowDefinition Height="80"/>
                 </Grid.RowDefinitions>
-                <TabControl Grid.Row="0" x:Name="tabcontrol" Height="Auto" Foreground="AliceBlue"
-                            SelectionChanged="tabcontrol_SelectionChanged">
-                    <TabItem x:Name="tabitemAudio" Header="Audio">
+                <TabControl Grid.Row="0" x:Name="tabcontrol" Height="Auto" BorderBrush="Gainsboro" BorderThickness="2"
+                            SelectionChanged="tabcontrol_SelectionChanged" Background="#FFC4F7F7">
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="Gainsboro" CornerRadius="8,8,8,8" Margin="2">
+                                            <ContentPresenter x:Name="ContentSite"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            ContentSource="Header"
+                                            Margin="10,2"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="LightSkyBlue" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="False">
+                                                <Setter TargetName="Border" Property="Background" Value="Gray" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+                    <TabItem x:Name="tabitemAudio" Header="Audio" Background="Gray">
                         <StackPanel>
                             <Expander Header="Genre" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="False">
                                 <ListBox x:Name="listboxGenres" Height="Auto" MaxHeight="100" Tag="Genre" ItemContainerStyle="{DynamicResource listboxItemStyle}" ItemsSource="{Binding}"
@@ -297,7 +363,8 @@
                             </Expander>
                         </StackPanel>
                     </TabItem>
-                    <TabItem x:Name="tabitemPlaylist" Header="Playlist"  ContextMenu="{StaticResource contextmenuTabcontrol}" Margin="-2,2,-2,-4">
+                    <TabItem x:Name="tabitemPlaylist" Header="Playlist" Background="Gray"
+                             ContextMenu="{StaticResource contextmenuTabcontrol}">
                         <StackPanel>
                             <ListBox x:Name="listboxPlaylists" Height="Auto" Tag="Playlists" ItemContainerStyle="{DynamicResource listboxItemStyle}"
                                      Background="#FFC4F7F7" ScrollViewer.VerticalScrollBarVisibility="Visible" 

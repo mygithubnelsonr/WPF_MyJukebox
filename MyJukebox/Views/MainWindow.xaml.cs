@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -15,10 +16,12 @@ namespace MyJukeboxWMPDapper
 {
     /// <summary>
     /// Version History:
-    /// v2.2.2  12.05.2021  MyJukebox:  Button Shuffle - on click select first random number
-    /// v2.2.3  13.05.2021  GetSetData: Implement DeleteSong ([spMyJukebox_DeleteSong])
-    ///                     Fixed Playlist Playnext Song
-    /// v2.2.4  15.05.2021  Refactoring: vPlaylistModel not longer needed. Clean code.
+    /// v2.2.2.0  12.05.2021  MyJukebox:  Button Shuffle - on click select first random number
+    /// v2.2.3.0  13.05.2021  GetSetData: Implement DeleteSong ([spMyJukebox_DeleteSong])
+    ///                       Fixed Playlist Playnext Song
+    /// v2.2.4.0  15.05.2021  Refactoring: vPlaylistModel not longer needed. Clean code.
+    /// v2.2.4.1  04.06.2021  Bugfix: repeat song after pause and then play
+    /// v2.2.5.0              Refactoring: Seperate Statusbar for Audio and Playlist
     /// </summary>
 
 
@@ -108,7 +111,7 @@ namespace MyJukeboxWMPDapper
             this.Top = Convert.ToInt32(GetSetData.GetSetting("FormTop"));
             this.Left = Convert.ToInt32(GetSetData.GetSetting("FormLeft"));
 
-            statusVersion.Text = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            statusVersion.Text = "v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             expanderLeftPanel.IsExpanded = Convert.ToBoolean(GetSetData.GetSetting("LeftPanel"));
             textboxQuery.Tag = GetSetData.GetSetting("PlaceHolder");
             #endregion
@@ -137,6 +140,9 @@ namespace MyJukeboxWMPDapper
 
             if (!String.IsNullOrEmpty(_lastQuery))
             {
+                //sbaudio.Visibility = Visibility.Hidden;
+                //sbplaylist.Visibility = Visibility.Hidden;
+                //sbquery.Visibility = Visibility.Visible;
                 _lastRow = GetSetData.GetQueryLastRow(_lastQuery);
                 FillDatagridByQuery();
             }
@@ -144,12 +150,17 @@ namespace MyJukeboxWMPDapper
             {
                 if (tabcontrol.SelectedIndex == (int)Tab.Audio)
                 {
+                    //sbplaylist.Visibility = Visibility.Hidden;
+                    //sbquery.Visibility = Visibility.Hidden;
+                    //sbaudio.Visibility = Visibility.Visible;
                     _lastRow = GetSetData.GetAlbumLastRow(AudioStates.Album);
                     FillDatagridByTabAudio();
-
                 }
                 else
                 {
+                    //sbaudio.Visibility = Visibility.Hidden;
+                    //sbquery.Visibility = Visibility.Hidden;
+                    //sbplaylist.Visibility = Visibility.Visible;
                     FillDatagridByTabPlaylist();
                 }
             }
@@ -295,11 +306,10 @@ namespace MyJukeboxWMPDapper
 
             DatagridContextmenuCreate();
 
-            if (_lastTab == 0)
+            if (_lastTab == (int)Tab.Audio)
                 FillDatagridByTabAudio();
             else
                 FillDatagridByTabPlaylist();
-
         }
 
         private void listboxGenres_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -613,6 +623,11 @@ namespace MyJukeboxWMPDapper
 
                 if (datagrid.Items.Count > 0)
                 {
+                    if (datagrid.Items.Count % 2 == 0)
+                        datagrid.Background = new SolidColorBrush(Color.FromRgb(210, 234, 247));
+                    else
+                        datagrid.Background = new SolidColorBrush(Color.FromRgb(185, 223, 247));
+
                     datagrid.SelectedIndex = _lastRow;
                     datagrid.SelectedItem = _lastRow;
                     datagrid.ScrollIntoView(datagrid.SelectedItem);
@@ -622,6 +637,8 @@ namespace MyJukeboxWMPDapper
 
                     random.InitRandomNumbers(datagrid.Items.Count - 1);
                 }
+
+                SetStatusbar("audio");
             }
             else
             {
@@ -653,6 +670,10 @@ namespace MyJukeboxWMPDapper
                 {
                     datagrid.ItemsSource = null;
                 }
+                PlaylistModel playlist = listboxPlaylists.SelectedItem as PlaylistModel;
+
+                textblockPlaylist.Text = playlist.Name;
+                SetStatusbar("playlist");
             }
             else
             {
@@ -679,11 +700,26 @@ namespace MyJukeboxWMPDapper
 
                     random.InitRandomNumbers(datagrid.Items.Count - 1);
                 }
+                SetStatusbar("query");
             }
             else
                 QueryClear();
 
             _dataLoaded = true;
+        }
+
+        private void SetStatusbar(string statusbar)
+        {
+            sbplaylist.Visibility = Visibility.Hidden;
+            sbquery.Visibility = Visibility.Hidden;
+            sbaudio.Visibility = Visibility.Hidden;
+
+            if (statusbar == "audio")
+                sbaudio.Visibility = Visibility.Visible;
+            if (statusbar == "playlist")
+                sbplaylist.Visibility = Visibility.Visible;
+            if (statusbar == "query")
+                sbquery.Visibility = Visibility.Visible;
         }
 
         private void SetAlbumRow(string name, int row)
@@ -869,8 +905,6 @@ namespace MyJukeboxWMPDapper
         #region Datagrid
         private void datagrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Debug.Print("datagrid_SelectionChanged");
-
             statusProgress.Text = @"00:00";
             statusDuration.Text = @"00:00";
             this.Title = "MyJukeboxWMPDapper";
@@ -1071,6 +1105,7 @@ namespace MyJukeboxWMPDapper
                 imageArtist.Stretch = System.Windows.Media.Stretch.Uniform;
             }
             Playback_Play();
+            _isPaused = false;
         }
 
         private void Pause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
