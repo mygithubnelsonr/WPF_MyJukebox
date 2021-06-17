@@ -82,6 +82,48 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
+        public static string GetLastCatalog(string genre)
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                string sql = $"select * from tGenres where name = '{genre}'";
+                var gen = conn.QuerySingle<GenreModel>(sql);
+                string catalog = gen.LastCatalog;
+                return catalog;
+            }
+        }
+
+        public static int GetLastCatalogID(string genre)
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                string sql = $"select * from tGenres where name = '{genre}'";
+                var gen = conn.QuerySingle<GenreModel>(sql);
+                int catalogid = gen.LastCatalogID;
+                return catalogid;
+            }
+        }
+
+        public static string GetLastAlbum(string catalog)
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                string sql = $"select * from tCatalogs where name = '{catalog}'";
+                var cat = conn.QuerySingle<CatalogModel>(sql);
+                return cat.LastAlbum;
+            }
+        }
+
+        internal static int GetLastAlbumID(string catalog)
+        {
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                string sql = $"select * from tCatalogs where name = '{catalog}'";
+                var cat = conn.QuerySingle<CatalogModel>(sql);
+                return cat.LastAlbumID;
+            }
+        }
+
         public static List<AlbumModel> GetAlbumsByGenreID(int genreId)
         {
             if (genreId == -1)
@@ -144,11 +186,35 @@ namespace MyJukeboxWMPDapper.DataAccess
                 p.Add("@Name", catalog);
                 p.Add("@ID", -1, DbType.Int32, ParameterDirection.Output);
 
-                string sql = "sbMyJukebox_GetCatalogIDByName";
+                string sql = "[dbo].[spMyJukebox_GetCatalogIDByName]";
                 var result = conn.Query(sql, p, commandType: CommandType.StoredProcedure);
 
                 int catalogId = p.Get<int>("@ID");
                 return catalogId;
+            }
+        }
+
+        public static CatalogSetting GetCatalogSettings(int catalogid, int albumid)
+        {
+            try
+            {
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
+                {
+                    string sql = $"select * from tSettingsCatalogs where ID_Catalog = {catalogid} and ID_Album = {albumid}";
+                    var settings = conn.QueryFirstOrDefault<CatalogSetting>(sql);
+
+                    if (settings == null)
+                        return null;
+                    else
+                    {
+                        return settings;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.Message);
+                return null;
             }
         }
 
@@ -222,6 +288,39 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
+        public static bool SetCatalogSettings(string catalog, int idcatalog, string album, int idalbum, int row)
+        {
+            try
+            {
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
+                {
+                    string sql = $"select * from tSettingsCatalogs where ID_Catalog = {idcatalog} and ID_Album = {idalbum}";
+                    var settingExits = conn.QueryFirstOrDefault(sql);
+
+                    if (settingExits == null)
+                    {
+                        string albumtemp = album.Replace("'", "''");
+
+                        sql = $"insert into tSettingsCatalogs (Catalog, ID_Catalog, Album, ID_Album, Row) values ('{catalog}',{idcatalog},'{albumtemp}',{idalbum}, 0)";
+                        var result = conn.Execute(sql);
+                    }
+                    else
+                    {
+                        sql = $"update tSettingsCatalogs set row = {row}" +
+                                $"where ID_Catalog = {idcatalog} and ID_Album = {idalbum}";
+
+                        var result = conn.Execute(sql);
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.Message);
+                return false;
+            }
+        }
+
         public static bool SetGenreCatalog(int genreID, string catalog, int catalogid)
         {
             try
@@ -229,6 +328,25 @@ namespace MyJukeboxWMPDapper.DataAccess
                 using (IDbConnection conn = new SqlConnection(_connectionstring))
                 {
                     string sql = $"update tGenres set LastCatalog = '{catalog}', LastCatalogID = {catalogid} where ID = {genreID}";
+                    var result = conn.Execute(sql);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.Message);
+                return false;
+            }
+        }
+
+        public static bool SetCatalogAlbum(int catlogid, string album, int albumid)
+        {
+            try
+            {
+                using (IDbConnection conn = new SqlConnection(_connectionstring))
+                {
+                    string albumtemp = album.Replace("'", "''");
+                    string sql = $"update tCatalogs set LastAlbum = '{albumtemp}', LastAlbumID = {albumid} where ID = {catlogid}";
                     var result = conn.Execute(sql);
                     return true;
                 }
@@ -723,6 +841,7 @@ namespace MyJukeboxWMPDapper.DataAccess
                 }
             }
         }
+
 
         public static List<string> GetSongPathList()
         {

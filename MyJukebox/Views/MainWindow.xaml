@@ -486,7 +486,7 @@
                       AlternationCount="1" RowBackground="{StaticResource RowBackgroundBrush}"
                       AlternatingRowBackground="{StaticResource AlternatingRowBackgroundBrush}"
                       IsReadOnly="True" SelectionMode="Single" ColumnHeaderStyle="{StaticResource datagridHeaderStyle}"
-                      SelectionChanged="datagrid_SelectionChanged">
+                      SelectionChanged="datagrid_SelectionChanged" ScrollViewer.ScrollChanged="datagrid_ScrollChanged">
 
                 <DataGrid.RowValidationRules>
                     <local:FileExistValidationRule/>

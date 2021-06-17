@@ -29,7 +29,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>15</ApplicationRevision>
+    <ApplicationRevision>17</ApplicationRevision>
     <ApplicationVersion>2.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -116,6 +116,7 @@
     <Compile Include="DataAccess\AlbumModel.cs" />
     <Compile Include="DataAccess\ArtistModel.cs" />
     <Compile Include="DataAccess\CatalogModel.cs" />
+    <Compile Include="DataAccess\CatalogSettings.cs" />
     <Compile Include="DataAccess\Connection.cs" />
     <Compile Include="DataAccess\GenreModel.cs" />
     <Compile Include="DataAccess\GetSetData.cs" />

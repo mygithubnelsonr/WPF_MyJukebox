@@ -21,9 +21,9 @@ namespace MyJukeboxWMPDapper
     ///                       Fixed Playlist Playnext Song
     /// v2.2.4.0  15.05.2021  Refactoring: vPlaylistModel not longer needed. Clean code.
     /// v2.2.4.1  04.06.2021  Bugfix: repeat song after pause and then play
-    /// v2.2.5.0              Refactoring: Seperate Statusbar for Audio and Playlist
+    /// v2.2.5.0              Refactoring: Seperate Statusbar for Audio, Playlist and Query
+    /// v2.2.5.2  17.06.2021  Refactoring: Implement saveing catalog lastrow per album
     /// </summary>
-
 
     public partial class MainWindow : Window
     {
@@ -48,6 +48,9 @@ namespace MyJukeboxWMPDapper
         private string _lastQuery = "";
         private string _artist = "";
         private string _lastArtist = "";
+
+        private int _firstVisibleRow = 0;
+        private int _lastVisibleRow = 0;
 
         private bool _isDraggingSlider;
         private string _fullpath = "";
@@ -95,12 +98,17 @@ namespace MyJukeboxWMPDapper
             #region Initialize State Values
 
             AudioStates.Genre = GetSetData.GetSetting("LastGenre");
-            AudioStates.Album = GetSetData.GetSetting("LastAlbum");
-            AudioStates.Artist = GetSetData.GetSetting("LastArtist");
-
             _lastGenreID = Convert.ToInt32(GetSetData.GetSetting("LastGenreID"));
-            _lastAlbumID = Convert.ToInt32(GetSetData.GetSetting("LastAlbumID"));
-            _lastRow = Convert.ToInt32(GetSetData.GetSetting("LastRow"));
+
+            //AudioStates.Catalog = GetSetData.GetLastCatalog(AudioStates.Genre);
+            //_lastCatalogID = GetSetData.GetLastCatalogID(AudioStates.Genre);
+
+            //AudioStates.Album = GetSetData.GetSetting("LastAlbum");
+            //AudioStates.Artist = GetSetData.GetSetting("LastArtist");
+
+            //_lastAlbumID = Convert.ToInt32(GetSetData.GetSetting("LastAlbumID"));
+            //_lastRow = Convert.ToInt32(GetSetData.GetSetting("LastRow"));
+
             _lastTab = Convert.ToInt32(GetSetData.GetSetting("LastTab"));
             _lastPlaylistID = Convert.ToInt32(GetSetData.GetSetting("LastPlaylistID"));
             _lastPlaylist = GetSetData.GetSetting("LastPlaylist");
@@ -131,7 +139,8 @@ namespace MyJukeboxWMPDapper
 
             GetSetData.RefillTableAlbums();
 
-            InitializeComboGenres();
+            // initialize LbGenres then fill LbCatalogs then fill LbAlbums then fill LbAtrists
+            InitializeListboxGenres();
 
             FillPlaylists();
             FillQueryCombo();
@@ -140,9 +149,6 @@ namespace MyJukeboxWMPDapper
 
             if (!String.IsNullOrEmpty(_lastQuery))
             {
-                //sbaudio.Visibility = Visibility.Hidden;
-                //sbplaylist.Visibility = Visibility.Hidden;
-                //sbquery.Visibility = Visibility.Visible;
                 _lastRow = GetSetData.GetQueryLastRow(_lastQuery);
                 FillDatagridByQuery();
             }
@@ -150,17 +156,11 @@ namespace MyJukeboxWMPDapper
             {
                 if (tabcontrol.SelectedIndex == (int)Tab.Audio)
                 {
-                    //sbplaylist.Visibility = Visibility.Hidden;
-                    //sbquery.Visibility = Visibility.Hidden;
-                    //sbaudio.Visibility = Visibility.Visible;
                     _lastRow = GetSetData.GetAlbumLastRow(AudioStates.Album);
                     FillDatagridByTabAudio();
                 }
                 else
                 {
-                    //sbaudio.Visibility = Visibility.Hidden;
-                    //sbquery.Visibility = Visibility.Hidden;
-                    //sbplaylist.Visibility = Visibility.Visible;
                     FillDatagridByTabPlaylist();
                 }
             }
@@ -174,25 +174,9 @@ namespace MyJukeboxWMPDapper
                 datagrid.ScrollIntoView(datagrid.SelectedItem);
                 datagrid.Focus();
 
-                //if (GetSetData.Datasource == GetSetData.DataSourceEnum.Songs ||
-                //    GetSetData.Datasource == GetSetData.DataSourceEnum.Query)
-                //{
-                //    var record = (vSongModel)datagrid.SelectedItem;
-                //    rootFolder = Helpers.GetShortPath(record.Path);
-                //    _artist = record.Artist;
-                //}
-
-                //if (GetSetData.Datasource == GetSetData.DataSourceEnum.Playlist)
-                //{
-                //    var record = (vSongModel)datagrid.SelectedItem;
-                //    rootFolder = record.Path;
-                //    _artist = record.Artist;
-                //}
-
                 var record = (vSongModel)datagrid.SelectedItem;
                 rootFolder = Helpers.GetShortPath(record.Path);
                 _artist = record.Artist;
-
                 _dataLoaded = true;
             }
 
@@ -277,10 +261,12 @@ namespace MyJukeboxWMPDapper
 
         private void menuToolsTest1_Click(object sender, RoutedEventArgs e)
         {
+            //ScrollToCenter();
         }
 
         private void menuToolsTest2_Click(object sender, RoutedEventArgs e)
         {
+
         }
 
         private void menuDatabaseCheckPath_Click(object sender, RoutedEventArgs e)
@@ -329,9 +315,9 @@ namespace MyJukeboxWMPDapper
             GetSetData.SetSettingGeneral("LastGenre", AudioStates.Genre);
             GetSetData.SetSettingGeneral("LastGenreID", _lastGenreID.ToString());
 
-            FillListboxCatalogs();
-
             statusGenre.Text = AudioStates.Genre;
+
+            FillListboxCatalogs();
             FillDatagridByTabAudio();
         }
 
@@ -339,20 +325,27 @@ namespace MyJukeboxWMPDapper
         {
             var item = (CatalogModel)listboxCatalogs.SelectedItem;
 
-            GetSetData.SetGenreCatalog(_lastGenreID, item.Name, item.ID);
-
             if (item != null)
             {
                 AudioStates.Catalog = item.Name;
-                _lastCatalogID = GetSetData.GetCatalogID(AudioStates.Catalog);
+                _lastCatalogID = item.ID;
 
-                _lastAlbumID = 0;
-                AudioStates.Album = "Alle";
+                GetSetData.SetGenreCatalog(_lastGenreID, item.Name, item.ID);
 
-                GetSetData.SetSettingGeneral("LastCatalog", AudioStates.Catalog);
-                GetSetData.SetSettingGeneral("LastCatalogID", _lastCatalogID.ToString());
-                GetSetData.SetSettingGeneral("LastAlbum", AudioStates.Album);
-                GetSetData.SetSettingGeneral("LastAlbumID", _lastAlbumID.ToString());
+                CatalogSetting catalog = GetSetData.GetCatalogSettings(_lastCatalogID, _lastAlbumID);
+                if (catalog == null)
+                {
+                    AudioStates.Album = "Alle";
+                    _lastAlbumID = 0;
+                    _lastRow = 0;
+                    GetSetData.SetCatalogSettings(AudioStates.Catalog, _lastCatalogID, AudioStates.Album, _lastAlbumID, _lastRow);
+                }
+                else
+                {
+                    AudioStates.Album = catalog.Album;
+                    _lastAlbumID = catalog.ID_Album;
+                    _lastRow = catalog.Row;
+                }
 
                 FillListboxAlbums();
             };
@@ -363,6 +356,7 @@ namespace MyJukeboxWMPDapper
                 listboxAlbums.SelectedItem = 0;
             }
 
+            statusCatalog.Text = AudioStates.Catalog;
             FillDatagridByTabAudio();
         }
 
@@ -373,10 +367,21 @@ namespace MyJukeboxWMPDapper
             AudioStates.Album = item.Name;
             _lastAlbumID = item.ID;
 
-            GetSetData.SetSettingGeneral("LastAlbum", AudioStates.Album);
-            GetSetData.SetSettingGeneral("LastAlbumID", _lastAlbumID.ToString());
-            GetSetData.SetSettingGeneral("LastArtist", "Alle");
-            GetSetData.SetSettingAlbumLastRow("Name", 0);
+            GetSetData.SetCatalogAlbum(_lastCatalogID, AudioStates.Album, _lastAlbumID);
+
+
+            CatalogSetting catalog = GetSetData.GetCatalogSettings(_lastCatalogID, _lastAlbumID);
+            if (catalog == null)
+            {
+                _lastRow = 0;
+                GetSetData.SetCatalogSettings(AudioStates.Catalog, _lastCatalogID, AudioStates.Album, _lastAlbumID, _lastRow);
+            }
+            else
+            {
+                AudioStates.Album = catalog.Album;
+                _lastAlbumID = catalog.ID_Album;
+                _lastRow = catalog.Row;
+            }
 
             statusAlbum.Text = AudioStates.Album;
 
@@ -533,7 +538,7 @@ namespace MyJukeboxWMPDapper
 
                 if (_isStoped == false)
                 {
-                    Dispatcher.BeginInvoke(new Action(() => Playback_PlayNext()));
+                    Dispatcher.BeginInvoke(new Action(() => Playback_Next()));
                     Dispatcher.BeginInvoke(new Action(() => Play_Executed(this, null)));
                 }
             }
@@ -556,34 +561,6 @@ namespace MyJukeboxWMPDapper
         void player_ClickEvent(object sender, AxWMPLib._WMPOCXEvents_ClickEvent e)
         {
 
-        }
-
-        private void SaveSettings()
-        {
-            try
-            {
-                SettingsDb.Settings["LastGenre"] = AudioStates.Genre;
-                SettingsDb.Settings["LastGenreID"] = Convert.ToString(_lastGenreID);
-                SettingsDb.Settings["LastCatalog"] = AudioStates.Catalog;
-                SettingsDb.Settings["LastCatalogID"] = Convert.ToString(_lastCatalogID);
-                SettingsDb.Settings["LastArtist"] = AudioStates.Artist;
-                SettingsDb.Settings["LastAlbum"] = AudioStates.Album;
-                SettingsDb.Settings["LastAlbumID"] = Convert.ToString(_lastAlbumID);
-                SettingsDb.Settings["LastTab"] = _lastTab.ToString();
-                //SettingsDb.Settings["Volume"] = Convert.ToString(mediaPlayer.Volume);
-                SettingsDb.Settings["Volume"] = Convert.ToString(wmp.settings.volume);
-                SettingsDb.Settings["LastRow"] = Convert.ToString(_lastRow);
-                SettingsDb.Settings["FormHeight"] = this.Height.ToString();
-                SettingsDb.Settings["FormWidth"] = this.Width.ToString();
-                SettingsDb.Settings["FormTop"] = this.Top.ToString();
-                SettingsDb.Settings["FormLeft"] = this.Left.ToString();
-                SettingsDb.Settings["LeftPanel"] = expanderLeftPanel.IsExpanded.ToString();
-                //SettingsDb.Save();
-            }
-            catch (Exception ex)
-            {
-                Debug.Print(ex.Message);
-            }
         }
 
         private bool hasDataGridErrors()
@@ -616,10 +593,16 @@ namespace MyJukeboxWMPDapper
                 datagrid.ItemsSource = results;
                 datagrid.Columns[9].Visibility = Visibility.Collapsed;
 
-                _dataLoaded = true;
+                CatalogSetting catalog = GetSetData.GetCatalogSettings(_lastCatalogID, _lastAlbumID);
+                _lastRow = catalog.Row;
 
-                string album = AudioStates.Album;
-                _lastRow = album == "Alle" ? 0 : GetSetData.GetAlbumLastRow(AudioStates.Album);
+
+
+                //int idcatalog = GetSetData.GetCatalogID(AudioStates.Catalog);
+
+
+
+                _dataLoaded = true;
 
                 if (datagrid.Items.Count > 0)
                 {
@@ -637,7 +620,6 @@ namespace MyJukeboxWMPDapper
 
                     random.InitRandomNumbers(datagrid.Items.Count - 1);
                 }
-
                 SetStatusbar("audio");
             }
             else
@@ -737,7 +719,7 @@ namespace MyJukeboxWMPDapper
             bool result = GetSetData.SetQueryLastRow(textboxQuery.Text, _lastRow);
         }
 
-        private void InitializeComboGenres()
+        private void InitializeListboxGenres()
         {
             List<GenreModel> genres = GetSetData.GetGenres();
             genres.Insert(0, new GenreModel { ID = 0, Name = "Alle" });
@@ -748,11 +730,24 @@ namespace MyJukeboxWMPDapper
             listboxGenres.ScrollIntoView(listboxGenres.SelectedItem);
             listboxGenres.Focus();
 
-            var item = (GenreModel)listboxGenres.SelectedItem;
-            _lastCatalogID = item.LastCatalogID;
-            AudioStates.Catalog = item.LastCatalog;
+            AudioStates.Catalog = GetSetData.GetLastCatalog(AudioStates.Genre);
+            _lastCatalogID = GetSetData.GetLastCatalogID(AudioStates.Genre);
 
             FillListboxCatalogs();
+
+            CatalogSetting catalog = GetSetData.GetCatalogSettings(_lastCatalogID, _lastAlbumID);
+            if (catalog == null)
+            {
+                AudioStates.Album = "Alle";
+                _lastAlbumID = 0;
+                _lastRow = 0;
+            }
+            else
+            {
+                AudioStates.Album = catalog.Album;
+                _lastAlbumID = catalog.ID_Album;
+                _lastRow = catalog.Row;
+            }
         }
 
         private void FillListboxCatalogs()
@@ -768,6 +763,25 @@ namespace MyJukeboxWMPDapper
             listboxCatalogs.ScrollIntoView(listboxCatalogs.SelectedItem);
             listboxCatalogs.Focus();
 
+            AudioStates.Album = GetSetData.GetLastAlbum(AudioStates.Catalog);
+            _lastAlbumID = GetSetData.GetLastAlbumID(AudioStates.Catalog);
+
+            CatalogSetting catalog = GetSetData.GetCatalogSettings(_lastCatalogID, _lastAlbumID);
+
+            if (catalog == null)
+            {
+                AudioStates.Album = "Alle";
+                _lastAlbumID = 0;
+                _lastRow = 0;
+            }
+            else
+            {
+                AudioStates.Album = catalog.Album;
+                _lastAlbumID = catalog.ID_Album;
+                _lastRow = catalog.Row;
+            }
+
+            statusCatalog.Text = AudioStates.Catalog;
             FillListboxAlbums();
         }
 
@@ -791,6 +805,10 @@ namespace MyJukeboxWMPDapper
             listboxAlbums.ScrollIntoView(listboxAlbums.SelectedItem);
             listboxAlbums.Focus();
 
+            //CatalogSetting catalog = GetSetData.GetCatalogSettings(_lastCatalogID, _lastAlbumID);
+
+            statusAlbum.Text = AudioStates.Album;
+
             FillListboxArtists();
         }
 
@@ -812,6 +830,8 @@ namespace MyJukeboxWMPDapper
             listboxArtists.SelectedItem = index;
             listboxArtists.ScrollIntoView(listboxArtists.SelectedItem);
             listboxArtists.Focus();
+
+            statusArtist.Text = AudioStates.Artist;
 
         }
 
@@ -900,6 +920,28 @@ namespace MyJukeboxWMPDapper
             return newIndex;
         }
 
+        private void ScrollToCenter()
+        {
+            if (datagrid.Items.Count > 0)
+            {
+                var border = VisualTreeHelper.GetChild(datagrid, 0) as Decorator;
+                if (border != null)
+                {
+                    var scroll = border.Child as ScrollViewer;
+                    if (scroll != null)
+                    {
+                        int index = datagrid.SelectedIndex;
+                        int offset = (_lastVisibleRow - _firstVisibleRow) / 2;
+                        //Debug.Print($"index:{index}, firstVisibleRow:{_firstVisibleRow}, lasteVisibleRow:{_lastVisibleRow}, offset:{offset}, scroll:{_lastVisibleRow - offset}");
+                        if (index > _lastVisibleRow - 4)
+                        {
+                            scroll.ScrollToVerticalOffset(_lastVisibleRow - offset + 4);
+                        }
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Datagrid
@@ -932,7 +974,10 @@ namespace MyJukeboxWMPDapper
             _lastRow = datagrid.SelectedIndex;
 
             if (GetSetData.Datasource == GetSetData.DataSourceEnum.Songs)
+            {
                 SetAlbumRow(AudioStates.Album, _lastRow);
+                GetSetData.SetCatalogSettings(AudioStates.Catalog, _lastCatalogID, AudioStates.Album, _lastAlbumID, _lastRow);
+            }
 
             if (GetSetData.Datasource == GetSetData.DataSourceEnum.Query)
                 SetQueryRow(textboxQuery.Text, _lastRow);
@@ -945,6 +990,13 @@ namespace MyJukeboxWMPDapper
 
             if (!_firstPlay)
                 Playback_Play();
+        }
+
+        private void datagrid_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            _firstVisibleRow = (int)e.VerticalOffset;
+            _lastVisibleRow = (int)e.VerticalOffset + (int)e.ViewportHeight;
+            // Debug.Print($"datagrid_ScrollChanged: firstRow={_firstVisibleRow}, lastRow={_lastVisibleRow}");
         }
 
         #endregion
@@ -1177,6 +1229,7 @@ namespace MyJukeboxWMPDapper
             int index = random.GetFirstNumber;
             datagrid.SelectedIndex = index;
             datagrid.SelectedItem = index;
+            datagrid.ScrollIntoView(datagrid.SelectedItem);
         }
 
         #endregion
@@ -1204,9 +1257,9 @@ namespace MyJukeboxWMPDapper
             timerFlipImage.Start();
         }
 
-        private void Playback_PlayNext()
+        private void Playback_Next()
         {
-            Debug.Print("Playback_PlayNext");
+            Debug.Print("Playback_Next");
 
             int nextindex = 0;
 
@@ -1214,7 +1267,9 @@ namespace MyJukeboxWMPDapper
                 return;
 
             if ((bool)Playback_Shuffle.IsChecked)
+            {
                 nextindex = random.GetNextNumber;
+            }
             else
                 nextindex = GetNextIndex();
 
@@ -1222,35 +1277,13 @@ namespace MyJukeboxWMPDapper
             {
                 datagrid.SelectedIndex = nextindex;
                 datagrid.SelectedItem = nextindex;
+                // datagrid.ScrollIntoView(datagrid.SelectedItem);
+                ScrollToCenter();
 
                 _fullpath = GetSongPath();
-
             }
             else
                 _isLastDgRow = true;
-        }
-
-        private string GetSongPath()
-        {
-            string fullpath = "";
-
-            //if (GetSetData.Datasource == GetSetData.DataSourceEnum.Songs ||
-            //        GetSetData.Datasource == GetSetData.DataSourceEnum.Query)
-            //{
-            //    var record = (vSongModel)datagrid.SelectedItem;
-            //    fullpath = $"{record.Path}\\{record.FileName}";
-            //}
-
-            //if (GetSetData.Datasource == GetSetData.DataSourceEnum.Playlist)
-            //{
-            //    var record = (vSongModel)datagrid.SelectedItem;
-            //    fullpath = $"{record.Path}\\{record.FileName}";
-            //}
-
-            var record = (vSongModel)datagrid.SelectedItem;
-            fullpath = $"{record.Path}\\{record.FileName}";
-
-            return fullpath;
         }
 
         private void Playback_Pause()
@@ -1275,6 +1308,29 @@ namespace MyJukeboxWMPDapper
                 timerFlipImage.Stop();
                 wmp.Ctlcontrols.stop();
             }
+        }
+
+        private string GetSongPath()
+        {
+            string fullpath = "";
+
+            var record = (vSongModel)datagrid.SelectedItem;
+            fullpath = $"{record.Path}\\{record.FileName}";
+
+            return fullpath;
+        }
+
+        ScrollViewer GetScrollViewer()
+        {
+            if (VisualTreeHelper.GetChildrenCount(this) == 0)
+                return null;
+            var x = VisualTreeHelper.GetChild(this, 0);
+            if (x == null)
+                return null;
+            Debug.Print(x.ToString());
+            if (VisualTreeHelper.GetChildrenCount(x) == 0)
+                return null;
+            return VisualTreeHelper.GetChild(x, 0) as ScrollViewer;
         }
 
         #endregion
