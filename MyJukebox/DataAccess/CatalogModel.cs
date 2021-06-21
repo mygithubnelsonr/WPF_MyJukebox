@@ -6,5 +6,6 @@
         public string Name { get; set; }
         public string LastAlbum { get; set; }
         public int LastAlbumID { get; set; }
+        public string LastArtist { get; set; }
     }
 }

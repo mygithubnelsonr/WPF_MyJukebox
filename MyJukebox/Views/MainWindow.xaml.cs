@@ -21,8 +21,11 @@ namespace MyJukeboxWMPDapper
     ///                       Fixed Playlist Playnext Song
     /// v2.2.4.0  15.05.2021  Refactoring: vPlaylistModel not longer needed. Clean code.
     /// v2.2.4.1  04.06.2021  Bugfix: repeat song after pause and then play
-    /// v2.2.5.0              Refactoring: Seperate Statusbar for Audio, Playlist and Query
+    /// v2.2.5.0  06.06.2021  Refactoring: Seperate Statusbar for Audio, Playlist and Query
+    /// v2.2.5.1  12.06.2021  datagrid: make selected row visible (center if possible) 
     /// v2.2.5.2  17.06.2021  Refactoring: Implement saveing catalog lastrow per album
+    /// v2.2.5.3  18.06.2021  Implement catalog LastArtist
+    /// v2.2.5.4  21.06.2021  showing title in formheader
     /// </summary>
 
     public partial class MainWindow : Window
@@ -47,7 +50,6 @@ namespace MyJukeboxWMPDapper
         private string _lastPlaylist = "";
         private string _lastQuery = "";
         private string _artist = "";
-        private string _lastArtist = "";
 
         private int _firstVisibleRow = 0;
         private int _lastVisibleRow = 0;
@@ -96,14 +98,18 @@ namespace MyJukeboxWMPDapper
             #endregion
 
             #region Initialize State Values
+            AudioStates.Genre = "Alle";
+            AudioStates.Catalog = "Alle";
+            AudioStates.Album = "Alle";
+            AudioStates.Artist = "Alle";
 
             AudioStates.Genre = GetSetData.GetSetting("LastGenre");
             _lastGenreID = Convert.ToInt32(GetSetData.GetSetting("LastGenreID"));
 
             //AudioStates.Catalog = GetSetData.GetLastCatalog(AudioStates.Genre);
             //_lastCatalogID = GetSetData.GetLastCatalogID(AudioStates.Genre);
-
             //AudioStates.Album = GetSetData.GetSetting("LastAlbum");
+
             //AudioStates.Artist = GetSetData.GetSetting("LastArtist");
 
             //_lastAlbumID = Convert.ToInt32(GetSetData.GetSetting("LastAlbumID"));
@@ -184,7 +190,7 @@ namespace MyJukeboxWMPDapper
             statusCatalog.Text = AudioStates.Catalog;
             statusArtist.Text = AudioStates.Artist;
             statusAlbum.Text = AudioStates.Album;
-            sliderVolume.Value = Convert.ToDouble(SettingsDb.Settings["Volume"]);
+            //sliderVolume.Value = Convert.ToDouble(SettingsDb.Settings["Volume"]);
 
             ImageFlipperLoad(rootFolder + "\\" + AudioStates.Genre, _isLoaded);
 
@@ -391,12 +397,9 @@ namespace MyJukeboxWMPDapper
 
         private void listboxArtists_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            string artist = listboxArtists.SelectedItem.ToString();
+            AudioStates.Artist = listboxArtists.SelectedItem.ToString();
 
-            AudioStates.Artist = artist;
-            _lastArtist = artist;
-
-            GetSetData.SetSettingGeneral("LastArtist", AudioStates.Artist);
+            GetSetData.SetCatalogArtist(_lastCatalogID, AudioStates.Artist);
 
             statusArtist.Text = AudioStates.Artist;
 
@@ -596,10 +599,8 @@ namespace MyJukeboxWMPDapper
                 CatalogSetting catalog = GetSetData.GetCatalogSettings(_lastCatalogID, _lastAlbumID);
                 _lastRow = catalog.Row;
 
-
-
-                //int idcatalog = GetSetData.GetCatalogID(AudioStates.Catalog);
-
+                if (datagrid.Items.Count - 1 < _lastRow)
+                    _lastRow = 0;
 
 
                 _dataLoaded = true;
@@ -805,8 +806,6 @@ namespace MyJukeboxWMPDapper
             listboxAlbums.ScrollIntoView(listboxAlbums.SelectedItem);
             listboxAlbums.Focus();
 
-            //CatalogSetting catalog = GetSetData.GetCatalogSettings(_lastCatalogID, _lastAlbumID);
-
             statusAlbum.Text = AudioStates.Album;
 
             FillListboxArtists();
@@ -819,11 +818,10 @@ namespace MyJukeboxWMPDapper
             if (artists.Count > 1)
                 artists.Insert(0, "Alle");
 
-            _lastArtist = GetSetData.GetSetting("LastArtist");
-            AudioStates.Artist = _lastArtist;
-
+            var artist = GetSetData.GetLastArtist(AudioStates.Catalog);
             listboxArtists.ItemsSource = artists;
 
+            AudioStates.Artist = artist == null ? "Alle" : artist;
             int index = GetArtistIndex(AudioStates.Artist);
 
             listboxArtists.SelectedIndex = index;
@@ -969,7 +967,7 @@ namespace MyJukeboxWMPDapper
             _lastID = record.ID;
             _artist = record.Artist;
             _fullpath = $"{record.Path}\\{record.FileName}";
-            this.Title = $"{record.Artist} - {record.Title}";
+            this.Title = textblockCurrentSong.Text = $"{record.Artist} - {record.Title}";
 
             _lastRow = datagrid.SelectedIndex;
 
@@ -1061,7 +1059,7 @@ namespace MyJukeboxWMPDapper
 
         private void buttonQuerySave_Click(object sender, RoutedEventArgs e)
         {
-            AddQueryToComboBox(textboxQuery.Text);
+            AddQueryToComboBox(Helpers.ToTitleCase(textboxQuery.Text));
         }
 
         private void AddQueryToComboBox(string query)

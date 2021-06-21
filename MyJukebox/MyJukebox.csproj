@@ -140,7 +140,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DataAccess\SettingsDb.cs" />
     <Compile Include="Commands\MyJukeboxCommands.cs" />
     <Compile Include="Common\AudioStates.cs" />
     <Compile Include="Common\Helpers.cs" />

@@ -199,7 +199,6 @@
                             <Trigger Property="IsSelected" Value="true">
                                 <Setter TargetName="_Border" Property="Background" Value="#FF8CEFFF"/>
                                 <Setter Property="Foreground" Value="DarkBlue"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -207,13 +206,10 @@
             </Setter>
         </Style>
         <!-- Hintergrund für Header von MainWindow -->
-        <!-- Color="#FF0991C3" -->
-        <!-- Color="Blue" -->
-        <!-- Color="#FF0991C3" -->
         <LinearGradientBrush x:Key="datagridHeaderBackground" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Offset="0" Color="#FFFD8CFD"/>
-            <GradientStop Offset="0.3" Color="DarkViolet"/>
-            <GradientStop Offset="1" Color="#FFFD8CFD"/>
+            <GradientStop Offset="0" Color="#FF0991C3"/>
+            <GradientStop Offset="0.5" Color="Blue"/>
+            <GradientStop Offset="1" Color="#FF0991C3"/>
         </LinearGradientBrush>
         <!-- Style für die DataGridColumnHeader -->
         <Style x:Key="datagridHeaderStyle" TargetType="DataGridColumnHeader">
@@ -225,7 +221,7 @@
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="MinHeight" Value="26" />
+            <Setter Property="MinHeight" Value="30" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
         <!--Style für Toolbar-->
@@ -255,7 +251,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!-- Style for MenuItem -->
+
         <Style TargetType="{x:Type MenuItem}">
             <Setter Property = "Background" Value="{DynamicResource ContextmenuBackgroundBrush}"/>
             <Setter Property = "Foreground" Value="{DynamicResource ContextmenuForegroundBrush}"/>
@@ -267,6 +263,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        
         <!--Style for Textbox with Palceholder-->
         <Style x:Key="placeHolder" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Template">

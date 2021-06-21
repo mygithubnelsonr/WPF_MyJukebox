@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 
 namespace MyJukeboxWMPDapper.Common
@@ -128,5 +129,11 @@ namespace MyJukeboxWMPDapper.Common
             return found;
         }
 
+        public static string ToTitleCase(string text)
+        {
+            TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+            string title = textInfo.ToTitleCase(text);
+            return title;
+        }
     }
 }
