@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("interop.wmplib.dll")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resourcedictionarys/blue.xaml")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resourcedictionarys/brown.xaml")]
 
 

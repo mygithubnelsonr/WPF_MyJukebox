@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.IO;
+using System.Windows;
+using System.Windows.Markup;
 
 namespace MyJukeboxWMPDapper.Views
 {
@@ -18,6 +21,9 @@ namespace MyJukeboxWMPDapper.Views
         public InputBox()
         {
             InitializeComponent();
+
+            DynamicLoadStyles("Blue");
+
             textboxInput.Focus();
         }
 
@@ -72,5 +78,39 @@ namespace MyJukeboxWMPDapper.Views
         {
             this.DragMove();
         }
+
+        private void DynamicLoadStyles(string text)
+        {
+            string fileName;
+
+
+            if (text == "None")
+            {
+                // Clear any previous dictionaries loaded
+                Resources.MergedDictionaries.Clear();
+            }
+            else
+            {
+                fileName = Environment.CurrentDirectory +
+                             @"\Dictionaries\" + text + ".xaml";
+
+                if (File.Exists(fileName))
+                {
+                    using (FileStream fs = new FileStream(fileName, FileMode.Open))
+                    {
+                        // Read in ResourceDictionary File
+                        ResourceDictionary dic = (ResourceDictionary)XamlReader.Load(fs);
+                        // Clear any previous dictionaries loaded
+                        Resources.MergedDictionaries.Clear();
+                        // Add in newly loaded Resource Dictionary
+                        Resources.MergedDictionaries.Add(dic);
+                    }
+                }
+                else
+                    MessageBox.Show("File: " + text +
+                       " does not exist. Please re-enter the name.");
+            }
+        }
+
     }
 }

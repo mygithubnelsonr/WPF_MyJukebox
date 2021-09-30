@@ -6,30 +6,10 @@
         xmlns:local="clr-namespace:MyJukeboxWMPDapper"
         xmlns:ax="clr-namespace:AxWMPLib;assembly=AxInterop.WMPLib"
         mc:Ignorable="d"
-        Title="MyJukebox" Height="900" Width="1339" WindowStartupLocation="Manual" Background="{StaticResource WindowBackgroundBrush}"
+        Title="MyJukebox" Height="900" Width="1339" WindowStartupLocation="Manual" Background="{DynamicResource WindowBackgroundBrush}"
             Icon="/Images/Jukebox.ico" WindowStyle="None"
-            MouseLeftButtonDown="Move_Window" SizeChanged="Window_SizeChanged"  Loaded="Window_Loaded">
+            MouseLeftButtonDown="Move_Window" SizeChanged="Window_SizeChanged" Loaded="Window_Loaded" KeyUp="Window_KeyUp">
     <Window.Resources>
-        <Style TargetType="TabItem">
-            <Setter Property="Background" Value="Aqua"/>
-        </Style>
-        <!-- Style für die Statusbar -->
-        <Style x:Key="sbgrid" TargetType="{x:Type Grid}">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Offset="0" Color="#FF0991C3"/>
-                        <GradientStop Offset="0.4" Color="#FF0991C3"/>
-                        <GradientStop Offset="1" Color="#FF0955C3"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <!-- Style für die Statusbar -->
-        <Style TargetType="StatusBar">
-            <Setter Property="Foreground" Value="Blue"/>
-            <Setter Property="FontSize" Value="14"/>
-        </Style>
         <!--Datagrid Context Menu-->
         <ContextMenu x:Key="contextmenuDatagrid">
             <MenuItem x:Name="datagridMenuitemSendTo" Header="Send to"/>
@@ -39,12 +19,24 @@
             <MenuItem x:Name="datagridMenuitemOpenEditor" Header="Edit Record" Click="datagridMenuitemOpenEditor_Click"/>
             <Separator />
             <MenuItem Header="Open Folder" Command="ApplicationCommands.Open"/>
+            <MenuItem x:Name="datagridMenuitemOpenBrowser" Header="Open Browser" Click="datagridMenuitemOpenBrowser_Click"/>
         </ContextMenu>
         <ContextMenu x:Key="contextmenuTabcontrol">
             <MenuItem Header="Add new Playlist" Click="contextmenuPlaylistAdd_Click" />
             <MenuItem Header="Rename Playlist" Click="contextmenuPlaylistRename_Click" />
             <MenuItem Header="Remove selected Playlist" Click="contextmenuPlaylistRemove_Click" />
         </ContextMenu>
+        <Style TargetType="MenuItem">
+            <Setter Property="Foreground" Value="#FF2E1704"/>
+            <Setter Property="Background" Value="#FFECC09C"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF2E1704"/>
+                    <Setter Property="Foreground" Value="#FFECC09C"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="MediaCommands.Play" CanExecute="Play_CanExecute" Executed="Play_Executed"  />
@@ -62,47 +54,47 @@
                         Executed="PlaybackShuffle_Execute"/>
     </Window.CommandBindings>
     <DockPanel>
-        <Grid DockPanel.Dock="Bottom" Style="{StaticResource sbgrid}">
+        <Grid DockPanel.Dock="Bottom" Style="{DynamicResource StatusbarGrid}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <StatusBar Grid.Column="0" x:Name="sbaudio" Margin="10 0 0 0" Background="Transparent" Foreground="AntiqueWhite" Visibility="Hidden">
+            <StatusBar Grid.Column="0" x:Name="sbaudio" Margin="10 0 0 0" Visibility="Hidden">
                 <Separator/>
                 <StatusBarItem>
-                    <TextBlock Text="Genre:" Foreground="DarkBlue"/>
+                    <TextBlock Text="Genre:" Foreground="{DynamicResource LabelForegroundBrush}"/>
                 </StatusBarItem>
                 <StatusBarItem>
                     <TextBlock x:Name="statusGenre" Text=""/>
                 </StatusBarItem>
                 <Separator/>
                 <StatusBarItem>
-                    <TextBlock Text="Catalog:" Foreground="DarkBlue"/>
+                    <TextBlock Text="Catalog:" Foreground="{DynamicResource LabelForegroundBrush}"/>
                 </StatusBarItem>
                 <StatusBarItem>
                     <TextBlock x:Name="statusCatalog" Text=""/>
                 </StatusBarItem>
                 <Separator/>
                 <StatusBarItem>
-                    <TextBlock Text="Album:" Foreground="DarkBlue"/>
+                    <TextBlock Text="Album:" Foreground="{DynamicResource LabelForegroundBrush}"/>
                 </StatusBarItem>
                 <StatusBarItem>
                     <TextBlock x:Name="statusAlbum" Text=""/>
                 </StatusBarItem>
                 <Separator/>
                 <StatusBarItem>
-                    <TextBlock Text="Artist:" Foreground="DarkBlue"/>
+                    <TextBlock Text="Artist:" Foreground="{DynamicResource LabelForegroundBrush}"/>
                 </StatusBarItem>
                 <StatusBarItem>
                     <TextBlock x:Name="statusArtist" Text=""/>
                 </StatusBarItem>
                 <Separator/>
             </StatusBar>
-            <StatusBar  Grid.Column="0" x:Name="sbplaylist" Margin="10 0 0 0" Background="Transparent" Foreground="AntiqueWhite" Visibility="Hidden">
+            <StatusBar  Grid.Column="0" x:Name="sbplaylist" Margin="10 0 0 0" Visibility="Hidden">
                 <Separator/>
                 <StatusBarItem>
-                    <TextBlock Text="Playlist:" Foreground="DarkBlue"/>
+                    <TextBlock Text="Playlist:" Foreground="{DynamicResource LabelForegroundBrush}"/>
                 </StatusBarItem>
                 <StatusBarItem>
                     <TextBlock x:Name="textblockPlaylist" Text=""/>
@@ -110,10 +102,10 @@
                 <Separator/>
                 <TextBlock Text=""/>
             </StatusBar>
-            <StatusBar  Grid.Column="0" x:Name="sbquery" Margin="10 0 0 0" Background="Transparent" Foreground="AntiqueWhite" Visibility="Hidden">
+            <StatusBar  Grid.Column="0" x:Name="sbquery" Margin="10 0 0 0" Visibility="Hidden">
                 <Separator/>
                 <StatusBarItem>
-                    <TextBlock Text="Query:" Foreground="DarkBlue"/>
+                    <TextBlock Text="Query:" Foreground="{DynamicResource LabelForegroundBrush}"/>
                 </StatusBarItem>
                 <StatusBarItem>
                     <TextBlock x:Name="textblockQuery" Text="{Binding ElementName=textboxQuery, Path=Text}"/>
@@ -121,7 +113,7 @@
                 <Separator/>
                 <TextBlock Text=""/>
             </StatusBar>
-            <StatusBar Grid.Column="1" Background="Transparent" Foreground="AntiqueWhite" HorizontalAlignment="Center">
+            <StatusBar Grid.Column="1" HorizontalAlignment="Center">
                 <Separator/>
                 <StatusBarItem>
                     <TextBlock Text="Row "/>
@@ -141,7 +133,7 @@
                 <Separator/>
                 <TextBlock Text=""/>
             </StatusBar>
-            <StatusBar Grid.Column="2" Margin="0 0 10 0" Background="Transparent" Foreground="AntiqueWhite">
+            <StatusBar Grid.Column="2" Margin="0 0 10 0">
                 <Separator/>
                 <StatusBarItem>
                     <TextBlock x:Name="statusDuration" Text="00:00"/>
@@ -163,7 +155,7 @@
                 <Separator/>
             </StatusBar>
         </Grid>
-        <Grid DockPanel.Dock="Top" Height="50" Background="{StaticResource headerBackground}">
+        <Grid DockPanel.Dock="Top" Height="50" Background="{DynamicResource HeaderBackground}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="34"/>
@@ -199,20 +191,21 @@
             </StackPanel>
             <!-- textblock current song-->
             <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock x:Name="textblockCurrentSong" Text="" VerticalAlignment="Bottom" Foreground="#FFA2D2FB" FontFamily="Agency FB" FontSize="18"/>
+                <TextBlock x:Name="textblockCurrentSong" Text="" VerticalAlignment="Bottom"
+                           Foreground="{DynamicResource TextblockCurrentSongForegroundBrush}" FontFamily="Agency FB" FontSize="18"/>
             </StackPanel>
-            <!-- Buttons-->
+            <!-- Buttons Max Min Exit -->
             <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 4 10 0">
-                <ToggleButton x:Name="buttonMaximize" Margin="2" Style="{StaticResource maxButton}"
+                <ToggleButton x:Name="buttonMaximize" Margin="2" Style="{DynamicResource maxButton}"
                               Checked="buttonMaximize_Checked" Unchecked="buttonMaximize_Unchecked">
                     <Rectangle Width="20" Height="20" Stroke="WhiteSmoke" StrokeThickness="4"/>
                 </ToggleButton>
-                <Button x:Name="buttonMinimize" Margin="2" Style="{StaticResource exitButton}" Click="buttonMinimize_Click">
+                <Button x:Name="buttonMinimize" Margin="2" Style="{DynamicResource exitButton}" Click="buttonMinimize_Click">
                     <Button.Content>
                         <Rectangle Width="20" Height="6" Fill="White"/>
                     </Button.Content>
                 </Button>
-                <Button x:Name="buttonClose" Content="X" Margin="2" Style="{StaticResource exitButton}" Click="buttonClose_Click"/>
+                <Button x:Name="buttonClose" Content="X" Margin="2" Style="{DynamicResource exitButton}" Click="buttonClose_Click"/>
             </StackPanel>
         </Grid>
         <Menu DockPanel.Dock="Top" Margin="0 0 0 10" Foreground="White" FontSize="16" FontWeight="Bold" Opacity="0.82" BorderThickness="1">
@@ -250,10 +243,26 @@
                 <MenuItem.Icon>
                     <Image Source="/Images/edit.png" Margin="0 0 2 0"/>
                 </MenuItem.Icon>
-                <MenuItem Header="_Ausschneiden"/>
-                <MenuItem Header="_Kopieren"/>
-                <MenuItem Header="_Einfügen"/>
-                <MenuItem Header="_Löschen"/>
+                <MenuItem Header="_Ausschneiden">
+                    <MenuItem.Icon>
+                        <Image Width="16" Height="16" Source="/Images/ausschneiden.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Kopieren">
+                    <MenuItem.Icon>
+                        <Image Source="/Images/kopieren.png" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Einfügen">
+                    <MenuItem.Icon>
+                        <Image Source="/Images/einfuegen.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Löschen">
+                    <MenuItem.Icon>
+                        <Image Source="/Images/loeschen.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="Enable Multiline" Click="menuEditMultiline_Click"/>
             </MenuItem>
@@ -271,6 +280,8 @@
                     <Image Source="/images/settings.png" Margin="0 0 2 0" />
                 </MenuItem.Icon>
                 <MenuItem x:Name="menuEditRecordLocation" Header="Edit Record Location" Click="menuEditRecordLocation_Click"/>
+                <MenuItem x:Name="menuThemeBlue" Header="Set Blue Theme" Click="menuThemeBlue_Click"/>
+                <MenuItem x:Name="menuThemeBrown" Header="Set Brown Theme" Click="menuThemeBrown_Click"/>
             </MenuItem>
             <MenuItem Header="D_atabase" Margin="4 0" Background="Transparent" Foreground="LightGreen" FontSize="16">
                 <MenuItem.Icon>
@@ -288,37 +299,19 @@
                     <RowDefinition Height="80"/>
                 </Grid.RowDefinitions>
                 <TabControl Grid.Row="0" x:Name="tabcontrol" Height="Auto" BorderBrush="Gainsboro" BorderThickness="2"
-                            SelectionChanged="tabcontrol_SelectionChanged" Background="#FFC4F7F7">
-                    <TabControl.Resources>
-                        <Style TargetType="TabItem">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="TabItem">
-                                        <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="Gainsboro" CornerRadius="8,8,8,8" Margin="2">
-                                            <ContentPresenter x:Name="ContentSite"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center"
-                                            ContentSource="Header"
-                                            Margin="10,2"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="Border" Property="Background" Value="LightSkyBlue" />
-                                            </Trigger>
-                                            <Trigger Property="IsSelected" Value="False">
-                                                <Setter TargetName="Border" Property="Background" Value="Gray" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </TabControl.Resources>
-                    <TabItem x:Name="tabitemAudio" Header="Audio" Background="Gray">
-                        <StackPanel>
-                            <Expander Header="Genre" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="False">
-                                <ListBox x:Name="listboxGenres" Height="Auto" MaxHeight="100" Tag="Genre" ItemContainerStyle="{DynamicResource listboxItemStyle}" ItemsSource="{Binding}"
-                                     Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxGenres_MouseLeftButtonUp">
+                              SelectionChanged="tabcontrol_SelectionChanged">
+                    <TabItem x:Name="tabitemAudio" Header="Audio">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition x:Name="rdgenre" Height="Auto" />
+                                <RowDefinition x:Name="rdcatalog" Height="*"/>
+                                <RowDefinition x:Name="rdalbum" Height="*"/>
+                                <RowDefinition x:Name="rdartist" Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Expander Grid.Row="0" x:Name="expanderGenre" Header="Genre" Foreground="{DynamicResource ExpanderForegroundBrush}" ExpandDirection="Down" IsExpanded="False"
+                                      Expanded="expanderGenre_Expanded" Collapsed="expanderGenre_Collapsed">
+                                <ListBox x:Name="listboxGenres" Tag="Genre" ItemContainerStyle="{DynamicResource listboxItemStyle}" ItemsSource="{Binding}"
+                                     Background="{DynamicResource ListboxBackgroundBrush}" MouseLeftButtonUp="listboxGenres_MouseLeftButtonUp">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -329,9 +322,10 @@
                                     </ListBox.ItemTemplate>
                                 </ListBox>
                             </Expander>
-                            <Expander Header="Catalog" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="True">
-                                <ListBox x:Name="listboxCatalogs" Height="Auto" MaxHeight="100" Tag="Catalog" ItemContainerStyle="{DynamicResource listboxItemStyle}" ItemsSource="{Binding}"
-                                     Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Visible" MouseLeftButtonUp="listboxCatalogs_MouseLeftButtonUp">
+                            <Expander Grid.Row="1" x:Name="expanderCatalog" Header="Catalog" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="True"
+                                      Expanded="expanderCatalog_Expanded" Collapsed="expanderCatalog_Collapsed">
+                                <ListBox x:Name="listboxCatalogs" Tag="Catalog" ItemContainerStyle="{DynamicResource listboxItemStyle}" ItemsSource="{Binding}"
+                                     Background="{DynamicResource ListboxBackgroundBrush}" MouseLeftButtonUp="listboxCatalogs_MouseLeftButtonUp">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -342,9 +336,10 @@
                                     </ListBox.ItemTemplate>
                                 </ListBox>
                             </Expander>
-                            <Expander Header="Album" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="True">
-                                <ListBox x:Name="listboxAlbums" Height="Auto" MaxHeight="100" Tag="Album" ItemContainerStyle="{DynamicResource listboxItemStyle}" ItemsSource="{Binding}"
-                                     Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Auto" MouseLeftButtonUp="listboxAlbums_MouseLeftButtonUp">
+                            <Expander Grid.Row="2" x:Name="expanderAlbum" Header="Album" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="True"
+                                      Expanded="expanderAlbum_Expanded" Collapsed="expanderAlbum_Collapsed">
+                                <ListBox x:Name="listboxAlbums" Tag="Album" ItemContainerStyle="{DynamicResource listboxItemStyle}" ItemsSource="{Binding}"
+                                     Background="{DynamicResource ListboxBackgroundBrush}" MouseLeftButtonUp="listboxAlbums_MouseLeftButtonUp">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -355,9 +350,10 @@
                                     </ListBox.ItemTemplate>
                                 </ListBox>
                             </Expander>
-                            <Expander Header="Artist" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="False">
-                                <ListBox x:Name="listboxArtists" Height="Auto" MaxHeight="100" Tag="Artist" ItemContainerStyle="{DynamicResource listboxItemStyle}"
-                                     Background="{StaticResource ListboxBackgroundBrush}" ScrollViewer.VerticalScrollBarVisibility="Auto" MouseLeftButtonUp="listboxArtists_MouseLeftButtonUp">
+                            <Expander Grid.Row="3" x:Name="expanderArtist" Header="Artist" Foreground="DarkBlue" ExpandDirection="Down" IsExpanded="False"
+                                      Expanded="expanderArtist_Expanded" Collapsed="expanderArtist_Collapsed">
+                                <ListBox x:Name="listboxArtists" Tag="Artist" ItemContainerStyle="{DynamicResource listboxItemStyle}"
+                                     Background="{DynamicResource ListboxBackgroundBrush}" MouseLeftButtonUp="listboxArtists_MouseLeftButtonUp">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -368,7 +364,7 @@
                                     </ListBox.ItemTemplate>
                                 </ListBox>
                             </Expander>
-                        </StackPanel>
+                        </Grid>
                     </TabItem>
                     <TabItem x:Name="tabitemPlaylist" Header="Playlist" Background="Gray"
                              ContextMenu="{StaticResource contextmenuTabcontrol}">
@@ -394,69 +390,73 @@
                 <Border Grid.Row="2" Background="#FF1D1B1B">
                     <Image x:Name="imageArtist" Source="/Images/NiceImage01.PNG" Stretch="Fill" />
                 </Border>
-                <Border Grid.Row="3" Background="Blue">
+                <Border Grid.Row="3" Background="{DynamicResource LogoBackgroundBrush}">
                     <Image Source="/Images/MyBitmap.gif"/>
                 </Border>
             </Grid>
         </Expander>
         <Grid Margin="10 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="1061*"/>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <ToolBarTray Grid.Row="0" Background="{StaticResource ToolBarTrayBackgroundBrush}">
-                <ToolBar Band="0" Height="Auto" Background="{StaticResource ToolBarTrayBackgroundBrush}">
-                    <Button x:Name="buttonPlay" Command="MediaCommands.Play" Height="38" Width="38" Template="{StaticResource rundButton}">
+            <ToolBarTray Grid.Row="0" Background="{DynamicResource ToolBarTrayBackgroundBrush}" Grid.ColumnSpan="2">
+                <ToolBar Band="0" Height="Auto" Background="{DynamicResource ToolBarTrayBackgroundBrush}">
+                    <Button x:Name="buttonPlay" Command="MediaCommands.Play" Height="38" Width="38" Template="{DynamicResource rundButton}">
                         <Image Source="/Images/PlaybackPlay.png" Width="32" Height="32"/>
                     </Button>
-                    <Button Command="MediaCommands.Pause" Height="38" Width="38" Margin="10 0" Template="{StaticResource rundButton}">
+                    <Button Command="MediaCommands.Pause" Height="38" Width="38" Margin="10 0" Template="{DynamicResource rundButton}">
                         <Image Source="/Images/PlaybackPause.png"  Width="32" Height="32"/>
                     </Button>
-                    <Button Command="MediaCommands.Stop" Height="38" Width="38" Template="{StaticResource rundButton}">
+                    <Button Command="MediaCommands.Stop" Height="38" Width="38" Template="{DynamicResource rundButton}">
                         <Image Source="/Images/PlaybackStop.png" Width="32" Height="32" />
                     </Button>
-                    <ToggleButton x:Name="Playback_Loop" Height="38" Width="38" Margin="20 0 0 0" Template="{StaticResource toggleButton}"
+                    <ToggleButton x:Name="Playback_Loop" Height="38" Width="38" Margin="20 0 0 0" Template="{DynamicResource toggleButton}"
                                   Command="{x:Static local:MyJukeboxCommands.PlaybackLoop}">
                         <Image Source="/Images/PlaybackLoop.png" Width="24" Height="24"  Margin="3 0 0 0"/>
                     </ToggleButton>
-                    <ToggleButton x:Name="Playback_Shuffle"  Height="38" Width="38" Margin="10 0 0 0" Template="{StaticResource toggleButton}"
+                    <ToggleButton x:Name="Playback_Shuffle"  Height="38" Width="38" Margin="10 0 0 0" Template="{DynamicResource toggleButton}"
                                   Command="{x:Static local:MyJukeboxCommands.PlaybackShuffle}">
                         <Image Source="/Images/PlaybackShuffel.png" Width="26" Height="26" />
                     </ToggleButton>
                     <ToggleButton x:Name="touglebuttonSpeaker" Margin="40 0 0 0"
-                                  Style="{StaticResource simpleImageTouggleButton}"
+                                  Style="{DynamicResource simpleImageTouggleButton}"
                                   Click="touglebuttonSpeaker_Click">
                     </ToggleButton>
 
                     <Grid Height="24" Width="120" Margin="5 0 10 0">
-                        <ProgressBar Name="progressBarVolume" Foreground="#FF77AAF5" Background="{StaticResource SliderBackgroundBrush}"
+                        <ProgressBar Name="progressBarVolume" Foreground="{DynamicResource ComboBox.Static.Background}" Background="{DynamicResource SliderBackgroundBrush}"
                                  Value="{Binding ElementName=sliderVolume, Path=Value}" />
-                        <Slider x:Name="sliderVolume" Minimum="0" Maximum="100" Value="10" Height="24"
+                        <Slider x:Name="sliderVolume" Minimum="0" Maximum="100" Height="24"
                                 IsSnapToTickEnabled="False"
                                 TickPlacement="TopLeft"
-                                TickFrequency="10"
+                                TickFrequency="5"
                                 MouseWheel="sliderVolume_MouseWheel"
                                 ValueChanged="sliderVolume_ValueChanged">
                         </Slider>
                     </Grid>
                     <Grid Width="120" Height="24" Margin="10 0 10 0">
-                        <ProgressBar Name="progressBarPosition" Foreground="#FF77AAF5" Background="{StaticResource SliderBackgroundBrush}"
+                        <ProgressBar Name="progressBarPosition" Foreground="{DynamicResource ComboBox.Static.Background}" Background="{DynamicResource SliderBackgroundBrush}"
                                  Value="{Binding ElementName=sliderPosition, Path=Value}" />
                         <Slider x:Name="sliderPosition" Minimum="0" Maximum="100"
-                                TickPlacement="TopLeft"
-                                TickFrequency="10"
-                                MouseWheel="sliderPosition_MouseWheel"
+                                TickPlacement="TopLeft" TickFrequency="10"
+                                MouseWheel="sliderPosition_MouseWheel" ValueChanged="sliderPosition_ValueChanged"
                                 Thumb.DragStarted="sliderPosition_DragStarted"
                                 Thumb.DragCompleted="sliderPosition_DragCompleted">
                         </Slider>
                     </Grid>
                 </ToolBar>
-                <ToolBar x:Name="barQuery" Band="1" Height="34" FontSize="14" Foreground="Blue">
-                    <Label Content="Enter Query: " Foreground="DarkBlue"/>
-                    <TextBox x:Name="textboxQuery" Text="" Height="24" Width="200" Background="Beige" FontWeight="Medium"
+                <ToolBar x:Name="barQuery" Band="1" Height="34" Background="{DynamicResource ToolBarTrayBackgroundBrush}" >
+                    <Label Content="Enter Query: " Foreground="{DynamicResource LabelForegroundBrush}"/>
+                    <TextBox x:Name="textboxQuery" Text="" Height="22" Width="200" FontWeight="Medium"
                              IsReadOnly="False" KeyDown="textboxQuery_KeyDown" Tag=""
-                             Style="{StaticResource placeHolder}">
-
+                             FontSize="14"
+                             Foreground="{DynamicResource ComboBox.Static.Foreground}"
+                             Background="{DynamicResource Placeholder.Static.Background}">
                     </TextBox>
                     <Button x:Name="buttonQueryClear" Margin="4 0" Click="buttonQueryClear_Click">
                         <Image Source="/Images/QueryClear.png" />
@@ -476,10 +476,11 @@
                             <ToolTip Content="Save Query"/>
                         </Button.ToolTip>
                     </Button>
-                    <Label Content="Stored Queries:" Margin="20 0 0 0" Foreground="DarkBlue"/>
-                    <ComboBox x:Name="comboboxStoredQueries" Width="200" Margin="10 0" IsEditable="True" FontWeight="Medium"
-                              ToolBar.OverflowMode="AsNeeded"
-                             SelectionChanged="comboboxStoredQueries_SelectionChanged">
+                    <Label Content="Stored Queries:" Margin="20 0 0 0" Foreground="{DynamicResource LabelForegroundBrush}"/>
+                    <ComboBox x:Name="comboboxStoredQueries" Width="200" Margin="10 0" FontWeight="Medium" Foreground="{DynamicResource ComboBox.Static.Foreground}"
+                            ToolBar.OverflowMode="AsNeeded" FontSize="14"
+                            Style="{DynamicResource ComboBoxStyle1}" ItemContainerStyle="{DynamicResource ComboBoxItemStyle1}"
+                            SelectionChanged="comboboxStoredQueries_SelectionChanged">
                     </ComboBox>
                     <Button x:Name="buttonQueryDelete" ToolBar.OverflowMode="AsNeeded" Click="buttonQueryDelete_Click">
                         <Image Source="/Images/QueryDelete.ico" />
@@ -487,13 +488,13 @@
                 </ToolBar>
             </ToolBarTray>
 
-            <DataGrid Grid.Row="1" x:Name="datagrid" ContextMenu="{StaticResource contextmenuDatagrid}"
-                      DockPanel.Dock="Right" VerticalAlignment="Stretch" Background="LightGray"
+            <DataGrid Grid.Row="1" x:Name="datagrid" ContextMenu="{StaticResource contextmenuDatagrid}" VerticalAlignment="Stretch" Background="LightGray"
                       CanUserSortColumns="True" ScrollViewer.VerticalScrollBarVisibility="Visible" AllowDrop="True"
-                      AlternationCount="1" RowBackground="{StaticResource RowBackgroundBrush}"
-                      AlternatingRowBackground="{StaticResource AlternatingRowBackgroundBrush}"
-                      IsReadOnly="True" SelectionMode="Single" ColumnHeaderStyle="{StaticResource datagridHeaderStyle}"
-                      SelectionChanged="datagrid_SelectionChanged" ScrollViewer.ScrollChanged="datagrid_ScrollChanged">
+                      AlternationCount="1" RowBackground="{DynamicResource RowBackgroundBrush}"
+                      AlternatingRowBackground="{DynamicResource AlternatingRowBackgroundBrush}"
+                      IsReadOnly="True" SelectionMode="Single" 
+                      SelectionChanged="datagrid_SelectionChanged" ScrollViewer.ScrollChanged="datagrid_ScrollChanged"
+                      PreviewMouseRightButtonDown="datagrid_PreviewMouseRightButtonDown" Grid.ColumnSpan="2">
 
                 <DataGrid.RowValidationRules>
                     <local:FileExistValidationRule/>

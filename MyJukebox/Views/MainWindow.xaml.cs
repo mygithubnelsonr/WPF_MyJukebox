@@ -4,10 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -24,8 +26,17 @@ namespace MyJukeboxWMPDapper
     /// v2.2.5.0  06.06.2021  Refactoring: Seperate Statusbar for Audio, Playlist and Query
     /// v2.2.5.1  12.06.2021  datagrid: make selected row visible (center if possible) 
     /// v2.2.5.2  17.06.2021  Refactoring: Implement saveing catalog lastrow per album
-    /// v2.2.5.3  18.06.2021  Implement catalog LastArtist
-    /// v2.2.5.4  21.06.2021  showing title in formheader
+    /// v2.2.5.3  18.06.2021  Implement: catalog LastArtist
+    /// v2.2.5.4  21.06.2021  Implement: show title in formheader
+    /// v2.2.5.5  22.06.2021  implement: Autosized Listboxes
+    /// v2.2.5.6  13.08.2021  implement: Play Pause when Spacebar is pressed
+    /// v2.2.5.7  24.08.2021  implement: continue playing when Spacebar is pressed again (toggle)
+    /// v2.2.5.8  26.08.2021  Bugfix: Stop and Message when filetype is '.m3u'
+    /// v2.2.5.9  02.09.2021  Implement: Copy Celltext to Clipboard
+    /// v2.2.5.10 07.09.2021  Implement: Open Browser with URL
+    /// v2.2.5.11 13.09.2021  Bugfix: Set lastrow on textblockRowSelected when query loaded
+    /// v2.2.5.12 17.09.2021  Implement: Add Slider Tooltip volume in percentage
+    /// v2.2.6.1  30.09.2021  Implement: Combobox/Item Style
     /// </summary>
 
     public partial class MainWindow : Window
@@ -50,6 +61,7 @@ namespace MyJukeboxWMPDapper
         private string _lastPlaylist = "";
         private string _lastQuery = "";
         private string _artist = "";
+        private string _cellvalue = "";
 
         private int _firstVisibleRow = 0;
         private int _lastVisibleRow = 0;
@@ -75,6 +87,8 @@ namespace MyJukeboxWMPDapper
         public MainWindow()
         {
             InitializeComponent();
+
+            DynamicLoadStyles("Brown");
 
             InitMediaPlayer();
 
@@ -106,15 +120,6 @@ namespace MyJukeboxWMPDapper
             AudioStates.Genre = GetSetData.GetSetting("LastGenre");
             _lastGenreID = Convert.ToInt32(GetSetData.GetSetting("LastGenreID"));
 
-            //AudioStates.Catalog = GetSetData.GetLastCatalog(AudioStates.Genre);
-            //_lastCatalogID = GetSetData.GetLastCatalogID(AudioStates.Genre);
-            //AudioStates.Album = GetSetData.GetSetting("LastAlbum");
-
-            //AudioStates.Artist = GetSetData.GetSetting("LastArtist");
-
-            //_lastAlbumID = Convert.ToInt32(GetSetData.GetSetting("LastAlbumID"));
-            //_lastRow = Convert.ToInt32(GetSetData.GetSetting("LastRow"));
-
             _lastTab = Convert.ToInt32(GetSetData.GetSetting("LastTab"));
             _lastPlaylistID = Convert.ToInt32(GetSetData.GetSetting("LastPlaylistID"));
             _lastPlaylist = GetSetData.GetSetting("LastPlaylist");
@@ -128,6 +133,9 @@ namespace MyJukeboxWMPDapper
             statusVersion.Text = "v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             expanderLeftPanel.IsExpanded = Convert.ToBoolean(GetSetData.GetSetting("LeftPanel"));
             textboxQuery.Tag = GetSetData.GetSetting("PlaceHolder");
+            sliderVolume.Value = 15;
+            sliderVolume.ToolTip = $"{(int)sliderVolume.Value}%";
+
             #endregion
         }
         #endregion
@@ -182,24 +190,32 @@ namespace MyJukeboxWMPDapper
 
                 var record = (vSongModel)datagrid.SelectedItem;
                 rootFolder = Helpers.GetShortPath(record.Path);
+                _fullpath = $"{record.Path}\\{record.FileName}";
                 _artist = record.Artist;
+
                 _dataLoaded = true;
+
             }
 
             statusGenre.Text = AudioStates.Genre;
             statusCatalog.Text = AudioStates.Catalog;
             statusArtist.Text = AudioStates.Artist;
             statusAlbum.Text = AudioStates.Album;
-            //sliderVolume.Value = Convert.ToDouble(SettingsDb.Settings["Volume"]);
 
             ImageFlipperLoad(rootFolder + "\\" + AudioStates.Genre, _isLoaded);
-
+            wmp.settings.volume = (int)sliderVolume.Value;
             _isLoaded = true;
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_KeyUp(object sender, KeyEventArgs e)
         {
-            //SaveSettings();
+            if (e.Key == Key.Space)
+            {
+                if (_isPlaying)
+                    Playback_Pause();
+                else if (_isPaused)
+                    Playback_Play();
+            }
         }
 
         private void Move_Window(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -265,6 +281,16 @@ namespace MyJukeboxWMPDapper
             datagrid.SelectionMode = DataGridSelectionMode.Extended;
         }
 
+        private void menuThemeBlue_Click(object sender, RoutedEventArgs e)
+        {
+            DynamicLoadStyles("Blue");
+        }
+
+        private void menuThemeBrown_Click(object sender, RoutedEventArgs e)
+        {
+            DynamicLoadStyles("Brown");
+        }
+
         private void menuToolsTest1_Click(object sender, RoutedEventArgs e)
         {
             //ScrollToCenter();
@@ -302,6 +328,62 @@ namespace MyJukeboxWMPDapper
                 FillDatagridByTabAudio();
             else
                 FillDatagridByTabPlaylist();
+        }
+
+        private void expanderGenre_Expanded(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+
+            listboxGenres.Height = Double.NaN;
+            rdgenre.Height = new GridLength(1, GridUnitType.Star);
+        }
+
+        private void expanderGenre_Collapsed(object sender, RoutedEventArgs e)
+        {
+            listboxGenres.Height = 0;
+            rdgenre.Height = new GridLength(1, GridUnitType.Auto);
+        }
+
+        private void expanderCatalog_Expanded(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+
+            listboxCatalogs.Height = Double.NaN;
+            rdcatalog.Height = new GridLength(1, GridUnitType.Star);
+        }
+
+        private void expanderCatalog_Collapsed(object sender, RoutedEventArgs e)
+        {
+            listboxCatalogs.Height = 0;
+            rdcatalog.Height = new GridLength(1, GridUnitType.Auto);
+        }
+
+        private void expanderAlbum_Expanded(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+
+            listboxAlbums.Height = Double.NaN;
+            rdalbum.Height = new GridLength(1, GridUnitType.Star);
+        }
+
+        private void expanderAlbum_Collapsed(object sender, RoutedEventArgs e)
+        {
+            listboxAlbums.Height = 0;
+            rdalbum.Height = new GridLength(1, GridUnitType.Auto);
+        }
+
+        private void expanderArtist_Expanded(object sender, RoutedEventArgs e)
+        {
+            if (!_isLoaded) return;
+
+            listboxArtists.Height = Double.NaN;
+            rdartist.Height = new GridLength(1, GridUnitType.Star);
+        }
+
+        private void expanderArtist_Collapsed(object sender, RoutedEventArgs e)
+        {
+            listboxArtists.Height = 0;
+            rdartist.Height = new GridLength(1, GridUnitType.Auto);
         }
 
         private void listboxGenres_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -511,9 +593,6 @@ namespace MyJukeboxWMPDapper
             wmp = formsHost.Child as AxWMPLib.AxWindowsMediaPlayer;
             wmp.uiMode = "none";
             wmp.settings.autoStart = false;
-            wmp.settings.volume = 0;
-            //player.settings.setMode("loop", false);
-            //player.stretchToFit = true;
             wmp.enableContextMenu = false;
             wmp.AllowDrop = true;
             wmp.ErrorEvent += new EventHandler(player_ErrorEvent);
@@ -523,12 +602,12 @@ namespace MyJukeboxWMPDapper
 
         void player_ErrorEvent(object sender, EventArgs e)
         {
-            //textblockStatus.Text = "An error occured while trying to play the video.";
+            MessageBox.Show("An error occured while trying to play the video.");
         }
 
         void player_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
         {
-            Debug.Print($"PlayStateChange: newState={WMPStatesText.Playstate(e.newState)}");
+            //Debug.Print($"PlayStateChange: newState={WMPStatesText.Playstate(e.newState)}");
 
             if (e.newState == (int)WMPLib.WMPPlayState.wmppsMediaEnded)
             {
@@ -538,7 +617,6 @@ namespace MyJukeboxWMPDapper
             if (e.newState == (int)WMPLib.WMPPlayState.wmppsStopped)
             {
                 timerDuration.Stop();
-
                 if (_isStoped == false)
                 {
                     Dispatcher.BeginInvoke(new Action(() => Playback_Next()));
@@ -547,9 +625,7 @@ namespace MyJukeboxWMPDapper
             }
 
             if (e.newState == (int)WMPLib.WMPPlayState.wmppsPaused)
-            {
                 _isPaused = true;
-            }
 
             if (e.newState == (int)WMPLib.WMPPlayState.wmppsPlaying)
             {
@@ -680,6 +756,9 @@ namespace MyJukeboxWMPDapper
                     datagrid.SelectedIndex = _lastRow;
                     datagrid.SelectedItem = _lastRow;
                     datagrid.ScrollIntoView(datagrid.SelectedItem);
+
+                    var row = datagrid.Items.IndexOf(datagrid.SelectedItem);
+                    textblockRowSelected.Text = (row + 1).ToString();
 
                     random.InitRandomNumbers(datagrid.Items.Count - 1);
                 }
@@ -930,13 +1009,43 @@ namespace MyJukeboxWMPDapper
                     {
                         int index = datagrid.SelectedIndex;
                         int offset = (_lastVisibleRow - _firstVisibleRow) / 2;
-                        //Debug.Print($"index:{index}, firstVisibleRow:{_firstVisibleRow}, lasteVisibleRow:{_lastVisibleRow}, offset:{offset}, scroll:{_lastVisibleRow - offset}");
                         if (index > _lastVisibleRow - 4)
                         {
                             scroll.ScrollToVerticalOffset(_lastVisibleRow - offset + 4);
                         }
                     }
                 }
+            }
+        }
+
+        private void DynamicLoadStyles(string text)
+        {
+            string fileName;
+
+            if (text == "None")
+            {
+                // Clear any previous dictionaries loaded
+                Resources.MergedDictionaries.Clear();
+            }
+            else
+            {
+                fileName = Environment.CurrentDirectory + @"\ResourceDictionarys\" + text + ".xaml";
+
+                if (File.Exists(fileName))
+                {
+                    using (FileStream fs = new FileStream(fileName, FileMode.Open))
+                    {
+                        // Read in ResourceDictionary File
+                        ResourceDictionary dic = (ResourceDictionary)XamlReader.Load(fs);
+                        // Clear any previous dictionaries loaded
+                        Resources.MergedDictionaries.Clear();
+                        // Add in newly loaded Resource Dictionary
+                        Resources.MergedDictionaries.Add(dic);
+                    }
+                }
+                else
+                    MessageBox.Show("File: " + text +
+                       " does not exist. Please re-enter the name.");
             }
         }
 
@@ -994,7 +1103,6 @@ namespace MyJukeboxWMPDapper
         {
             _firstVisibleRow = (int)e.VerticalOffset;
             _lastVisibleRow = (int)e.VerticalOffset + (int)e.ViewportHeight;
-            // Debug.Print($"datagrid_ScrollChanged: firstRow={_firstVisibleRow}, lastRow={_lastVisibleRow}");
         }
 
         #endregion
@@ -1005,6 +1113,7 @@ namespace MyJukeboxWMPDapper
             if (_dataLoaded)
             {
                 wmp.settings.volume = (int)sliderVolume.Value;
+                sliderVolume.ToolTip = $"{(int)sliderVolume.Value}%";
             }
         }
         private void sliderVolume_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -1240,6 +1349,14 @@ namespace MyJukeboxWMPDapper
             if (_isLastDgRow)
                 return;
 
+            int m3u = _fullpath.IndexOf(".m3u");
+            if (m3u > -1)
+            {
+                Playback_Stop();
+                MessageBox.Show("Can not play m3u file!", "FILE ERROR");
+                return;
+            }
+
             if (_isPaused == false)
             {
                 wmp.URL = _fullpath;
@@ -1275,7 +1392,6 @@ namespace MyJukeboxWMPDapper
             {
                 datagrid.SelectedIndex = nextindex;
                 datagrid.SelectedItem = nextindex;
-                // datagrid.ScrollIntoView(datagrid.SelectedItem);
                 ScrollToCenter();
 
                 _fullpath = GetSongPath();
@@ -1290,6 +1406,7 @@ namespace MyJukeboxWMPDapper
             {
                 wmp.Ctlcontrols.pause();
                 _isPaused = true;
+                _isPlaying = false;
                 timerDuration.Stop();
                 timerFlipImage.Stop();
             }
@@ -1493,18 +1610,6 @@ namespace MyJukeboxWMPDapper
         {
             try
             {
-                //if (_lastTab == (int)Tab.Audio)
-                //{
-                //    var rowlist = (vSongModel)datagrid.SelectedItem;
-                //    Process.Start(rowlist.Path);
-                //}
-
-                //if (_lastTab == (int)Tab.Playlist)
-                //{
-                //    var rowlist = (vSongModel)datagrid.SelectedItem;
-                //    Process.Start(rowlist.Path);
-                //}
-
                 var rowlist = (vSongModel)datagrid.SelectedItem;
                 Process.Start(rowlist.Path);
 
@@ -1512,9 +1617,18 @@ namespace MyJukeboxWMPDapper
             catch { }
         }
 
+        private void datagrid_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Point p = e.GetPosition(datagrid);
+            TextBlock info = (TextBlock)datagrid.InputHitTest(p);
+            _cellvalue = info.Text;
+            //Debug.Print(_cellvalue);
+        }
+
         private void datagridMenuitemCopyCell_Click(object sender, RoutedEventArgs e)
         {
-
+            Clipboard.Clear();
+            Clipboard.SetText(_cellvalue);
         }
 
         private void contextmenuDatagridRemoveFromAudio_Click(object sender, RoutedEventArgs e)
@@ -1628,7 +1742,23 @@ namespace MyJukeboxWMPDapper
                 timerEditor.Stop();
             }
         }
+
         #endregion
+
+        private void datagridMenuitemOpenBrowser_Click(object sender, RoutedEventArgs e)
+        {
+            string token = _cellvalue.Replace(" ", "+");
+            string url = "https://www.google.de/search?q=" + token;
+            System.Diagnostics.Process.Start(url);
+        }
+
+        private void sliderPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            string tooltip = $"{(int)sliderPosition.Value}%";
+            Debug.Print(tooltip);
+            sliderPosition.ToolTip = tooltip;
+        }
+
 
     }
 }
