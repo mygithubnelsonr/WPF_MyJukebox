@@ -231,20 +231,21 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
-        public static async void RefillTableAlbums()
+        //public static async void RefillTableAlbums()
+        public static void RefillTableAlbums()
         {
-            using (IDbConnection conn = new SqlConnection(_connectionstring))
-            {
-                try
-                {
-                    string sql = "[dbo].[spMyJukebox_FillAlbums]";
-                    await conn.ExecuteAsync(sql, commandType: CommandType.StoredProcedure);
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
+            //using (IDbConnection conn = new SqlConnection(_connectionstring))
+            //{
+            //    try
+            //    {
+            //        string sql = "[dbo].[spMyJukebox_FillAlbums]";
+            //        await conn.ExecuteAsync(sql, commandType: CommandType.StoredProcedure);
+            //    }
+            //    catch (Exception)
+            //    {
+            //        throw;
+            //    }
+            //}
         }
 
         public static int GetAlbumLastRow(string name)
@@ -872,7 +873,6 @@ namespace MyJukeboxWMPDapper.DataAccess
                 }
             }
         }
-
 
         public static List<string> GetSongPathList()
         {

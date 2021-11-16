@@ -12,7 +12,7 @@
 
     <DockPanel Margin="10 10 10 0">
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Close" Style="{StaticResource designButton}" Command="ApplicationCommands.Close"/>
+            <Button Content="Close" Style="{DynamicResource DesignButton}" Command="ApplicationCommands.Close"/>
         </StackPanel>
         <Grid Background="#FF02123C">
             <ScrollViewer VerticalScrollBarVisibility="Auto">

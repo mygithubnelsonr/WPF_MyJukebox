@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resourcedictionarys/blue.xaml")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resourcedictionarys/brown.xaml")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resourcedictionaries/blue.xaml")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resourcedictionaries/brown.xaml")]
 
 

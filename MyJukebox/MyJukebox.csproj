@@ -129,7 +129,8 @@
       <DependentUpon>MyMessageBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="WMPPlaystatesText.cs" />
-    <Content Include="ResourceDictionarys\Blue.xaml">
+    <Resource Include="Images\SplashBlue.png" />
+    <Content Include="ResourceDictionaries\Blue.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -138,9 +139,9 @@
     <Resource Include="Images\einfuegen.png" />
     <Resource Include="Images\kopieren.png" />
     <Resource Include="Images\loeschen.png" />
-    <Resource Include="Images\Splash.png" />
+    <Resource Include="Images\SplashBrown.png" />
     <Resource Include="Images\MyLogo.jpg" />
-    <Content Include="ResourceDictionarys\Brown.xaml">
+    <Content Include="ResourceDictionaries\Brown.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

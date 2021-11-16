@@ -4,11 +4,26 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Windows.Input;
 
 namespace MyJukeboxWMPDapper.Common
 {
     public class Helpers
     {
+        public static List<string> GetThemesNames()
+        {
+            // Read Theme Filenames
+            string themedir = Environment.CurrentDirectory + @"\ResourceDictionaries\";
+            List<string> themNames = new List<string>();
+            DirectoryInfo di = new DirectoryInfo(themedir);
+            var files = di.GetFiles();
+
+            foreach (var f in files)
+                themNames.Add(f.Name);
+
+            return themNames;
+        }
+
         public static string GetContainer(string path)
         {
             string container = "";
@@ -56,6 +71,8 @@ namespace MyJukeboxWMPDapper.Common
 
         public static void CheckSongPathExist()
         {
+            Mouse.OverrideCursor = Cursors.Wait;
+
             List<string> notValidPath = new List<string>();
             Views.MyMessageBox messageBox = new Views.MyMessageBox();
 
@@ -89,9 +106,10 @@ namespace MyJukeboxWMPDapper.Common
                 messageBox.MMessage = $"All path are valid.";
             }
 
+            Mouse.OverrideCursor = Cursors.Arrow;
+
             messageBox.MTitle = "Check Song Path";
             messageBox.ShowDialog();
-
         }
 
         public static bool CheckSongPathExistAsync()

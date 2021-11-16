@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using MyJukeboxWMPDapper.DataAccess;
+using System.Windows;
 
 namespace MyJukeboxWMPDapper
 {
@@ -9,7 +10,10 @@ namespace MyJukeboxWMPDapper
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            SplashScreen splash = new SplashScreen("Images/Splash.png");
+            string theme = GetSetData.GetSetting("Theme");
+            string image = $"Images/Splash{theme.Replace(".xaml","")}.png";
+
+            SplashScreen splash = new SplashScreen(image);
             splash.Show(true, true);
 
             base.OnStartup(e);

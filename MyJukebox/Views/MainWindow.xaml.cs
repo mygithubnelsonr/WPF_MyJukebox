@@ -3,9 +3,12 @@ using MyJukeboxWMPDapper.DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -37,6 +40,7 @@ namespace MyJukeboxWMPDapper
     /// v2.2.5.11 13.09.2021  Bugfix: Set lastrow on textblockRowSelected when query loaded
     /// v2.2.5.12 17.09.2021  Implement: Add Slider Tooltip volume in percentage
     /// v2.2.6.1  30.09.2021  Implement: Combobox/Item Style
+    /// v2.2.6.2  02.10.2021  Implement: Meun/Item Style + Bugfix Position %age
     /// </summary>
 
     public partial class MainWindow : Window
@@ -47,6 +51,8 @@ namespace MyJukeboxWMPDapper
         private ObservableCollection<PlaylistModel> _playlists;
         private List<string> _artistImageList;
         internal List<string> listTitles = new List<string>();
+
+        private object _datasource = null;
 
         private bool _isLoaded = false;
         private bool _dataLoaded = false;
@@ -79,6 +85,7 @@ namespace MyJukeboxWMPDapper
         private DispatcherTimer timerFlipImage;
         private DispatcherTimer timerEditor;
 
+        private string _theme = "";
         #endregion
 
         public static bool processEnded = false;
@@ -88,7 +95,8 @@ namespace MyJukeboxWMPDapper
         {
             InitializeComponent();
 
-            DynamicLoadStyles("Brown");
+            _theme = GetSetData.GetSetting("Theme");
+            DynamicLoadStyles(_theme);
 
             InitMediaPlayer();
 
@@ -151,6 +159,8 @@ namespace MyJukeboxWMPDapper
         {
             string rootFolder = "";
 
+            FillThemesMenu();
+
             GetSetData.RefillTableAlbums();
 
             // initialize LbGenres then fill LbCatalogs then fill LbAlbums then fill LbAtrists
@@ -205,6 +215,34 @@ namespace MyJukeboxWMPDapper
             ImageFlipperLoad(rootFolder + "\\" + AudioStates.Genre, _isLoaded);
             wmp.settings.volume = (int)sliderVolume.Value;
             _isLoaded = true;
+        }
+
+        private void FillThemesMenu()
+        {
+            List<string> themeNames = Helpers.GetThemesNames();
+
+            // add menu items to existing menu
+            Menu menuMain = (Menu)this.menuMain;
+            MenuItem menuSettings = (MenuItem)menuMain.Items[3];
+
+            foreach (var theme in themeNames)
+            {
+                string themeName = theme.Substring(0, theme.IndexOf("."));
+                MenuItem menuItem = new MenuItem();
+                menuItem.Header = "Set " + themeName + " Theme";
+                menuItem.Tag = theme;
+                menuItem.Click += new RoutedEventHandler(this.menuSettingsTheme_Click);
+                menuSettings.Items.Add(menuItem);
+            }
+        }
+
+        private void menuSettingsTheme_Click(object sender, RoutedEventArgs e)
+        {
+            var menuitem = sender as MenuItem;
+            string theme = (string)menuitem.Tag;
+
+            DynamicLoadStyles(theme);
+            GetSetData.SetSettingGeneral("Theme", theme);
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
@@ -293,12 +331,32 @@ namespace MyJukeboxWMPDapper
 
         private void menuToolsTest1_Click(object sender, RoutedEventArgs e)
         {
-            //ScrollToCenter();
+            // Debug.Print($"column: {e.Column.SortDirection.HasValue}, {e.Column.SortMemberPath},  {e.Column.SortDirection}");
+            
+            //datagrid.Items.SortDescriptions.Add(new SortDescription("ID", ListSortDirection.Ascending));
+            //datagrid.Items.Refresh();
+
+            var performSortMethod = typeof(DataGrid)
+                            .GetMethod("PerformSort",
+                                       BindingFlags.Instance | BindingFlags.NonPublic);
+
+            performSortMethod?.Invoke(datagrid, new[] { datagrid.Columns[0] });
+
+
         }
 
         private void menuToolsTest2_Click(object sender, RoutedEventArgs e)
         {
+            //datagrid.Items.SortDescriptions.Add(new SortDescription("ID", ListSortDirection.Descending));
+            //datagrid.Items.Refresh();
 
+            ObservableCollection<vSongModel> view = new ObservableCollection<vSongModel>();
+
+            List<vSongModel> vSongs = new List<vSongModel>();
+
+            vSongs = (List<vSongModel>)_datasource;
+
+            vSongs.Sort();
         }
 
         private void menuDatabaseCheckPath_Click(object sender, RoutedEventArgs e)
@@ -500,7 +558,7 @@ namespace MyJukeboxWMPDapper
             FillDatagridByTabPlaylist();
         }
 
-        private void contextmenuPlaylistAdd_Click(object sender, RoutedEventArgs e)
+        private void ContextmenuPlaylistAdd_Click(object sender, RoutedEventArgs e)
         {
             Views.InputBox inputBox = new Views.InputBox();
             inputBox.ITitle = "New Playlist";
@@ -546,7 +604,7 @@ namespace MyJukeboxWMPDapper
             }
         }
 
-        private void contextmenuPlaylistRename_Click(object sender, RoutedEventArgs e)
+        private void ContextmenuPlaylistRename_Click(object sender, RoutedEventArgs e)
         {
             var playlist = (PlaylistModel)listboxPlaylists.SelectedItem;
             int index = listboxPlaylists.SelectedIndex;
@@ -631,7 +689,7 @@ namespace MyJukeboxWMPDapper
             {
                 _isPlaying = true;
                 sliderPosition.Maximum = (int)wmp.currentMedia.duration;
-                progressBarPosition.Maximum = sliderPosition.Maximum = wmp.currentMedia.duration;
+                progressBarPosition.Maximum = sliderPosition.Maximum;
                 sliderPosition.TickFrequency = sliderPosition.Maximum / 10;
                 statusDuration.Text = TimeSpan.FromSeconds(sliderPosition.Maximum).ToString(@"mm\:ss");
             }
@@ -683,10 +741,10 @@ namespace MyJukeboxWMPDapper
 
                 if (datagrid.Items.Count > 0)
                 {
-                    if (datagrid.Items.Count % 2 == 0)
-                        datagrid.Background = new SolidColorBrush(Color.FromRgb(210, 234, 247));
-                    else
-                        datagrid.Background = new SolidColorBrush(Color.FromRgb(185, 223, 247));
+                    //if (datagrid.Items.Count % 2 == 0)
+                    //    datagrid.Background = new SolidColorBrush(Color.FromRgb(210, 234, 247));
+                    //else
+                    //    datagrid.Background = new SolidColorBrush(Color.FromRgb(185, 223, 247));
 
                     datagrid.SelectedIndex = _lastRow;
                     datagrid.SelectedItem = _lastRow;
@@ -746,6 +804,9 @@ namespace MyJukeboxWMPDapper
             if (textboxQuery.Text != "")
             {
                 var results = GetSetData.GetQueryResult(textboxQuery.Text);
+
+                _datasource = results;
+
                 if (results.Count > 0)
                 {
                     GetSetData.Datasource = GetSetData.DataSourceEnum.Query;
@@ -875,7 +936,7 @@ namespace MyJukeboxWMPDapper
                 albums = GetSetData.GetAlbums(_lastGenreID, _lastCatalogID);
 
             if (albums.Count > 1)
-                albums.Insert(0, new AlbumModel { ID = 0, Name = "Alle", ID_Genre = _lastGenreID, ID_Catalog = _lastCatalogID });
+                albums.Insert(0, new AlbumModel { ID = 0, Name = "Alle", ID_Genre = _lastGenreID, ID_Catalog = _lastCatalogID, IsSampler = false });
 
             listboxAlbums.ItemsSource = albums;
             int index = GetAlbumIndex(AudioStates.Album);
@@ -1029,7 +1090,7 @@ namespace MyJukeboxWMPDapper
             }
             else
             {
-                fileName = Environment.CurrentDirectory + @"\ResourceDictionarys\" + text + ".xaml";
+                fileName = Environment.CurrentDirectory + @"\ResourceDictionaries\" + text;
 
                 if (File.Exists(fileName))
                 {
@@ -1104,6 +1165,11 @@ namespace MyJukeboxWMPDapper
             _firstVisibleRow = (int)e.VerticalOffset;
             _lastVisibleRow = (int)e.VerticalOffset + (int)e.ViewportHeight;
         }
+        
+        private void datagrid_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            Debug.Print($"column: {e.Column.SortDirection.HasValue}, {e.Column.SortMemberPath},  {e.Column.SortDirection}");
+        }
 
         #endregion
 
@@ -1140,6 +1206,14 @@ namespace MyJukeboxWMPDapper
 
             sliderPosition.Value += pos;
             wmp.Ctlcontrols.currentPosition = sliderPosition.Value;
+        }
+
+        private void sliderPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            double p1 = sliderPosition.Maximum / 100;
+            double p2 = sliderPosition.Value / p1;
+            string tooltip = $"{(int)p2}%";
+            sliderPosition.ToolTip = tooltip;
         }
 
         #endregion
@@ -1253,6 +1327,7 @@ namespace MyJukeboxWMPDapper
         private void Play_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Debug.Print("Play_Executed");
+            _isPlaying = true;
             _firstPlay = false;
             _isStoped = false;
 
@@ -1270,6 +1345,7 @@ namespace MyJukeboxWMPDapper
         private void Pause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = _isPlaying;
+            //Debug.Print($"{_isPlaying}");
         }
 
         private void Pause_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1476,7 +1552,7 @@ namespace MyJukeboxWMPDapper
                 MenuItem menuItem = new MenuItem();
                 menuItem.Header = playlist.Name;
                 menuItem.Tag = playlist.ID;
-                menuItem.Click += new RoutedEventHandler(this.contextmenuDatagridSendtoPlaylist_Click);
+                menuItem.Click += new RoutedEventHandler(this.ContextmenuDatagridSendtoPlaylist_Click);
                 miSendto.Items.Add(menuItem);
             }
 
@@ -1486,7 +1562,7 @@ namespace MyJukeboxWMPDapper
 
             MenuItem miRemove = new MenuItem();
             miRemove.Header = "Remove";
-            miRemove.Click += new RoutedEventHandler(this.contextmenuDatagridRemoveFromAudio_Click);
+            miRemove.Click += new RoutedEventHandler(this.ContextmenuDatagridRemoveFromAudio_Click);
             contextmenu.Items.Insert(1, miRemove);
         }
 
@@ -1503,7 +1579,7 @@ namespace MyJukeboxWMPDapper
                 MenuItem menuItem = new MenuItem();
                 menuItem.Header = playlist.Name;
                 menuItem.Tag = playlist.ID;
-                menuItem.Click += new RoutedEventHandler(this.contextmenuDatagridMovetoPlaylist_Click);
+                menuItem.Click += new RoutedEventHandler(this.ContextmenuDatagridMovetoPlaylist_Click);
                 miSendto.Items.Add(menuItem);
             }
 
@@ -1513,11 +1589,11 @@ namespace MyJukeboxWMPDapper
 
             MenuItem miRemove = new MenuItem();
             miRemove.Header = "Remove";
-            miRemove.Click += new RoutedEventHandler(this.contextmenuDatagridRemoveFromPlaylist_Click);
+            miRemove.Click += new RoutedEventHandler(this.ContextmenuDatagridRemoveFromPlaylist_Click);
             contextmenu.Items.Insert(1, miRemove);
         }
 
-        private void contextmenuDatagridMovetoPlaylist_Click(object sender, RoutedEventArgs e)
+        private void ContextmenuDatagridMovetoPlaylist_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -1544,7 +1620,7 @@ namespace MyJukeboxWMPDapper
             }
         }
 
-        private void contextmenuDatagridSendtoPlaylist_Click(object sender, RoutedEventArgs e)
+        private void ContextmenuDatagridSendtoPlaylist_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -1565,7 +1641,14 @@ namespace MyJukeboxWMPDapper
             }
         }
 
-        private void datagridMenuitemOpenEditor_Click(object sender, RoutedEventArgs e)
+        private void ContextmenuDatagridOpenBrowser_Click(object sender, RoutedEventArgs e)
+        {
+            string token = _cellvalue.Replace(" ", "+");
+            string url = "https://www.google.de/search?q=" + token;
+            System.Diagnostics.Process.Start(url);
+        }
+
+        private void ContextmenuDatagridOpenEditor_Click(object sender, RoutedEventArgs e)
         {
             int _lastRow = datagrid.SelectedIndex;
             processEnded = false;
@@ -1622,16 +1705,15 @@ namespace MyJukeboxWMPDapper
             Point p = e.GetPosition(datagrid);
             TextBlock info = (TextBlock)datagrid.InputHitTest(p);
             _cellvalue = info.Text;
-            //Debug.Print(_cellvalue);
         }
 
-        private void datagridMenuitemCopyCell_Click(object sender, RoutedEventArgs e)
+        private void ContextmenuDatagridCopyCell_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.Clear();
             Clipboard.SetText(_cellvalue);
         }
 
-        private void contextmenuDatagridRemoveFromAudio_Click(object sender, RoutedEventArgs e)
+        private void ContextmenuDatagridRemoveFromAudio_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -1643,7 +1725,12 @@ namespace MyJukeboxWMPDapper
                 }
 
                 datagrid.SelectionMode = DataGridSelectionMode.Single;
-                FillDatagridByTabAudio();
+
+                if (!String.IsNullOrEmpty(_lastQuery))
+                    FillDatagridByQuery();
+                else
+                    FillDatagridByTabAudio();
+
             }
             catch (Exception ex)
             {
@@ -1654,7 +1741,7 @@ namespace MyJukeboxWMPDapper
             }
         }
 
-        private void contextmenuDatagridRemoveFromPlaylist_Click(object sender, RoutedEventArgs e)
+        private void ContextmenuDatagridRemoveFromPlaylist_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -1744,21 +1831,6 @@ namespace MyJukeboxWMPDapper
         }
 
         #endregion
-
-        private void datagridMenuitemOpenBrowser_Click(object sender, RoutedEventArgs e)
-        {
-            string token = _cellvalue.Replace(" ", "+");
-            string url = "https://www.google.de/search?q=" + token;
-            System.Diagnostics.Process.Start(url);
-        }
-
-        private void sliderPosition_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            string tooltip = $"{(int)sliderPosition.Value}%";
-            Debug.Print(tooltip);
-            sliderPosition.ToolTip = tooltip;
-        }
-
 
     }
 }
