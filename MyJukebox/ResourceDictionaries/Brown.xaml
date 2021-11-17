@@ -43,11 +43,9 @@
     <Color x:Key="ButtonSelected">#FF4B290E</Color>
     <SolidColorBrush x:Key="ButtonSelectedBrush" Color="{StaticResource ButtonSelected}"/>
 
-    <Color x:Key="AlternatingRowBackground">#FFD6C4AD</Color>
-    <SolidColorBrush x:Key="AlternatingRowBackgroundBrush" Color="{StaticResource AlternatingRowBackground}"/>
-
-    <Color x:Key="RowBackground">Tan</Color>
-    <SolidColorBrush x:Key="RowBackgroundBrush" Color="{StaticResource RowBackground}"/>
+    <SolidColorBrush x:Key="DatagridBackgroundBrush" Color="#FFD4B795"/>
+    <SolidColorBrush x:Key="AlternatingRowBackgroundBrush" Color="#FFD6C4AD"/>
+    <SolidColorBrush x:Key="RowBackgroundBrush" Color="#FFD2B48C"/>
 
     <Color x:Key="DataGridRow">#FF524B2C</Color>
     <SolidColorBrush x:Key="DataGridRowBrush" Color="{StaticResource DataGridRow}"/>
@@ -342,7 +340,7 @@
         <Setter Property="AlternatingRowBackground" Value="{StaticResource AlternatingRowBackgroundBrush}"/>
         <Setter Property="SelectionMode" Value="Single"/>
         <Setter Property="IsReadOnly" Value="True"/>
-        <Setter Property="Background" Value="#FFB8976B"/>
+        <Setter Property="Background" Value="{StaticResource DatagridBackgroundBrush}"/>
     </Style>
 
     <!-- Style für die Statusbar -->

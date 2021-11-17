@@ -82,6 +82,22 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
+        public static List<AlbumModel> GetAlbumsByGenreID(int genreId)
+        {
+            if (genreId == -1)
+                return null;
+
+            using (IDbConnection conn = new SqlConnection(_connectionstring))
+            {
+                var p = new DynamicParameters();
+                p.Add("@ID_Genre", genreId);
+
+                string sql = "dbo.spMyJukebox_GetAlbumsByGenreID";
+                var albums = conn.Query<AlbumModel>(sql, p, commandType: CommandType.StoredProcedure).ToList();
+                return albums;
+            }
+        }
+
         public static string GetLastCatalog(string genre)
         {
             using (IDbConnection conn = new SqlConnection(_connectionstring))
@@ -124,8 +140,6 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
-
-
         public static string GetLastArtist(string catalog)
         {
             using (IDbConnection conn = new SqlConnection(_connectionstring))
@@ -137,21 +151,13 @@ namespace MyJukeboxWMPDapper.DataAccess
         }
 
 
-        public static List<AlbumModel> GetAlbumsByGenreID(int genreId)
-        {
-            if (genreId == -1)
-                return null;
 
-            using (IDbConnection conn = new SqlConnection(_connectionstring))
-            {
-                var p = new DynamicParameters();
-                p.Add("@ID_Genre", genreId);
 
-                string sql = "dbo.spMyJukebox_GetAlbumsByGenreID";
-                var albums = conn.Query<AlbumModel>(sql, p, commandType: CommandType.StoredProcedure).ToList();
-                return albums;
-            }
-        }
+
+
+
+
+
 
         public static List<vSongModel> GetTitles(int genreID, int catalogID, string album, string artist)
         {

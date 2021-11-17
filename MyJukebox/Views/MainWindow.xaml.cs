@@ -3,8 +3,6 @@ using MyJukeboxWMPDapper.DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -40,7 +38,8 @@ namespace MyJukeboxWMPDapper
     /// v2.2.5.11 13.09.2021  Bugfix: Set lastrow on textblockRowSelected when query loaded
     /// v2.2.5.12 17.09.2021  Implement: Add Slider Tooltip volume in percentage
     /// v2.2.6.1  30.09.2021  Implement: Combobox/Item Style
-    /// v2.2.6.2  02.10.2021  Implement: Meun/Item Style + Bugfix Position %age
+    /// v2.2.6.2  02.10.2021  Implement: Menu/Item Style + Bugfix Position %age
+    /// v2.2.6.3  17.11.2021  Implement: Add Datagrid Background Color to XAML
     /// </summary>
 
     public partial class MainWindow : Window
@@ -332,7 +331,7 @@ namespace MyJukeboxWMPDapper
         private void menuToolsTest1_Click(object sender, RoutedEventArgs e)
         {
             // Debug.Print($"column: {e.Column.SortDirection.HasValue}, {e.Column.SortMemberPath},  {e.Column.SortDirection}");
-            
+
             //datagrid.Items.SortDescriptions.Add(new SortDescription("ID", ListSortDirection.Ascending));
             //datagrid.Items.Refresh();
 
@@ -742,9 +741,17 @@ namespace MyJukeboxWMPDapper
                 if (datagrid.Items.Count > 0)
                 {
                     //if (datagrid.Items.Count % 2 == 0)
-                    //    datagrid.Background = new SolidColorBrush(Color.FromRgb(210, 234, 247));
+                    //{
+                    //    datagrid.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD2B48C"));
+                    //    //datagrid.Background = new SolidColorBrush(Color.FromRgb(210, 234, 247));
+                    //    //datagrid.Background = Application.Current.Resources["RowBackgroundBrush"] as SolidColorBrush;
+                    //}
                     //else
-                    //    datagrid.Background = new SolidColorBrush(Color.FromRgb(185, 223, 247));
+                    //{
+                    //    datagrid.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD6C4AD"));
+                    //    //datagrid.Background = new SolidColorBrush(Color.FromRgb(185, 223, 247));
+                    //    //datagrid.Background = Application.Current.Resources["AlternatingRowBackgroundBrush"] as SolidColorBrush;
+                    //}
 
                     datagrid.SelectedIndex = _lastRow;
                     datagrid.SelectedItem = _lastRow;
@@ -936,7 +943,7 @@ namespace MyJukeboxWMPDapper
                 albums = GetSetData.GetAlbums(_lastGenreID, _lastCatalogID);
 
             if (albums.Count > 1)
-                albums.Insert(0, new AlbumModel { ID = 0, Name = "Alle", ID_Genre = _lastGenreID, ID_Catalog = _lastCatalogID, IsSampler = false });
+                albums.Insert(0, new AlbumModel { ID = 0, Name = "Alle", ID_Genre = _lastGenreID, ID_Catalog = _lastCatalogID, IsSampler = true });
 
             listboxAlbums.ItemsSource = albums;
             int index = GetAlbumIndex(AudioStates.Album);
@@ -970,7 +977,6 @@ namespace MyJukeboxWMPDapper
             listboxArtists.Focus();
 
             statusArtist.Text = AudioStates.Artist;
-
         }
 
         private void FillPlaylists()
@@ -1165,7 +1171,7 @@ namespace MyJukeboxWMPDapper
             _firstVisibleRow = (int)e.VerticalOffset;
             _lastVisibleRow = (int)e.VerticalOffset + (int)e.ViewportHeight;
         }
-        
+
         private void datagrid_Sorting(object sender, DataGridSortingEventArgs e)
         {
             Debug.Print($"column: {e.Column.SortDirection.HasValue}, {e.Column.SortMemberPath},  {e.Column.SortDirection}");
