@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -40,6 +39,7 @@ namespace MyJukeboxWMPDapper
     /// v2.2.6.1  30.09.2021  Implement: Combobox/Item Style
     /// v2.2.6.2  02.10.2021  Implement: Menu/Item Style + Bugfix Position %age
     /// v2.2.6.3  17.11.2021  Implement: Add Datagrid Background Color to XAML
+    /// v2.2.6.4  18.11.2021  Implement: Listbox Albums Tooltip Artist
     /// </summary>
 
     public partial class MainWindow : Window
@@ -335,12 +335,27 @@ namespace MyJukeboxWMPDapper
             //datagrid.Items.SortDescriptions.Add(new SortDescription("ID", ListSortDirection.Ascending));
             //datagrid.Items.Refresh();
 
-            var performSortMethod = typeof(DataGrid)
-                            .GetMethod("PerformSort",
-                                       BindingFlags.Instance | BindingFlags.NonPublic);
+            //var performSortMethod = typeof(DataGrid)
+            //                .GetMethod("PerformSort",
+            //                           BindingFlags.Instance | BindingFlags.NonPublic);
 
-            performSortMethod?.Invoke(datagrid, new[] { datagrid.Columns[0] });
+            //performSortMethod?.Invoke(datagrid, new[] { datagrid.Columns[0] });
 
+
+            List<AlbumModel> albums = new List<AlbumModel>();
+            //List<AlbumModel> albumsTest = new List<AlbumModel>();
+
+            albums = GetSetData.GetAlbums(4, 9);
+
+            //foreach(var item in albums)
+            //{
+            //    if (item.IsSampler == true)
+            //        albumsTest.Add(new AlbumModel { ID = item.ID, Album = item.Album, Artist = "Sampler", ID_Catalog = item.ID_Catalog, ID_Genre = item.ID_Genre, IsSampler = item.IsSampler });
+            //    else
+            //        albumsTest.Add(new AlbumModel { ID = item.ID, Album = item.Album, Artist = item.Artist, ID_Catalog = item.ID_Catalog, ID_Genre = item.ID_Genre, IsSampler = item.IsSampler });
+            //}
+
+            Debug.Print(albums.Count.ToString());
 
         }
 
@@ -509,7 +524,7 @@ namespace MyJukeboxWMPDapper
         {
             var item = (AlbumModel)listboxAlbums.SelectedItem;
 
-            AudioStates.Album = item.Name;
+            AudioStates.Album = item.Album;
             _lastAlbumID = item.ID;
 
             GetSetData.SetCatalogAlbum(_lastCatalogID, AudioStates.Album, _lastAlbumID);
@@ -943,7 +958,7 @@ namespace MyJukeboxWMPDapper
                 albums = GetSetData.GetAlbums(_lastGenreID, _lastCatalogID);
 
             if (albums.Count > 1)
-                albums.Insert(0, new AlbumModel { ID = 0, Name = "Alle", ID_Genre = _lastGenreID, ID_Catalog = _lastCatalogID, IsSampler = true });
+                albums.Insert(0, new AlbumModel { ID = 0, Album = "Alle", ID_Genre = _lastGenreID, ID_Catalog = _lastCatalogID, IsSampler = true });
 
             listboxAlbums.ItemsSource = albums;
             int index = GetAlbumIndex(AudioStates.Album);
@@ -1025,7 +1040,7 @@ namespace MyJukeboxWMPDapper
             foreach (AlbumModel c in listboxAlbums.Items)
             {
                 listindex += 1;
-                if (c.Name == album)
+                if (c.Album == album)
                     break;
             }
             return listindex;

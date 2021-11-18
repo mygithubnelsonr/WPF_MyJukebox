@@ -334,7 +334,7 @@
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
                                                 <Image Source="/Images/album.ico" Width="20" Height="20" Margin="0,0,20,0" />
-                                                <TextBlock Text="{Binding Path=Name}"/>
+                                                <TextBlock Text="{Binding Path=Album}" ToolTipService.ToolTip="{Binding Path=Artist}"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>

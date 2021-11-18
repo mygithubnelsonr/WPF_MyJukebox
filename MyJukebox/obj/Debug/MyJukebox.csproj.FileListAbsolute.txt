@@ -162,4 +162,3 @@ A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_Themes\MyJukebox\obj\Debug\M
 A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_Themes\MyJukebox\obj\Debug\App.baml
 A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_Themes\MyJukebox\bin\Debug\ResourceDictionaries\Blue.xaml
 A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_Themes\MyJukebox\bin\Debug\ResourceDictionaries\Brown.xaml
-A:\Source\Repos\90_Work\03_WPF\MyTools\MyJukeboxWPF_Themes\MyJukebox\bin\Debug\WmpFormsLib.pdb

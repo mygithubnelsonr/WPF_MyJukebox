@@ -82,6 +82,23 @@ namespace MyJukeboxWMPDapper.DataAccess
             }
         }
 
+        //public static List<AlbumModel> GetAlbumsTest(int genreId, int catalogId)
+        //{
+        //    if (genreId == -1 || catalogId == -1)
+        //        return null;
+
+        //    using (IDbConnection conn = new SqlConnection(_connectionstring))
+        //    {
+        //        var p = new DynamicParameters();
+        //        p.Add("@ID_Genre", genreId);
+        //        p.Add("@ID_Catalog", catalogId);
+
+        //        string sql = "dbo.spMyJukebox_GetAlbumsTest";
+        //        var albums = conn.Query<AlbumModel>(sql, p, commandType: CommandType.StoredProcedure).ToList();
+        //        return albums;
+        //    }
+        //}
+
         public static List<AlbumModel> GetAlbumsByGenreID(int genreId)
         {
             if (genreId == -1)
